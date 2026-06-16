@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
+const BACKEND_URL = '';
 
 // TypeScript Interfaces
 export interface RecoveryTimeline {
@@ -318,46 +318,25 @@ const client = axios.create({
 
 export const diseaseApi = {
   getDiseaseCategories: async (): Promise<DiseaseResponse<DiseaseCategory[]>> => {
-    try {
-      const res = await client.get('/disease-categories');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /disease-categories failed. Using local fallback.');
-      return { data: MOCK_DISEASE_CATEGORIES, isFallback: true, error: err.message };
-    }
+      return { data: MOCK_DISEASE_CATEGORIES, isFallback: true };
   },
 
   getDiseases: async (): Promise<DiseaseResponse<Disease[]>> => {
-    try {
-      const res = await client.get('/diseases');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /diseases failed. Using local fallback.');
-      return { data: MOCK_DISEASES, isFallback: true, error: err.message };
-    }
+      return { data: MOCK_DISEASES, isFallback: true };
   },
 
   getDiseaseById: async (id: string): Promise<DiseaseResponse<Disease | undefined>> => {
-    try {
-      const res = await client.get(`/diseases/${id}`);
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn(`API /diseases/${id} failed. Using local fallback.`);
       const found = MOCK_DISEASES.find(d => d.id === id || d.slug === id);
-      return { data: found, isFallback: true, error: err.message };
-    }
+      return { data: found, isFallback: true };
   },
 
   getPopularDiseases: async (): Promise<DiseaseResponse<Disease[]>> => {
-    try {
-      const res = await client.get('/popular-diseases');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /popular-diseases failed. Using local fallback.');
       const popular = MOCK_DISEASES.filter(d => 
         ["diabetes", "pcos", "arthritis", "migraine", "psoriasis"].includes(d.slug)
       );
-      return { data: popular, isFallback: true, error: err.message };
-    }
+      return { data: popular, isFallback: true };
   }
 };
+
+
+

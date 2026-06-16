@@ -1,8 +1,5 @@
-import axios from 'axios';
 import { DoctorFullProfile } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
-const client = axios.create({ baseURL: BACKEND_URL, timeout: 1500 });
 
 export const MOCK_DOCTOR_FULL_PROFILE: DoctorFullProfile = {
   id: 'dr-1',
@@ -32,22 +29,15 @@ export const MOCK_DOCTOR_FULL_PROFILE: DoctorFullProfile = {
 
 export const doctorProfileApi = {
   async getProfile(): Promise<{ data: DoctorFullProfile; isFallback: boolean }> {
-    try {
-      const res = await client.get('/doctor/profile');
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: MOCK_DOCTOR_FULL_PROFILE, isFallback: true };
-    }
   },
 
   async updateProfile(profileData: Partial<DoctorFullProfile>): Promise<{ data: DoctorFullProfile; isFallback: boolean }> {
-    try {
-      const res = await client.put('/doctor/profile', profileData);
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: { ...MOCK_DOCTOR_FULL_PROFILE, ...profileData }, isFallback: true };
-    }
   }
 };
 
 export default doctorProfileApi;
+
+
+

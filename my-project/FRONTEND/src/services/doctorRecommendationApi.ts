@@ -1,8 +1,6 @@
-import axios from 'axios';
 import { Doctor } from '../types';
 import { MOCK_DOCTORS } from './apiService';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
 
 export interface DoctorRecommendationResponse<T> {
   data: T;
@@ -10,18 +8,9 @@ export interface DoctorRecommendationResponse<T> {
   error?: string;
 }
 
-const client = axios.create({
-  baseURL: BACKEND_URL,
-  timeout: 1500
-});
 
 export const doctorRecommendationApi = {
   getRecommendedDoctors: async (treatmentId: string): Promise<DoctorRecommendationResponse<Doctor[]>> => {
-    try {
-      const res = await client.get(`/treatments/${treatmentId}/doctors`);
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn(`API /treatments/${treatmentId}/doctors failed, using fallback data. Error:`, err.message);
       
       // Filter MOCK_DOCTORS using local rule matching
       const idStr = treatmentId.toLowerCase();
@@ -49,9 +38,12 @@ export const doctorRecommendationApi = {
       });
 
       const fallback = matched.length > 0 ? matched.slice(0, 6) : MOCK_DOCTORS.slice(0, 6);
-      return { data: fallback, isFallback: true, error: err.message };
-    }
+      return { data: fallback, isFallback: true };
   }
 };
 
 export default doctorRecommendationApi;
+
+
+
+

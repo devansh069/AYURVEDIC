@@ -1,12 +1,6 @@
-import axios from 'axios';
 import { LabReport, TreatmentHistory, ApiResponse } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
 
-const client = axios.create({
-  baseURL: BACKEND_URL,
-  timeout: 1500
-});
 
 // Offline Sandbox Local Fallbacks
 const MOCK_LAB_REPORTS_LOCAL: LabReport[] = [
@@ -68,24 +62,16 @@ const MOCK_TREATMENT_HISTORY_LOCAL: TreatmentHistory[] = [
 
 export const labReportApi = {
   getLabReports: async (): Promise<ApiResponse<LabReport[]>> => {
-    try {
-      const res = await client.get('/lab-tests');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /lab-tests failed, using local fallback. Error:', err.message);
-      return { data: MOCK_LAB_REPORTS_LOCAL, isFallback: true, error: err.message };
-    }
+      return { data: MOCK_LAB_REPORTS_LOCAL, isFallback: true };
   },
 
   getTreatmentHistory: async (): Promise<ApiResponse<TreatmentHistory[]>> => {
-    try {
-      const res = await client.get('/treatment-history');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /treatment-history failed, using local fallback. Error:', err.message);
-      return { data: MOCK_TREATMENT_HISTORY_LOCAL, isFallback: true, error: err.message };
-    }
+      return { data: MOCK_TREATMENT_HISTORY_LOCAL, isFallback: true };
   }
 };
 
 export default labReportApi;
+
+
+
+

@@ -1,14 +1,8 @@
-import axios from 'axios';
-import { UserProfile, DietPlan, Meal, NutritionSummary, DietHistory, ApiResponse } from '../types';
+// dietApi.ts — Pure mock-data service (no backend required)
+import { UserProfile, DietPlan, Meal, DietHistory, ApiResponse } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
+// ─── Mock Data ────────────────────────────────────────────────────────────────
 
-const client = axios.create({
-  baseURL: BACKEND_URL,
-  timeout: 1500
-});
-
-// Local Fallback Datasets
 export const MOCK_DIET_USER_PROFILE_LOCAL: UserProfile = {
   id: "profile-1",
   name: "Priyanshi Sharma",
@@ -25,7 +19,7 @@ export const MOCK_DIET_USER_PROFILE_LOCAL: UserProfile = {
 
 export const MOCK_DIET_PLAN_LOCAL: DietPlan = {
   id: "plan-active-1",
-  planName: "Active Pitta-Pacifying Meal Schedule (Local Cache)",
+  planName: "Active Pitta-Pacifying Meal Schedule",
   doshaType: "Pitta",
   goal: "Hormonal Balance",
   dailyCalories: 1690,
@@ -48,22 +42,8 @@ export const MOCK_DIET_PLAN_LOCAL: DietPlan = {
 };
 
 export const MOCK_DIET_HISTORY_LOCAL: DietHistory[] = [
-  {
-    id: "plan-hist-1",
-    planName: "Metabolic Fire Reset (Vata)",
-    dateGenerated: "2026-05-12",
-    goal: "Metabolic Reset",
-    calories: 1850,
-    duration: "14 Days"
-  },
-  {
-    id: "plan-hist-2",
-    planName: "Pitta Balance Plan",
-    dateGenerated: "2026-05-26",
-    goal: "Hormonal Balance",
-    calories: 1690,
-    duration: "30 Days"
-  }
+  { id: "plan-hist-1", planName: "Metabolic Fire Reset (Vata)", dateGenerated: "2026-05-12", goal: "Metabolic Reset", calories: 1850, duration: "14 Days" },
+  { id: "plan-hist-2", planName: "Pitta Balance Plan", dateGenerated: "2026-05-26", goal: "Hormonal Balance", calories: 1690, duration: "30 Days" }
 ];
 
 const LOCAL_MEALS_DATABASE: Record<string, Record<string, Omit<Meal, 'id' | 'mealType' | 'time'>>> = {
@@ -81,10 +61,10 @@ const LOCAL_MEALS_DATABASE: Record<string, Record<string, Omit<Meal, 'id' | 'mea
     Lunch: { mealName: "Quinoa Greens Bowl", calories: 450, ingredients: ["Quinoa", "Kale", "Asparagus", "Zucchini"], benefits: ["Cooling and alkalizing"] },
     "Evening Snack": { mealName: "Fresh Melon Medley", calories: 120, ingredients: ["Watermelon", "Cantaloupe"], benefits: ["Flushes kidney tracts"] },
     Dinner: { mealName: "Mung Dal Soup & Rice", calories: 400, ingredients: ["Split lentils", "Rice", "Fennel seeds"], benefits: ["Nourishing and calming"] },
-    "Bedtime Drink": { mealName: "Fennel Milk infusion", calories: 110, ingredients: ["Cardamom", "Fennel seeds", "Warm milk"], benefits: ["Pacifies Pitta heat"] }
+    "Bedtime Drink": { mealName: "Fennel Milk Infusion", calories: 110, ingredients: ["Cardamom", "Fennel seeds", "Warm milk"], benefits: ["Pacifies Pitta heat"] }
   },
   "Kapha": {
-    Breakfast: { mealName: "Buckwheat Cranberry flakes", calories: 280, ingredients: ["Buckwheat", "Water", "Cranberries", "Ginger"], benefits: ["Light and dry to clear mucus"] },
+    Breakfast: { mealName: "Buckwheat Cranberry Flakes", calories: 280, ingredients: ["Buckwheat", "Water", "Cranberries", "Ginger"], benefits: ["Light and dry to clear mucus"] },
     "Mid-Morning Snack": { mealName: "Ginger Tulsi Tea", calories: 40, ingredients: ["Ginger", "Tulsi", "Honey"], benefits: ["Liquifies congestion"] },
     Lunch: { mealName: "Spiced Chickpea Salad", calories: 420, ingredients: ["Chickpeas", "Broccoli", "Mustard seeds", "Turmeric"], benefits: ["Scrapes lymph blockages"] },
     "Evening Snack": { mealName: "Roasted Pumpkin Seeds", calories: 140, ingredients: ["Pumpkin seeds", "Sunflower seeds", "Black pepper"], benefits: ["Warm and dry snack"] },
@@ -93,108 +73,69 @@ const LOCAL_MEALS_DATABASE: Record<string, Record<string, Omit<Meal, 'id' | 'mea
   }
 };
 
+// ─── API (mock-only, no network calls) ──────────────────────────────────────
+
 export const dietApi = {
   getProfile: async (): Promise<ApiResponse<UserProfile>> => {
-    try {
-      const res = await client.get('/diet/profile');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /diet/profile failed, using local cache. Error:', err.message);
-      return { data: MOCK_DIET_USER_PROFILE_LOCAL, isFallback: true, error: err.message };
-    }
+    return { data: MOCK_DIET_USER_PROFILE_LOCAL, isFallback: true };
   },
 
   getPlans: async (): Promise<ApiResponse<DietPlan[]>> => {
-    try {
-      const res = await client.get('/diet/plans');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /diet/plans failed, using local fallback. Error:', err.message);
-      return { data: [MOCK_DIET_PLAN_LOCAL], isFallback: true, error: err.message };
-    }
+    return { data: [MOCK_DIET_PLAN_LOCAL], isFallback: true };
   },
 
   getHistory: async (): Promise<ApiResponse<DietHistory[]>> => {
-    try {
-      const res = await client.get('/diet/history');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /diet/history failed, using local history cache. Error:', err.message);
-      return { data: MOCK_DIET_HISTORY_LOCAL, isFallback: true, error: err.message };
-    }
+    return { data: [...MOCK_DIET_HISTORY_LOCAL], isFallback: true };
   },
 
   generatePlan: async (profile: Omit<UserProfile, 'id'>): Promise<ApiResponse<DietPlan>> => {
-    try {
-      const res = await client.post('/diet/generate-plan', profile);
-      return { data: res.data.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /diet/generate-plan failed, building plan client-side. Error:', err.message);
-      
-      // Client-Side Plan Generator Engine
-      let lookupDosha = profile.doshaType;
-      if (lookupDosha.includes('-')) {
-        lookupDosha = lookupDosha.split('-')[0];
-      }
-      if (!LOCAL_MEALS_DATABASE[lookupDosha]) {
-        lookupDosha = 'Pitta';
-      }
+    let lookupDosha = profile.doshaType;
+    if (lookupDosha.includes('-')) lookupDosha = lookupDosha.split('-')[0];
+    if (!LOCAL_MEALS_DATABASE[lookupDosha]) lookupDosha = 'Pitta';
 
-      const baseMeals = LOCAL_MEALS_DATABASE[lookupDosha];
-      let calTarget = 1800;
-      if (profile.healthGoals.includes("Weight Loss") || profile.healthGoals.includes("Weight Management")) {
-        calTarget = 1500;
-      } else if (profile.healthGoals.includes("Muscle Gain")) {
-        calTarget = 2200;
-      }
-
-      let p = 60, c = 210, f = 40;
-      if (lookupDosha === 'Pitta') {
-        p = 65; c = 230; f = 45;
-      } else if (lookupDosha === 'Kapha') {
-        p = 75; c = 180; f = 35;
-      } else {
-        p = 55; c = 240; f = 50;
-      }
-
-      const generatedMeals: Meal[] = [
-        { id: `gm-1`, mealType: "Breakfast", mealName: baseMeals.Breakfast.mealName, time: "08:00 AM", calories: baseMeals.Breakfast.calories, ingredients: baseMeals.Breakfast.ingredients, benefits: baseMeals.Breakfast.benefits },
-        { id: `gm-2`, mealType: "Mid-Morning Snack", mealName: baseMeals["Mid-Morning Snack"].mealName, time: "11:00 AM", calories: baseMeals["Mid-Morning Snack"].calories, ingredients: baseMeals["Mid-Morning Snack"].ingredients, benefits: baseMeals["Mid-Morning Snack"].benefits },
-        { id: `gm-3`, mealType: "Lunch", mealName: baseMeals.Lunch.mealName, time: "01:00 PM", calories: baseMeals.Lunch.calories, ingredients: baseMeals.Lunch.ingredients, benefits: baseMeals.Lunch.benefits },
-        { id: `gm-4`, mealType: "Evening Snack", mealName: baseMeals["Evening Snack"].mealName, time: "04:30 PM", calories: baseMeals["Evening Snack"].calories, ingredients: baseMeals["Evening Snack"].ingredients, benefits: baseMeals["Evening Snack"].benefits },
-        { id: `gm-5`, mealType: "Dinner", mealName: baseMeals.Dinner.mealName, time: "07:30 PM", calories: baseMeals.Dinner.calories, ingredients: baseMeals.Dinner.ingredients, benefits: baseMeals.Dinner.benefits },
-        { id: `gm-6`, mealType: "Bedtime Drink", mealName: baseMeals["Bedtime Drink"].mealName, time: "09:45 PM", calories: baseMeals["Bedtime Drink"].calories, ingredients: baseMeals["Bedtime Drink"].ingredients, benefits: baseMeals["Bedtime Drink"].benefits }
-      ];
-
-      const clientGeneratedPlan: DietPlan = {
-        id: `plan-active-${Date.now()}`,
-        planName: `Customized ${lookupDosha}-Pacifying Nutrition Plan (Local Cache)`,
-        doshaType: profile.doshaType,
-        goal: profile.healthGoals[0] || "General Health",
-        dailyCalories: calTarget,
-        duration: "30 Days",
-        meals: generatedMeals,
-        nutritionSummary: {
-          calories: calTarget,
-          protein: p,
-          carbs: c,
-          fats: f,
-          waterTarget: 2500
-        }
-      };
-
-      // Add to local history list
-      MOCK_DIET_HISTORY_LOCAL.unshift({
-        id: clientGeneratedPlan.id,
-        planName: clientGeneratedPlan.planName,
-        dateGenerated: new Date().toISOString().split('T')[0],
-        goal: clientGeneratedPlan.goal,
-        calories: clientGeneratedPlan.dailyCalories,
-        duration: clientGeneratedPlan.duration
-      });
-
-      return { data: clientGeneratedPlan, isFallback: true, error: err.message };
+    const baseMeals = LOCAL_MEALS_DATABASE[lookupDosha];
+    let calTarget = 1800;
+    if (profile.healthGoals.includes("Weight Loss") || profile.healthGoals.includes("Weight Management")) {
+      calTarget = 1500;
+    } else if (profile.healthGoals.includes("Muscle Gain")) {
+      calTarget = 2200;
     }
+
+    let p = 60, c = 210, f = 40;
+    if (lookupDosha === 'Pitta') { p = 65; c = 230; f = 45; }
+    else if (lookupDosha === 'Kapha') { p = 75; c = 180; f = 35; }
+    else { p = 55; c = 240; f = 50; }
+
+    const generatedMeals: Meal[] = [
+      { id: `gm-1`, mealType: "Breakfast", mealName: baseMeals.Breakfast.mealName, time: "08:00 AM", calories: baseMeals.Breakfast.calories, ingredients: baseMeals.Breakfast.ingredients, benefits: baseMeals.Breakfast.benefits },
+      { id: `gm-2`, mealType: "Mid-Morning Snack", mealName: baseMeals["Mid-Morning Snack"].mealName, time: "11:00 AM", calories: baseMeals["Mid-Morning Snack"].calories, ingredients: baseMeals["Mid-Morning Snack"].ingredients, benefits: baseMeals["Mid-Morning Snack"].benefits },
+      { id: `gm-3`, mealType: "Lunch", mealName: baseMeals.Lunch.mealName, time: "01:00 PM", calories: baseMeals.Lunch.calories, ingredients: baseMeals.Lunch.ingredients, benefits: baseMeals.Lunch.benefits },
+      { id: `gm-4`, mealType: "Evening Snack", mealName: baseMeals["Evening Snack"].mealName, time: "04:30 PM", calories: baseMeals["Evening Snack"].calories, ingredients: baseMeals["Evening Snack"].ingredients, benefits: baseMeals["Evening Snack"].benefits },
+      { id: `gm-5`, mealType: "Dinner", mealName: baseMeals.Dinner.mealName, time: "07:30 PM", calories: baseMeals.Dinner.calories, ingredients: baseMeals.Dinner.ingredients, benefits: baseMeals.Dinner.benefits },
+      { id: `gm-6`, mealType: "Bedtime Drink", mealName: baseMeals["Bedtime Drink"].mealName, time: "09:45 PM", calories: baseMeals["Bedtime Drink"].calories, ingredients: baseMeals["Bedtime Drink"].ingredients, benefits: baseMeals["Bedtime Drink"].benefits }
+    ];
+
+    const clientGeneratedPlan: DietPlan = {
+      id: `plan-active-${Date.now()}`,
+      planName: `Customized ${lookupDosha}-Pacifying Nutrition Plan`,
+      doshaType: profile.doshaType,
+      goal: profile.healthGoals[0] || "General Health",
+      dailyCalories: calTarget,
+      duration: "30 Days",
+      meals: generatedMeals,
+      nutritionSummary: { calories: calTarget, protein: p, carbs: c, fats: f, waterTarget: 2500 }
+    };
+
+    MOCK_DIET_HISTORY_LOCAL.unshift({
+      id: clientGeneratedPlan.id,
+      planName: clientGeneratedPlan.planName,
+      dateGenerated: new Date().toISOString().split('T')[0],
+      goal: clientGeneratedPlan.goal,
+      calories: clientGeneratedPlan.dailyCalories,
+      duration: clientGeneratedPlan.duration
+    });
+
+    return { data: clientGeneratedPlan, isFallback: true };
   }
 };
 

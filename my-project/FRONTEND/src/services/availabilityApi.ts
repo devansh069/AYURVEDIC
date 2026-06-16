@@ -1,8 +1,5 @@
-import axios from 'axios';
 import { DoctorAvailability, DoctorConsultationSettings } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
-const client = axios.create({ baseURL: BACKEND_URL, timeout: 1500 });
 
 export const MOCK_AVAILABILITY: DoctorAvailability[] = [
   { id: '1', day: 'Monday', startTime: '09:00', endTime: '13:00', consultationMode: 'Both', slotDuration: 30, status: 'Available' },
@@ -25,31 +22,19 @@ export const MOCK_SETTINGS: DoctorConsultationSettings = {
 
 export const availabilityApi = {
   async getAvailability(): Promise<{ data: DoctorAvailability[]; isFallback: boolean }> {
-    try {
-      const res = await client.get('/doctor/availability');
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: MOCK_AVAILABILITY, isFallback: true };
-    }
   },
 
   async updateAvailability(availability: DoctorAvailability[]): Promise<{ success: boolean; isFallback: boolean }> {
-    try {
-      await client.put('/doctor/availability', availability);
-      return { success: true, isFallback: false };
-    } catch {
       return { success: true, isFallback: true };
-    }
   },
 
   async getSettings(): Promise<{ data: DoctorConsultationSettings; isFallback: boolean }> {
-    try {
-      const res = await client.get('/doctor/consultation-settings');
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: MOCK_SETTINGS, isFallback: true };
-    }
   }
 };
 
 export default availabilityApi;
+
+
+

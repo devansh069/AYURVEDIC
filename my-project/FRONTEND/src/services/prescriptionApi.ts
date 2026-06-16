@@ -1,12 +1,6 @@
-import axios from 'axios';
 import { Prescription, ApiResponse } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
 
-const client = axios.create({
-  baseURL: BACKEND_URL,
-  timeout: 1500
-});
 
 // Offline Sandbox Local Fallbacks
 const MOCK_PRESCRIPTIONS_LOCAL: Prescription[] = [
@@ -37,14 +31,12 @@ const MOCK_PRESCRIPTIONS_LOCAL: Prescription[] = [
 
 export const prescriptionApi = {
   getPrescriptions: async (): Promise<ApiResponse<Prescription[]>> => {
-    try {
-      const res = await client.get('/prescriptions');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /prescriptions failed, using local fallback. Error:', err.message);
-      return { data: MOCK_PRESCRIPTIONS_LOCAL, isFallback: true, error: err.message };
-    }
+      return { data: MOCK_PRESCRIPTIONS_LOCAL, isFallback: true };
   }
 };
 
 export default prescriptionApi;
+
+
+
+

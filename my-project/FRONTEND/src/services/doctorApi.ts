@@ -1,8 +1,6 @@
-import axios from 'axios';
 import { DoctorProfileModel } from '../types';
+import { MOCK_DOCTORS } from './apiService';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
-const client = axios.create({ baseURL: BACKEND_URL, timeout: 1500 });
 
 export const MOCK_DOCTOR_PROFILE: DoctorProfileModel = {
   id: 'dr-1',
@@ -19,23 +17,45 @@ export const MOCK_DOCTOR_PROFILE: DoctorProfileModel = {
 };
 
 export const doctorApi = {
+  // Fetch a single doctor by ID
+  async getDoctorById(id: string): Promise<{ data: any; isFallback: boolean }> {
+      let found = MOCK_DOCTORS.find(d => d.id === id);
+      if (!found && MOCK_DOCTOR_PROFILE.id === id) {
+        found = {
+          ...MOCK_DOCTOR_PROFILE,
+          experience: 15,
+          state: 'Rajasthan',
+          reviewCount: 45,
+          consultationFee: 500,
+          languages: ['Hindi', 'English'],
+          about: 'Dr. Arun Sharma is a veteran Ayurvedic practitioner specializing in Panchakarma and internal medicine.',
+          availability: 'Mon-Sat, 9:00 AM - 5:00 PM',
+          onlineConsultation: true,
+          offlineConsultation: true,
+          specialExpertise: ['Panchakarma Detox', 'Digestive Rejuvenation', 'Internal Medicine'],
+          education: ['BAMS - University of Rajasthan', 'MD in Ayurveda - National Institute of Ayurveda'],
+          awards: ['Ayurveda Ratna Award', 'Outstanding Vaidya Award'],
+        } as any;
+      }
+      return { data: found || null, isFallback: true };
+  },
+
+  // Fetch list of all doctors (mocked)
+  async getDoctors(): Promise<{ data: any[]; isFallback: boolean }> {
+      // Use MOCK_DOCTORS from apiService if available; fallback to single profile
+      const data = MOCK_DOCTORS ?? [MOCK_DOCTOR_PROFILE];
+      return { data, isFallback: true };
+  },
   async getProfile(): Promise<{ data: DoctorProfileModel; isFallback: boolean }> {
-    try {
-      const res = await client.get('/doctor/profile');
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: MOCK_DOCTOR_PROFILE, isFallback: true };
-    }
   },
 
   async updateStatus(status: string): Promise<{ success: boolean; isFallback: boolean }> {
-    try {
-      await client.post('/doctor/update-status', { status });
-      return { success: true, isFallback: false };
-    } catch {
       return { success: true, isFallback: true };
-    }
   }
 };
 
 export default doctorApi;
+
+
+

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DoshaQuestion, DoshaResult, Recommendation, FoodRecommendation, DailyRoutine, TreatmentSuggestion, AssessmentHistory, ApiResponse } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
+const BACKEND_URL = '';
 
 const client = axios.create({
   baseURL: BACKEND_URL,
@@ -384,21 +384,10 @@ const MOCK_RECOMMENDATIONS_LOCAL: Record<string, any> = {
 
 export const doshaApi = {
   getQuestions: async (): Promise<ApiResponse<DoshaQuestion[]>> => {
-    try {
-      const res = await client.get('/dosha/questions');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /dosha/questions failed, using local fallback. Error:', err.message);
-      return { data: MOCK_QUESTIONS_LOCAL, isFallback: true, error: err.message };
-    }
+      return { data: MOCK_QUESTIONS_LOCAL, isFallback: true };
   },
 
   submitAssessment: async (answers: Record<string, number>, patientName?: string): Promise<ApiResponse<DoshaResult>> => {
-    try {
-      const res = await client.post('/dosha/analyze', { answers, patientName });
-      return { data: res.data.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /dosha/analyze failed, doing scoring client-side. Error:', err.message);
       
       // Client-Side Scoring Engine
       let vataScore = 0;
@@ -455,23 +444,16 @@ export const doshaApi = {
       // Add to local mock results
       MOCK_RESULTS_LOCAL.unshift(mockRes);
 
-      return { data: mockRes, isFallback: true, error: err.message };
-    }
+      return { data: mockRes, isFallback: true };
   },
 
   getRecommendations: async (dosha?: string): Promise<ApiResponse<any>> => {
-    try {
-      const res = await client.get(`/dosha/recommendations?dosha=${dosha || 'Pitta'}`);
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn(`API /dosha/recommendations failed, using local fallback. Error:`, err.message);
       let selectedDosha = dosha || "Pitta";
       if (selectedDosha.includes("-")) {
         selectedDosha = selectedDosha.split("-")[0];
       }
       const recom = MOCK_RECOMMENDATIONS_LOCAL[selectedDosha] || MOCK_RECOMMENDATIONS_LOCAL["Pitta"];
-      return { data: { dosha: selectedDosha, ...recom }, isFallback: true, error: err.message };
-    }
+      return { data: { dosha: selectedDosha, ...recom }, isFallback: true };
   },
 
   getAssessmentHistory: async (): Promise<ApiResponse<AssessmentHistory[]>> => {
@@ -489,3 +471,6 @@ export const doshaApi = {
 };
 
 export default doshaApi;
+
+
+

@@ -1,7 +1,5 @@
-import axios from 'axios';
 import { MilestoneRecord } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
 
 export interface MilestonesApiResponse {
   data: MilestoneRecord[];
@@ -9,10 +7,6 @@ export interface MilestonesApiResponse {
   error?: string;
 }
 
-const client = axios.create({
-  baseURL: BACKEND_URL,
-  timeout: 1500
-});
 
 const MOCK_MILESTONES_LOCAL: MilestoneRecord[] = [
   { id: "ms-1", title: "Initial Diagnosis", description: "Pulse-diagnosis read as Vata accumulation in joint junctions.", date: "2026-05-15", status: "Completed" },
@@ -24,14 +18,12 @@ const MOCK_MILESTONES_LOCAL: MilestoneRecord[] = [
 
 export const milestoneApi = {
   getMilestones: async (): Promise<MilestonesApiResponse> => {
-    try {
-      const res = await client.get('/recovery/milestones');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /recovery/milestones failed, using local fallback. Error:', err.message);
-      return { data: MOCK_MILESTONES_LOCAL, isFallback: true, error: err.message };
-    }
+      return { data: MOCK_MILESTONES_LOCAL, isFallback: true };
   }
 };
 
 export default milestoneApi;
+
+
+
+

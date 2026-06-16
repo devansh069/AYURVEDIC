@@ -1,8 +1,5 @@
-import axios from 'axios';
+// recommendationApi.ts — Pure mock-data service (no backend required)
 import { AITreatmentRec, AIRecommendationCard, AINotificationItem, AIWellnessTask } from '../types';
-
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
-const client = axios.create({ baseURL: BACKEND_URL, timeout: 1500 });
 
 export const MOCK_TREATMENT_RECS_LOCAL: AITreatmentRec[] = [
   { id: 'tr-1', treatmentName: 'Shirodhara', benefits: ['Stress relief', 'Mental clarity', 'Better sleep', 'Headache relief'], estimatedDuration: '45-60 minutes per session', recommendedDoctor: 'Dr. Arun Sharma', confidence: 92 },
@@ -36,39 +33,16 @@ export const MOCK_WELLNESS_TASKS_LOCAL: AIWellnessTask[] = [
 
 export const recommendationApi = {
   async getTreatmentRecs(): Promise<{ data: AITreatmentRec[]; isFallback: boolean }> {
-    try {
-      const res = await client.get('/ai/treatment-recommendations');
-      return { data: res.data, isFallback: false };
-    } catch {
-      return { data: MOCK_TREATMENT_RECS_LOCAL, isFallback: true };
-    }
+    return { data: MOCK_TREATMENT_RECS_LOCAL, isFallback: true };
   },
-
   async getRecommendationCards(): Promise<{ data: AIRecommendationCard[]; isFallback: boolean }> {
-    try {
-      const res = await client.get('/ai/diet-recommendations');
-      return { data: res.data, isFallback: false };
-    } catch {
-      return { data: MOCK_RECOMMENDATION_CARDS_LOCAL, isFallback: true };
-    }
+    return { data: MOCK_RECOMMENDATION_CARDS_LOCAL, isFallback: true };
   },
-
   async getNotifications(): Promise<{ data: AINotificationItem[]; isFallback: boolean }> {
-    try {
-      const res = await client.get('/ai/notifications');
-      return { data: res.data, isFallback: false };
-    } catch {
-      return { data: MOCK_NOTIFICATIONS_LOCAL, isFallback: true };
-    }
+    return { data: MOCK_NOTIFICATIONS_LOCAL, isFallback: true };
   },
-
   async getWellnessTasks(): Promise<{ data: AIWellnessTask[]; isFallback: boolean }> {
-    try {
-      const res = await client.get('/ai/wellness-tasks');
-      return { data: res.data, isFallback: false };
-    } catch {
-      return { data: MOCK_WELLNESS_TASKS_LOCAL, isFallback: true };
-    }
+    return { data: MOCK_WELLNESS_TASKS_LOCAL, isFallback: true };
   },
 };
 

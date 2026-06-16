@@ -1,8 +1,5 @@
-import axios from 'axios';
 import { SecuritySettings, LoginEntry, ActiveDevice } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
-const client = axios.create({ baseURL: BACKEND_URL, timeout: 1500 });
 
 export const MOCK_SECURITY_SETTINGS: SecuritySettings = {
   lastPasswordChange: '2026-05-15',
@@ -22,40 +19,23 @@ export const MOCK_ACTIVE_DEVICES: ActiveDevice[] = [
 
 export const securityApi = {
   async getSecuritySettings(): Promise<{ data: SecuritySettings; isFallback: boolean }> {
-    try {
-      const res = await client.get('/security');
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: MOCK_SECURITY_SETTINGS, isFallback: true };
-    }
   },
 
   async updateSecuritySettings(settings: Partial<SecuritySettings>): Promise<{ data: SecuritySettings; isFallback: boolean }> {
-    try {
-      const res = await client.put('/security', settings);
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: { ...MOCK_SECURITY_SETTINGS, ...settings }, isFallback: true };
-    }
   },
 
   async getActiveDevices(): Promise<{ data: ActiveDevice[]; isFallback: boolean }> {
-    try {
-      const res = await client.get('/security/devices');
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: MOCK_ACTIVE_DEVICES, isFallback: true };
-    }
   },
 
   async logoutDevice(deviceId: string): Promise<{ success: boolean; isFallback: boolean }> {
-    try {
-      await client.post(`/security/devices/${deviceId}/logout`);
-      return { success: true, isFallback: false };
-    } catch {
       return { success: true, isFallback: true };
-    }
   }
 };
 
 export default securityApi;
+
+
+

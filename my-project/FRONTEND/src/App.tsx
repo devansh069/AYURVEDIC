@@ -19,7 +19,9 @@ import ProfileSettingsDashboard from './pages/ProfileSettingsDashboard';
 import DoctorDashboardPage from './pages/DoctorDashboardPage';
 import About from './pages/About';
 import DoctorProfileSettingsPage from './pages/DoctorProfileSettingsPage';
-
+import LoginPage from './pages/auth/LoginPage';
+import SignupPage from './pages/auth/SignupPage';
+import SymptomChecker from './pages/SymptomChecker';
 function App() {
   return (
     <Router>
@@ -44,6 +46,9 @@ function App() {
             <Route path="/doctors" element={<Doctors />} />
             <Route path="/doctor/:id" element={<DoctorProfile />} />
             <Route path="/about" element={<About />} />
+          <Route path="/auth/login" element={<LoginPage />} />
+          <Route path="/auth/signup" element={<SignupPage />} />
+          <Route path="/symptom-checker" element={<SymptomChecker />} />
           </Routes>
         </div>
         <Footer />

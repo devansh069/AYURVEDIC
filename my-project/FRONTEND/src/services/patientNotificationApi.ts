@@ -1,18 +1,11 @@
-import axios from 'axios';
+// patientNotificationApi.ts — Pure mock-data service (no backend required)
 import { Notification } from '../types';
-
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
 
 export interface NotificationsApiResponse {
   data: Notification[];
   isFallback: boolean;
   error?: string;
 }
-
-const client = axios.create({
-  baseURL: BACKEND_URL,
-  timeout: 1500
-});
 
 const MOCK_NOTIFICATIONS_LOCAL: Notification[] = [
   {
@@ -40,13 +33,7 @@ const MOCK_NOTIFICATIONS_LOCAL: Notification[] = [
 
 export const patientNotificationApi = {
   getNotifications: async (): Promise<NotificationsApiResponse> => {
-    try {
-      const res = await client.get('/patient/notifications');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /patient/notifications failed, using local fallback. Error:', err.message);
-      return { data: MOCK_NOTIFICATIONS_LOCAL, isFallback: true, error: err.message };
-    }
+    return { data: MOCK_NOTIFICATIONS_LOCAL, isFallback: true };
   }
 };
 

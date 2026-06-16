@@ -77,10 +77,10 @@ export const DoctorProfile: React.FC = () => {
 
         if (docRes.data) {
           setDoctor(docRes.data);
-          setReviews(reviewsRes);
+          setReviews(reviewsRes.data || []);
           setAllDoctors(allDocsRes.data);
           
-          if (docRes.isFallback || allDocsRes.isFallback) {
+          if (docRes.isFallback || allDocsRes.isFallback || reviewsRes.isFallback) {
             setIsFallbackMode(true);
           }
         } else {

@@ -1,7 +1,5 @@
-import axios from 'axios';
 import { RecoveryProgress } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
 
 export interface RecoveryProgressApiResponse {
   data: RecoveryProgress & {
@@ -12,10 +10,6 @@ export interface RecoveryProgressApiResponse {
   error?: string;
 }
 
-const client = axios.create({
-  baseURL: BACKEND_URL,
-  timeout: 1500
-});
 
 const MOCK_RECOVERY_LOCAL = {
   id: "rec-1",
@@ -40,14 +34,12 @@ const MOCK_RECOVERY_LOCAL = {
 
 export const patientRecoveryApi = {
   getRecoveryProgress: async (): Promise<RecoveryProgressApiResponse> => {
-    try {
-      const res = await client.get('/patient/recovery');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /patient/recovery failed, using local fallback. Error:', err.message);
-      return { data: MOCK_RECOVERY_LOCAL, isFallback: true, error: err.message };
-    }
+      return { data: MOCK_RECOVERY_LOCAL, isFallback: true };
   }
 };
 
 export default patientRecoveryApi;
+
+
+
+

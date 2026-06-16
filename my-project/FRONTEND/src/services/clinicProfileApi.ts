@@ -1,8 +1,6 @@
-import axios from 'axios';
 import { Clinic, ClinicReview, GalleryImage, Service } from '../types';
 import { MOCK_CLINICS } from './apiService';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
 
 export interface ClinicApiResponse<T> {
   data: T;
@@ -10,29 +8,14 @@ export interface ClinicApiResponse<T> {
   error?: string;
 }
 
-const client = axios.create({
-  baseURL: BACKEND_URL,
-  timeout: 1500
-});
 
 export const clinicProfileApi = {
   getClinicById: async (id: string): Promise<ClinicApiResponse<Clinic | undefined>> => {
-    try {
-      const res = await client.get(`/clinics/${id}`);
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn(`API /clinics/${id} failed, using local fallback. Error:`, err.message);
       const found = MOCK_CLINICS.find(c => c.id === id);
-      return { data: found, isFallback: true, error: err.message };
-    }
+      return { data: found, isFallback: true };
   },
 
   getClinicReviews: async (id: string): Promise<ClinicApiResponse<ClinicReview[]>> => {
-    try {
-      const res = await client.get(`/clinics/${id}/reviews`);
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn(`API /clinics/${id}/reviews failed, using local fallback. Error:`, err.message);
       const mockReviews = [
         {
           id: `rev-${id}-1`,
@@ -53,27 +36,15 @@ export const clinicProfileApi = {
           recoveryResult: "Completed Shirodhara therapy; migraine frequency reduced from twice weekly to zero."
         }
       ];
-      return { data: mockReviews, isFallback: true, error: err.message };
-    }
+      return { data: mockReviews, isFallback: true };
   },
 
   getClinicGallery: async (id: string): Promise<ClinicApiResponse<GalleryImage[]>> => {
-    try {
-      const res = await client.get(`/clinics/${id}/gallery`);
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn(`API /clinics/${id}/gallery failed, using local fallback. Error:`, err.message);
       const found = MOCK_CLINICS.find(c => c.id === id);
-      return { data: found?.gallery || [], isFallback: true, error: err.message };
-    }
+      return { data: found?.gallery || [], isFallback: true };
   },
 
   getClinicServices: async (id: string): Promise<ClinicApiResponse<Service[]>> => {
-    try {
-      const res = await client.get(`/clinics/${id}/services`);
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn(`API /clinics/${id}/services failed, using local fallback. Error:`, err.message);
       const clinic = MOCK_CLINICS.find(c => c.id === id);
       const allServicesDetails = [
         { id: 's-panch', name: 'Panchakarma', description: 'Classical fivefold detoxification and rejuvenation therapies.', icon: 'Activity' },
@@ -91,9 +62,12 @@ export const clinicProfileApi = {
       const services = clinic 
         ? allServicesDetails.filter(s => clinic.services.some(cs => cs.toLowerCase() === s.name.toLowerCase()))
         : allServicesDetails.slice(0, 3);
-      return { data: services, isFallback: true, error: err.message };
-    }
+      return { data: services, isFallback: true };
   }
 };
 
 export default clinicProfileApi;
+
+
+
+

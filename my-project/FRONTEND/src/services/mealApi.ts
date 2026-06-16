@@ -1,14 +1,6 @@
-import axios from 'axios';
+// mealApi.ts — Pure mock-data service (no backend required)
 import { Meal, FoodRecommendation, ApiResponse } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
-
-const client = axios.create({
-  baseURL: BACKEND_URL,
-  timeout: 1500
-});
-
-// Local Fallback Datasets
 export const FOODS_TO_EAT_AVOID_LOCAL: Record<string, Omit<FoodRecommendation, 'dosha'>> = {
   "Vata": {
     eat: ["Cooked oatmeal & rice", "Warm vegetable soups", "Ghee & olive oil", "Sweet potatoes", "Almonds & walnuts", "Fresh sweet grapes & mangoes"],
@@ -39,10 +31,10 @@ const MEALS_DATABASE_LOCAL: Record<string, Record<string, Omit<Meal, 'id' | 'mea
     Lunch: { mealName: "Quinoa Greens Bowl", calories: 450, ingredients: ["Quinoa", "Kale", "Asparagus", "Zucchini"], benefits: ["Cooling and alkalizing"] },
     "Evening Snack": { mealName: "Fresh Melon Medley", calories: 120, ingredients: ["Watermelon", "Cantaloupe"], benefits: ["Flushes kidney tracts"] },
     Dinner: { mealName: "Mung Dal Soup & Rice", calories: 400, ingredients: ["Split lentils", "Rice", "Fennel seeds"], benefits: ["Nourishing and calming"] },
-    "Bedtime Drink": { mealName: "Fennel Milk infusion", calories: 110, ingredients: ["Cardamom", "Fennel seeds", "Warm milk"], benefits: ["Pacifies Pitta heat"] }
+    "Bedtime Drink": { mealName: "Fennel Milk Infusion", calories: 110, ingredients: ["Cardamom", "Fennel seeds", "Warm milk"], benefits: ["Pacifies Pitta heat"] }
   },
   "Kapha": {
-    Breakfast: { mealName: "Buckwheat Cranberry flakes", calories: 280, ingredients: ["Buckwheat", "Water", "Cranberries", "Ginger"], benefits: ["Light and dry to clear mucus"] },
+    Breakfast: { mealName: "Buckwheat Cranberry Flakes", calories: 280, ingredients: ["Buckwheat", "Water", "Cranberries", "Ginger"], benefits: ["Light and dry to clear mucus"] },
     "Mid-Morning Snack": { mealName: "Ginger Tulsi Tea", calories: 40, ingredients: ["Ginger", "Tulsi", "Honey"], benefits: ["Liquifies congestion"] },
     Lunch: { mealName: "Spiced Chickpea Salad", calories: 420, ingredients: ["Chickpeas", "Broccoli", "Mustard seeds", "Turmeric"], benefits: ["Scrapes lymph blockages"] },
     "Evening Snack": { mealName: "Roasted Pumpkin Seeds", calories: 140, ingredients: ["Pumpkin seeds", "Sunflower seeds", "Black pepper"], benefits: ["Warm and dry snack"] },
@@ -53,46 +45,18 @@ const MEALS_DATABASE_LOCAL: Record<string, Record<string, Omit<Meal, 'id' | 'mea
 
 export const mealApi = {
   getRecommendations: async (dosha?: string): Promise<ApiResponse<FoodRecommendation>> => {
-    try {
-      const res = await client.get(`/diet/recommendations?dosha=${dosha || 'Pitta'}`);
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /diet/recommendations failed, using local recommendations. Error:', err.message);
-      let targetDosha = dosha || 'Pitta';
-      if (targetDosha.includes('-')) {
-        targetDosha = targetDosha.split('-')[0];
-      }
-      if (!FOODS_TO_EAT_AVOID_LOCAL[targetDosha]) {
-        targetDosha = 'Pitta';
-      }
-      const localRec = FOODS_TO_EAT_AVOID_LOCAL[targetDosha];
-      return {
-        data: {
-          dosha: targetDosha,
-          eat: localRec.eat,
-          avoid: localRec.avoid
-        },
-        isFallback: true,
-        error: err.message
-      };
-    }
+    let targetDosha = dosha || 'Pitta';
+    if (targetDosha.includes('-')) targetDosha = targetDosha.split('-')[0];
+    if (!FOODS_TO_EAT_AVOID_LOCAL[targetDosha]) targetDosha = 'Pitta';
+    const localRec = FOODS_TO_EAT_AVOID_LOCAL[targetDosha];
+    return { data: { dosha: targetDosha, eat: localRec.eat, avoid: localRec.avoid }, isFallback: true };
   },
 
   getMealsDatabase: async (dosha?: string): Promise<ApiResponse<Record<string, Omit<Meal, 'id' | 'mealType' | 'time'>>>> => {
-    try {
-      const res = await client.get(`/diet/meals?dosha=${dosha || 'Pitta'}`);
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /diet/meals failed, using local database. Error:', err.message);
-      let targetDosha = dosha || 'Pitta';
-      if (targetDosha.includes('-')) {
-        targetDosha = targetDosha.split('-')[0];
-      }
-      if (!MEALS_DATABASE_LOCAL[targetDosha]) {
-        targetDosha = 'Pitta';
-      }
-      return { data: MEALS_DATABASE_LOCAL[targetDosha], isFallback: true, error: err.message };
-    }
+    let targetDosha = dosha || 'Pitta';
+    if (targetDosha.includes('-')) targetDosha = targetDosha.split('-')[0];
+    if (!MEALS_DATABASE_LOCAL[targetDosha]) targetDosha = 'Pitta';
+    return { data: MEALS_DATABASE_LOCAL[targetDosha], isFallback: true };
   }
 };
 

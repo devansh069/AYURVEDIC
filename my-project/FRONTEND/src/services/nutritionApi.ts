@@ -1,12 +1,5 @@
-import axios from 'axios';
+// nutritionApi.ts — Pure mock-data service (no backend required)
 import { NutritionSummary, ProgressMetric, ApiResponse } from '../types';
-
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
-
-const client = axios.create({
-  baseURL: BACKEND_URL,
-  timeout: 1500
-});
 
 export const MOCK_NUTRITION_SUMMARY_LOCAL: NutritionSummary = {
   calories: 1690,
@@ -29,20 +22,13 @@ export interface NutritionDataResponse {
 
 export const nutritionApi = {
   getNutrition: async (): Promise<ApiResponse<NutritionDataResponse>> => {
-    try {
-      const res = await client.get('/diet/nutrition');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /diet/nutrition failed, using local cache. Error:', err.message);
-      return {
-        data: {
-          summary: MOCK_NUTRITION_SUMMARY_LOCAL,
-          progress: MOCK_DIET_PROGRESS_LOCAL
-        },
-        isFallback: true,
-        error: err.message
-      };
-    }
+    return {
+      data: {
+        summary: MOCK_NUTRITION_SUMMARY_LOCAL,
+        progress: MOCK_DIET_PROGRESS_LOCAL
+      },
+      isFallback: true
+    };
   }
 };
 

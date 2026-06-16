@@ -1,8 +1,5 @@
-import axios from 'axios';
 import { FullUserProfile, AccountOverview, ActivityLog, SavedContentItem, WellnessGoalItem } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
-const client = axios.create({ baseURL: BACKEND_URL, timeout: 1500 });
 
 export const MOCK_FULL_PROFILE: FullUserProfile = {
   id: 'user-1',
@@ -23,10 +20,12 @@ export const MOCK_FULL_PROFILE: FullUserProfile = {
   lifestylePreference: 'Active',
   dietPreference: 'Vegetarian',
   exercisePreference: 'Yoga & Walking',
+
 };
 
 export const MOCK_ACCOUNT_OVERVIEW: AccountOverview = {
   appointments: 12,
+
   savedTreatments: 8,
   medicalRecords: 15,
   recoveryPlans: 3,
@@ -59,58 +58,31 @@ export const MOCK_WELLNESS_GOALS: WellnessGoalItem[] = [
 
 export const profileSettingsApi = {
   async getProfile(): Promise<{ data: FullUserProfile; isFallback: boolean }> {
-    try {
-      const res = await client.get('/profile');
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: MOCK_FULL_PROFILE, isFallback: true };
-    }
   },
 
   async updateProfile(profile: Partial<FullUserProfile>): Promise<{ data: FullUserProfile; isFallback: boolean }> {
-    try {
-      const res = await client.put('/profile', profile);
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: { ...MOCK_FULL_PROFILE, ...profile }, isFallback: true };
-    }
   },
 
   async getAccountOverview(): Promise<{ data: AccountOverview; isFallback: boolean }> {
-    try {
-      const res = await client.get('/profile/overview');
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: MOCK_ACCOUNT_OVERVIEW, isFallback: true };
-    }
   },
 
   async getActivityLogs(): Promise<{ data: ActivityLog[]; isFallback: boolean }> {
-    try {
-      const res = await client.get('/activity');
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: MOCK_ACTIVITY_LOGS, isFallback: true };
-    }
   },
 
   async getSavedContent(): Promise<{ data: SavedContentItem[]; isFallback: boolean }> {
-    try {
-      const res = await client.get('/profile/saved');
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: MOCK_SAVED_CONTENT, isFallback: true };
-    }
   },
 
   async getWellnessGoals(): Promise<{ data: WellnessGoalItem[]; isFallback: boolean }> {
-    try {
-      const res = await client.get('/profile/goals');
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: MOCK_WELLNESS_GOALS, isFallback: true };
-    }
   },
 };
 
 export default profileSettingsApi;
+
+
+

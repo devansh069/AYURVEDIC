@@ -1,8 +1,5 @@
-import axios from 'axios';
 import { DoctorCertification, DoctorClinicAffiliation } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
-const client = axios.create({ baseURL: BACKEND_URL, timeout: 1500 });
 
 export const MOCK_CERTIFICATIONS: DoctorCertification[] = [
   { id: '1', title: 'MD in Ayurveda (Panchakarma)', institution: 'Gujarat Ayurved University', issueDate: '2010-06-15', certificateUrl: '#' },
@@ -17,22 +14,15 @@ export const MOCK_CLINICS: DoctorClinicAffiliation[] = [
 
 export const certificationApi = {
   async getCertifications(): Promise<{ data: DoctorCertification[]; isFallback: boolean }> {
-    try {
-      const res = await client.get('/doctor/certifications');
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: MOCK_CERTIFICATIONS, isFallback: true };
-    }
   },
 
   async getClinics(): Promise<{ data: DoctorClinicAffiliation[]; isFallback: boolean }> {
-    try {
-      const res = await client.get('/doctor/clinics');
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: MOCK_CLINICS, isFallback: true };
-    }
   }
 };
 
 export default certificationApi;
+
+
+

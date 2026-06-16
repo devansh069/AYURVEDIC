@@ -1,8 +1,5 @@
-import axios from 'axios';
 import { DoctorPatientModel } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
-const client = axios.create({ baseURL: BACKEND_URL, timeout: 1500 });
 
 export const MOCK_DOCTOR_PATIENTS: DoctorPatientModel[] = [
   { id: 'pat-1', name: 'Rahul Verma', age: 34, gender: 'Male', condition: 'Arthritis', appointmentDate: '2026-06-12', status: 'Active', progress: 40, lastVisit: '2026-05-28' },
@@ -14,13 +11,11 @@ export const MOCK_DOCTOR_PATIENTS: DoctorPatientModel[] = [
 
 export const doctorPatientApi = {
   async getPatients(): Promise<{ data: DoctorPatientModel[]; isFallback: boolean }> {
-    try {
-      const res = await client.get('/doctor/patients');
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: MOCK_DOCTOR_PATIENTS, isFallback: true };
-    }
   }
 };
 
 export default doctorPatientApi;
+
+
+

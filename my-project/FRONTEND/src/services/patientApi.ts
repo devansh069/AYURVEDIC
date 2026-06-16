@@ -1,7 +1,5 @@
-import axios from 'axios';
 import { Patient, HealthGoal, WellnessMetric, AIRecommendation, MedicalRecord } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
 
 export interface PatientDashboardData {
   profile: Patient;
@@ -17,10 +15,6 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
-const client = axios.create({
-  baseURL: BACKEND_URL,
-  timeout: 1500
-});
 
 // Standalone local fallbacks
 const MOCK_WELLNESS_LOCAL: WellnessMetric = {
@@ -97,11 +91,6 @@ const MOCK_RECORDS_LOCAL: MedicalRecord[] = [
 
 export const patientApi = {
   getPatientDashboard: async (): Promise<ApiResponse<PatientDashboardData>> => {
-    try {
-      const res = await client.get('/patient/dashboard');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /patient/dashboard failed, using local fallback. Error:', err.message);
       return {
         data: {
           profile: MOCK_PROFILE_LOCAL,
@@ -110,28 +99,15 @@ export const patientApi = {
           healthGoals: MOCK_HEALTH_GOALS_LOCAL,
           records: MOCK_RECORDS_LOCAL
         },
-        isFallback: true,
-        error: err.message
+        isFallback: true
       };
-    }
   },
 
   getPatientProfile: async (): Promise<ApiResponse<Patient>> => {
-    try {
-      const res = await client.get('/patient/profile');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /patient/profile failed, using local fallback. Error:', err.message);
-      return { data: MOCK_PROFILE_LOCAL, isFallback: true, error: err.message };
-    }
+      return { data: MOCK_PROFILE_LOCAL, isFallback: true };
   },
 
   uploadMedicalRecord: async (recordData: { title: string; type: string; doctorName?: string }): Promise<ApiResponse<MedicalRecord>> => {
-    try {
-      const res = await client.post('/patient/records/upload', recordData);
-      return { data: res.data.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /patient/records/upload failed, using local fallback. Error:', err.message);
       const offlineRecord: MedicalRecord = {
         id: `rec-doc-${Date.now()}`,
         title: recordData.title || 'Uploaded Document',
@@ -143,9 +119,12 @@ export const patientApi = {
       };
       // Keep local records up to date in cache
       MOCK_RECORDS_LOCAL.unshift(offlineRecord);
-      return { data: offlineRecord, isFallback: true, error: err.message };
-    }
+      return { data: offlineRecord, isFallback: true };
   }
 };
 
 export default patientApi;
+
+
+
+

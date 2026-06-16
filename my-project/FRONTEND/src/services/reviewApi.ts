@@ -1,8 +1,5 @@
-import axios from 'axios';
 import { DoctorReviewModel } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
-const client = axios.create({ baseURL: BACKEND_URL, timeout: 1500 });
 
 export const MOCK_REVIEWS: DoctorReviewModel[] = [
   { id: '1', patientName: 'Amit Kumar', rating: 5, review: 'Dr. Arun is amazing. Highly recommended! His Panchakarma treatment completely cured my digestive issues.', date: 'June 10, 2026' },
@@ -13,13 +10,11 @@ export const MOCK_REVIEWS: DoctorReviewModel[] = [
 
 export const reviewApi = {
   async getReviews(): Promise<{ data: DoctorReviewModel[]; isFallback: boolean }> {
-    try {
-      const res = await client.get('/doctor/reviews');
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: MOCK_REVIEWS, isFallback: true };
-    }
   }
 };
 
 export default reviewApi;
+
+
+

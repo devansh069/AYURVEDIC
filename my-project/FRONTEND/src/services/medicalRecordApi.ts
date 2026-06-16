@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { MedicalRecord, Activity, HealthInsight, ApiResponse } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
+const BACKEND_URL = '';
 
 const client = axios.create({
   baseURL: BACKEND_URL,
@@ -98,35 +98,18 @@ const MOCK_INSIGHTS_LOCAL: HealthInsight[] = [
 
 export const medicalRecordApi = {
   getRecords: async (): Promise<ApiResponse<MedicalRecord[]>> => {
-    try {
-      const res = await client.get('/records');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /records failed, using local fallback. Error:', err.message);
-      return { data: MOCK_DOCUMENTS_LOCAL, isFallback: true, error: err.message };
-    }
+      return { data: MOCK_DOCUMENTS_LOCAL, isFallback: true };
   },
 
   getRecordById: async (id: string): Promise<ApiResponse<MedicalRecord>> => {
-    try {
-      const res = await client.get(`/records/${id}`);
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn(`API /records/${id} failed, using local fallback. Error:`, err.message);
       const found = MOCK_DOCUMENTS_LOCAL.find(d => d.id === id);
       if (found) {
-        return { data: found, isFallback: true, error: err.message };
+        return { data: found, isFallback: true };
       }
       throw new Error('Record not found offline');
-    }
   },
 
   uploadRecord: async (data: Partial<MedicalRecord>): Promise<ApiResponse<MedicalRecord>> => {
-    try {
-      const res = await client.post('/records/upload', data);
-      return { data: res.data.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /records/upload failed, using local fallback. Error:', err.message);
       const newRecord: MedicalRecord = {
         id: `rec-${Date.now()}`,
         title: data.title || "New Document",
@@ -152,16 +135,10 @@ export const medicalRecordApi = {
       };
       MOCK_ACTIVITIES_LOCAL.unshift(newAct);
 
-      return { data: newRecord, isFallback: true, error: err.message };
-    }
+      return { data: newRecord, isFallback: true };
   },
 
   deleteRecord: async (id: string): Promise<ApiResponse<MedicalRecord>> => {
-    try {
-      const res = await client.delete(`/records/${id}`);
-      return { data: res.data.data, isFallback: false };
-    } catch (err: any) {
-      console.warn(`API /records/${id} delete failed, using local fallback. Error:`, err.message);
       const idx = MOCK_DOCUMENTS_LOCAL.findIndex(d => d.id === id);
       if (idx !== -1) {
         const deleted = MOCK_DOCUMENTS_LOCAL.splice(idx, 1)[0];
@@ -173,31 +150,21 @@ export const medicalRecordApi = {
           details: `Deleted ${deleted.title}.`
         };
         MOCK_ACTIVITIES_LOCAL.unshift(newAct);
-        return { data: deleted, isFallback: true, error: err.message };
+        return { data: deleted, isFallback: true };
       }
       throw new Error('Record not found offline');
-    }
   },
 
   getActivities: async (): Promise<ApiResponse<Activity[]>> => {
-    try {
-      const res = await client.get('/activities');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /activities failed, using local fallback. Error:', err.message);
-      return { data: MOCK_ACTIVITIES_LOCAL, isFallback: true, error: err.message };
-    }
+      return { data: MOCK_ACTIVITIES_LOCAL, isFallback: true };
   },
 
   getInsights: async (): Promise<ApiResponse<HealthInsight[]>> => {
-    try {
-      const res = await client.get('/insights');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /insights failed, using local fallback. Error:', err.message);
-      return { data: MOCK_INSIGHTS_LOCAL, isFallback: true, error: err.message };
-    }
+      return { data: MOCK_INSIGHTS_LOCAL, isFallback: true };
   }
 };
 
 export default medicalRecordApi;
+
+
+

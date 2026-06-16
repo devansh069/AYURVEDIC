@@ -1,8 +1,5 @@
-import axios from 'axios';
 import { DoctorAnalyticsModel } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
-const client = axios.create({ baseURL: BACKEND_URL, timeout: 1500 });
 
 export const MOCK_DOCTOR_ANALYTICS: DoctorAnalyticsModel = {
   revenueTrend: [
@@ -34,13 +31,11 @@ export const MOCK_DOCTOR_ANALYTICS: DoctorAnalyticsModel = {
 
 export const analyticsApi = {
   async getAnalytics(): Promise<{ data: DoctorAnalyticsModel; isFallback: boolean }> {
-    try {
-      const res = await client.get('/doctor/analytics');
-      return { data: res.data, isFallback: false };
-    } catch {
       return { data: MOCK_DOCTOR_ANALYTICS, isFallback: true };
-    }
   }
 };
 
 export default analyticsApi;
+
+
+

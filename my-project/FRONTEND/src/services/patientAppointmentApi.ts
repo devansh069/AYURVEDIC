@@ -1,7 +1,5 @@
-import axios from 'axios';
 import { PatientDashboardAppointment } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
 
 export interface AppointmentsApiResponse {
   data: PatientDashboardAppointment[];
@@ -15,10 +13,6 @@ export interface SingleAppointmentApiResponse {
   error?: string;
 }
 
-const client = axios.create({
-  baseURL: BACKEND_URL,
-  timeout: 1500
-});
 
 const MOCK_APPOINTMENTS_LOCAL: PatientDashboardAppointment[] = [
   {
@@ -52,46 +46,32 @@ const MOCK_APPOINTMENTS_LOCAL: PatientDashboardAppointment[] = [
 
 export const patientAppointmentApi = {
   getAppointments: async (): Promise<AppointmentsApiResponse> => {
-    try {
-      const res = await client.get('/patient/appointments');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /patient/appointments failed, using local fallback. Error:', err.message);
-      return { data: MOCK_APPOINTMENTS_LOCAL, isFallback: true, error: err.message };
-    }
+      return { data: MOCK_APPOINTMENTS_LOCAL, isFallback: true };
   },
 
   cancelAppointment: async (id: string): Promise<SingleAppointmentApiResponse> => {
-    try {
-      const res = await client.post(`/patient/appointments/${id}/cancel`);
-      return { data: res.data.data, isFallback: false };
-    } catch (err: any) {
-      console.warn(`API /patient/appointments/${id}/cancel failed, using local fallback. Error:`, err.message);
       const apt = MOCK_APPOINTMENTS_LOCAL.find(a => a.id === id);
       if (apt) {
         apt.status = 'Cancelled';
-        return { data: apt, isFallback: true, error: err.message };
+        return { data: apt, isFallback: true };
       }
       throw new Error('Appointment not found offline');
-    }
   },
 
   rescheduleAppointment: async (id: string, date: string, time: string): Promise<SingleAppointmentApiResponse> => {
-    try {
-      const res = await client.post(`/patient/appointments/${id}/reschedule`, { date, time });
-      return { data: res.data.data, isFallback: false };
-    } catch (err: any) {
-      console.warn(`API /patient/appointments/${id}/reschedule failed, using local fallback. Error:`, err.message);
       const apt = MOCK_APPOINTMENTS_LOCAL.find(a => a.id === id);
       if (apt) {
         apt.date = date;
         apt.time = time;
         apt.status = 'Confirmed'; // reset to Confirmed if rescheduled
-        return { data: apt, isFallback: true, error: err.message };
+        return { data: apt, isFallback: true };
       }
       throw new Error('Appointment not found offline');
-    }
   }
 };
 
 export default patientAppointmentApi;
+
+
+
+

@@ -11,7 +11,7 @@ import {
   RecoveryWellnessScore 
 } from '../types';
 
-const BACKEND_URL = 'http://127.0.0.1:5174/api';
+const BACKEND_URL = '';
 
 export interface RecoveryDashboardData {
   profile: RecoveryProfile;
@@ -105,11 +105,6 @@ const MOCK_JOURNAL_LOCAL: JournalEntryRecord[] = [
 
 export const recoveryApi = {
   getRecoveryDashboard: async (): Promise<ApiResponse<RecoveryDashboardData>> => {
-    try {
-      const res = await client.get('/recovery/progress');
-      return { data: res.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /recovery/progress failed, using local fallback. Error:', err.message);
       return {
         data: {
           profile: MOCK_PROFILE_LOCAL,
@@ -122,33 +117,20 @@ export const recoveryApi = {
           achievements: MOCK_ACHIEVEMENTS_LOCAL,
           journal: MOCK_JOURNAL_LOCAL
         },
-        isFallback: true,
-        error: err.message
+        isFallback: true
       };
-    }
   },
 
   toggleMedication: async (id: string): Promise<ApiResponse<MedicationRecord>> => {
-    try {
-      const res = await client.post(`/recovery/medications/${id}/toggle`);
-      return { data: res.data.data, isFallback: false };
-    } catch (err: any) {
-      console.warn(`API /recovery/medications/${id}/toggle failed, using local fallback. Error:`, err.message);
       const found = MOCK_MEDICATIONS_LOCAL.find(m => m.id === id);
       if (found) {
         found.completed = !found.completed;
-        return { data: found, isFallback: true, error: err.message };
+        return { data: found, isFallback: true };
       }
       throw new Error('Medication not found offline');
-    }
   },
 
   addJournalEntry: async (entry: { notes: string; mood: 'Great' | 'Good' | 'Neutral' | 'Fatigued'; healthFeedback: string }): Promise<ApiResponse<JournalEntryRecord>> => {
-    try {
-      const res = await client.post('/recovery/journal/add', entry);
-      return { data: res.data.data, isFallback: false };
-    } catch (err: any) {
-      console.warn('API /recovery/journal/add failed, using local fallback. Error:', err.message);
       const newEntry: JournalEntryRecord = {
         id: `j-${Date.now()}`,
         date: new Date().toISOString().split('T')[0],
@@ -157,9 +139,11 @@ export const recoveryApi = {
         healthFeedback: entry.healthFeedback
       };
       MOCK_JOURNAL_LOCAL.unshift(newEntry);
-      return { data: newEntry, isFallback: true, error: err.message };
-    }
+      return { data: newEntry, isFallback: true };
   }
 };
 
 export default recoveryApi;
+
+
+
