@@ -18,13 +18,28 @@ export const MOCK_DOCTOR_PROFILE: DoctorProfileModel = {
   phone: '+91 98765 12345',
 };
 
+const getActiveDoctor = (): DoctorProfileModel => {
+  const active = localStorage.getItem('activeUser');
+  if (active) {
+    try {
+      const parsed = JSON.parse(active);
+      if (parsed.role === 'doctor') {
+        return parsed.profile;
+      }
+    } catch (e) {
+      console.error('Error reading active doctor', e);
+    }
+  }
+  return MOCK_DOCTOR_PROFILE;
+};
+
 export const doctorApi = {
   async getProfile(): Promise<{ data: DoctorProfileModel; isFallback: boolean }> {
     try {
       const res = await client.get('/doctor/profile');
       return { data: res.data, isFallback: false };
     } catch {
-      return { data: MOCK_DOCTOR_PROFILE, isFallback: true };
+      return { data: getActiveDoctor(), isFallback: true };
     }
   },
 

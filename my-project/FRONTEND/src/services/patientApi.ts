@@ -95,6 +95,21 @@ const MOCK_RECORDS_LOCAL: MedicalRecord[] = [
   }
 ];
 
+const getActivePatient = (): Patient => {
+  const active = localStorage.getItem('activeUser');
+  if (active) {
+    try {
+      const parsed = JSON.parse(active);
+      if (parsed.role === 'patient') {
+        return parsed.profile;
+      }
+    } catch (e) {
+      console.error('Error reading active patient', e);
+    }
+  }
+  return MOCK_PROFILE_LOCAL;
+};
+
 export const patientApi = {
   getPatientDashboard: async (): Promise<ApiResponse<PatientDashboardData>> => {
     try {
@@ -104,7 +119,7 @@ export const patientApi = {
       console.warn('API /patient/dashboard failed, using local fallback. Error:', err.message);
       return {
         data: {
-          profile: MOCK_PROFILE_LOCAL,
+          profile: getActivePatient(),
           wellness: MOCK_WELLNESS_LOCAL,
           aiRecommendations: MOCK_AI_RECOMMENDATIONS_LOCAL,
           healthGoals: MOCK_HEALTH_GOALS_LOCAL,
@@ -122,7 +137,7 @@ export const patientApi = {
       return { data: res.data, isFallback: false };
     } catch (err: any) {
       console.warn('API /patient/profile failed, using local fallback. Error:', err.message);
-      return { data: MOCK_PROFILE_LOCAL, isFallback: true, error: err.message };
+      return { data: getActivePatient(), isFallback: true, error: err.message };
     }
   },
 

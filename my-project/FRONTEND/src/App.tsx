@@ -19,35 +19,42 @@ import ProfileSettingsDashboard from './pages/ProfileSettingsDashboard';
 import DoctorDashboardPage from './pages/DoctorDashboardPage';
 import About from './pages/About';
 import DoctorProfileSettingsPage from './pages/DoctorProfileSettingsPage';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
     <Router>
-      <div className="font-sans bg-background min-h-screen flex flex-col">
-        <Navbar />
-        <div className="flex-grow pt-20"> {/* PT matches Navbar height roughly */}
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/diseases" element={<Diseases />} />
-            <Route path="/treatments" element={<Treatments />} />
-            <Route path="/treatments/:id" element={<TreatmentDetails />} />
-            <Route path="/clinics" element={<Clinics />} />
-            <Route path="/clinics/:id" element={<ClinicProfile />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/recovery-tracker" element={<RecoveryDashboard />} />
-            <Route path="/dosha-analysis" element={<DoshaAnalysisDashboard />} />
-            <Route path="/diet-planner" element={<DietPlannerDashboard />} />
-            <Route path="/ai-assistant" element={<AIAssistantDashboard />} />
-            <Route path="/profile-settings" element={<ProfileSettingsDashboard />} />
-            <Route path="/doctor-dashboard" element={<DoctorDashboardPage />} />
-            <Route path="/doctor-profile-settings" element={<DoctorProfileSettingsPage />} />
-            <Route path="/doctors" element={<Doctors />} />
-            <Route path="/doctor/:id" element={<DoctorProfile />} />
-            <Route path="/about" element={<About />} />
-          </Routes>
+      <AuthProvider>
+        <div className="font-sans bg-background min-h-screen flex flex-col">
+          <Navbar />
+          <div className="flex-grow pt-20"> {/* PT matches Navbar height roughly */}
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/diseases" element={<Diseases />} />
+              <Route path="/treatments" element={<Treatments />} />
+              <Route path="/treatments/:id" element={<TreatmentDetails />} />
+              <Route path="/clinics" element={<Clinics />} />
+              <Route path="/clinics/:id" element={<ClinicProfile />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/recovery-tracker" element={<RecoveryDashboard />} />
+              <Route path="/dosha-analysis" element={<DoshaAnalysisDashboard />} />
+              <Route path="/diet-planner" element={<DietPlannerDashboard />} />
+              <Route path="/ai-assistant" element={<AIAssistantDashboard />} />
+              <Route path="/profile-settings" element={<ProfileSettingsDashboard />} />
+              <Route path="/doctor-dashboard" element={<DoctorDashboardPage />} />
+              <Route path="/doctor-profile-settings" element={<DoctorProfileSettingsPage />} />
+              <Route path="/doctors" element={<Doctors />} />
+              <Route path="/doctor/:id" element={<DoctorProfile />} />
+              <Route path="/about" element={<About />} />
+            </Routes>
+          </div>
+          <Footer />
         </div>
-        <Footer />
-      </div>
+      </AuthProvider>
     </Router>
   );
 }
