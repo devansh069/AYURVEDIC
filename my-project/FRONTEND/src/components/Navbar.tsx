@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { Menu, X, Sprout, Shield } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { isAuthenticated, user, userRole, logout } = useAuth();
+
+  const userName = user?.name || '';
+  const userAvatar = userRole === 'patient' 
+    ? (user as any)?.profilePhoto 
+    : (user as any)?.photo;
+  
+  const dashboardLink = userRole === 'patient' ? '/dashboard' : '/doctor-dashboard';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -79,14 +88,38 @@ const Navbar: React.FC = () => {
           <div className="w-[1px] h-5 bg-gray-200 mx-1" />
 
           {/* Auth Actions */}
-          <div className="flex items-center space-x-3">
-            <Link to="/dashboard" className="text-xs font-bold text-primary hover:text-primary-light px-4 py-2 rounded-full transition-colors">
-              Login
-            </Link>
-            <Link to="/dashboard" className="bg-primary hover:bg-primary-light text-white text-xs font-bold px-5 py-2.5 rounded-full shadow-md shadow-primary/10 transition-all duration-300 transform hover:-translate-y-0.5">
-              Sign Up
-            </Link>
-          </div>
+          {isAuthenticated ? (
+            <div className="flex items-center space-x-4">
+              <Link
+                to={dashboardLink}
+                className="flex items-center space-x-2 bg-primary/5 border border-primary/10 hover:border-primary/20 px-3 py-1.5 rounded-xl transition-all"
+              >
+                <img
+                  src={userAvatar || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&q=80'}
+                  alt=""
+                  className="w-6 h-6 rounded-lg object-cover border border-primary/10"
+                />
+                <span className="text-[11px] font-bold text-primary max-w-[100px] truncate">
+                  {userName.split(' ')[0]}
+                </span>
+              </Link>
+              <button
+                onClick={logout}
+                className="text-xs font-bold text-red-650 hover:text-red-700 hover:bg-red-50/50 border border-transparent hover:border-red-200/40 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-3">
+              <Link to="/login" className="text-xs font-bold text-primary hover:text-primary-light px-4 py-2 rounded-full transition-colors">
+                Login
+              </Link>
+              <Link to="/signup" className="bg-primary hover:bg-primary-light text-white text-xs font-bold px-5 py-2.5 rounded-full shadow-md shadow-primary/10 transition-all duration-300 transform hover:-translate-y-0.5">
+                Sign Up
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -116,22 +149,48 @@ const Navbar: React.FC = () => {
                 {link.label}
               </NavLink>
             ))}
-            <div className="pt-2 flex flex-col space-y-3">
-              <Link
-                to="/dashboard"
-                onClick={() => setIsOpen(false)}
-                className="w-full py-2.5 border border-[#2E7D32]/20 text-primary font-bold text-xs rounded-xl text-center"
-              >
-                Login
-              </Link>
-              <Link
-                to="/dashboard"
-                onClick={() => setIsOpen(false)}
-                className="w-full bg-primary text-white font-bold text-xs py-3 rounded-xl shadow-md text-center"
-              >
-                Sign Up
-              </Link>
-            </div>
+            {isAuthenticated ? (
+              <div className="pt-2 flex flex-col space-y-3">
+                <Link
+                  to={dashboardLink}
+                  onClick={() => setIsOpen(false)}
+                  className="w-full flex items-center justify-center space-x-2 py-2.5 border border-[#2E7D32]/20 text-primary font-bold text-xs rounded-xl text-center"
+                >
+                  <img
+                    src={userAvatar || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&q=80'}
+                    alt=""
+                    className="w-5 h-5 rounded-md object-cover border border-primary/10"
+                  />
+                  <span>Dashboard ({userName.split(' ')[0]})</span>
+                </Link>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    logout();
+                  }}
+                  className="w-full bg-red-600 text-white font-bold text-xs py-3 rounded-xl shadow-md text-center cursor-pointer"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className="pt-2 flex flex-col space-y-3">
+                <Link
+                  to="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="w-full py-2.5 border border-[#2E7D32]/20 text-primary font-bold text-xs rounded-xl text-center"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  onClick={() => setIsOpen(false)}
+                  className="w-full bg-primary text-white font-bold text-xs py-3 rounded-xl shadow-md text-center"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}

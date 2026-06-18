@@ -1,0 +1,13 @@
+// BACKEND/middlewares/errorHandler.js
+
+const errorHandler = (err, req, res, next) => {
+  console.error("🔥 Error details:", err.stack || err);
+  
+  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  res.status(statusCode).json({
+    error: err.message || "Something went wrong on the backend server!",
+    stack: process.env.NODE_ENV === "production" ? null : err.stack
+  });
+};
+
+module.exports = errorHandler;
