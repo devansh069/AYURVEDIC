@@ -20,6 +20,9 @@ const Diseases: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isFallbackMode, setIsFallbackMode] = useState(false);
 
+  // Syncing States
+  const [syncing, setSyncing] = useState(false);
+
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -98,6 +101,25 @@ const Diseases: React.FC = () => {
     }
   };
 
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      const res = await diseaseApi.syncDiseases();
+      if (res.data && !res.isFallback) {
+        // Reload diseases list to fetch the newly synced MySQL data
+        const dissRes = await diseaseApi.getDiseases();
+        setDiseases(dissRes.data);
+        alert("Real-time data successfully fetched from Wikipedia and openFDA, and stored in MySQL database!");
+      } else {
+        alert("Sync failed: " + (res.error || "Unknown error"));
+      }
+    } catch (err: any) {
+      alert("Sync failed: " + err.message);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <div className="min-h-screen pb-20">
       
@@ -145,13 +167,13 @@ const Diseases: React.FC = () => {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 animate-pulse">
-            {[1, 2, 3, 4, 5, 6].map(n => (
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 animate-pulse">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
               <div key={n} className="bg-white border border-gray-100 rounded-2xl h-24" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
             {categories.map((cat) => (
               <DiseaseCategoryCard
                 key={cat.id}
@@ -177,7 +199,17 @@ const Diseases: React.FC = () => {
                 onSelectCategory={setSelectedCategory}
                 selectedSeverity={selectedSeverity}
                 onSelectSeverity={setSelectedSeverity}
-                popularDiseases={['Diabetes', 'PCOS', 'Arthritis', 'Migraine', 'Psoriasis']}
+                popularDiseases={[
+                  { name: 'Diabetes', slug: 'diabetes' },
+                  { name: 'PCOS', slug: 'pcos' },
+                  { name: 'Arthritis', slug: 'arthritis' },
+                  { name: 'Migraine', slug: 'migraine' },
+                  { name: 'Psoriasis', slug: 'psoriasis' },
+                  { name: 'Gout', slug: 'gout' },
+                  { name: 'Thyroid', slug: 'thyroid' },
+                  { name: "Parkinson's", slug: 'parkinsons' },
+                  { name: 'Depression', slug: 'depression' }
+                ]}
                 onSelectPopular={handlePopularSelect}
               />
             </div>
@@ -186,7 +218,21 @@ const Diseases: React.FC = () => {
           {/* Grid display */}
           <div className="lg:col-span-3 space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="font-serif text-lg font-bold text-primary">Diagnostics Listing</h3>
+              <div className="flex items-center space-x-3">
+                <h3 className="font-serif text-lg font-bold text-primary">Diagnostics Listing</h3>
+                <button
+                  onClick={handleSync}
+                  disabled={syncing}
+                  className={`text-[9px] font-bold uppercase px-3 py-1.5 rounded-full border transition-all flex items-center space-x-1 ${
+                    syncing
+                      ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                      : 'bg-primary/5 hover:bg-primary/10 border-primary/20 text-primary hover:border-primary/30'
+                  }`}
+                >
+                  <Sparkles className={`w-3 h-3 ${syncing ? 'animate-spin' : ''}`} />
+                  <span>{syncing ? 'Syncing...' : 'Sync Real-Time Data'}</span>
+                </button>
+              </div>
               <span className="text-xs font-semibold text-text-secondary">
                 {loading ? 'Analyzing...' : `Showing ${filteredDiseases.length} Illnesses`}
               </span>

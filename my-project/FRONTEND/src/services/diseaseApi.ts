@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BACKEND_URL = '';
+const BACKEND_URL = 'http://localhost:5174/api';
 
 // TypeScript Interfaces
 export interface RecoveryTimeline {
@@ -12,6 +12,13 @@ export interface RecoveryTimeline {
 export interface FAQ {
   question: string;
   answer: string;
+}
+
+export interface ModernData {
+  wikiExtract?: string | null;
+  wikiImage?: string | null;
+  fdaApprovedDrugs?: string[];
+  lastSynced?: string;
 }
 
 export interface Disease {
@@ -32,6 +39,7 @@ export interface Disease {
   severity: 'Low' | 'Moderate' | 'High';
   image: string;
   faq: FAQ[];
+  modernData?: ModernData | null;
 }
 
 export interface DiseaseCategory {
@@ -107,7 +115,7 @@ export const MOCK_DISEASES: Disease[] = [
     id: "dis-3",
     name: "Arthritis",
     slug: "arthritis",
-    category: "Lifestyle Diseases", // Match requested category
+    category: "Lifestyle Diseases",
     shortDescription: "Addressing joint pain (Amavata or Sandhivata) by removing toxins and lubricating connective tissues.",
     severity: "High",
     image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=500&q=80",
@@ -313,30 +321,56 @@ export interface DiseaseResponse<T> {
 
 const client = axios.create({
   baseURL: BACKEND_URL,
-  timeout: 1500
+  timeout: 10000
 });
 
 export const diseaseApi = {
   getDiseaseCategories: async (): Promise<DiseaseResponse<DiseaseCategory[]>> => {
-      return { data: MOCK_DISEASE_CATEGORIES, isFallback: true };
+    try {
+      const res = await client.get('/disease-categories');
+      return { data: res.data, isFallback: false };
+    } catch (err: any) {
+      return { data: MOCK_DISEASE_CATEGORIES, isFallback: true, error: err.message };
+    }
   },
 
   getDiseases: async (): Promise<DiseaseResponse<Disease[]>> => {
-      return { data: MOCK_DISEASES, isFallback: true };
+    try {
+      const res = await client.get('/diseases');
+      return { data: res.data, isFallback: false };
+    } catch (err: any) {
+      return { data: MOCK_DISEASES, isFallback: true, error: err.message };
+    }
   },
 
   getDiseaseById: async (id: string): Promise<DiseaseResponse<Disease | undefined>> => {
+    try {
+      const res = await client.get(`/diseases/${id}`);
+      return { data: res.data, isFallback: false };
+    } catch (err: any) {
       const found = MOCK_DISEASES.find(d => d.id === id || d.slug === id);
-      return { data: found, isFallback: true };
+      return { data: found, isFallback: true, error: err.message };
+    }
   },
 
   getPopularDiseases: async (): Promise<DiseaseResponse<Disease[]>> => {
+    try {
+      const res = await client.get('/popular-diseases');
+      return { data: res.data, isFallback: false };
+    } catch (err: any) {
       const popular = MOCK_DISEASES.filter(d => 
         ["diabetes", "pcos", "arthritis", "migraine", "psoriasis"].includes(d.slug)
       );
-      return { data: popular, isFallback: true };
+      return { data: popular, isFallback: true, error: err.message };
+    }
+  },
+
+  syncDiseases: async (): Promise<DiseaseResponse<any>> => {
+    try {
+      const res = await client.post('/diseases/sync');
+      return { data: res.data, isFallback: false };
+    } catch (err: any) {
+      return { data: null, isFallback: true, error: err.message };
+    }
   }
 };
-
-
-

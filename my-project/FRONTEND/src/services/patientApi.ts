@@ -1,5 +1,5 @@
+import axios from 'axios';
 import { Patient, HealthGoal, WellnessMetric, AIRecommendation, MedicalRecord } from '../types';
-
 
 export interface PatientDashboardData {
   profile: Patient;
@@ -15,8 +15,28 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
+const client = axios.create({
+  baseURL: 'http://localhost:5174/api',
+  timeout: 25000
+});
 
-// Standalone local fallbacks
+const getAuthHeaders = () => {
+  const active = localStorage.getItem('activeUser');
+  if (active) {
+    try {
+      const parsed = JSON.parse(active);
+      return {
+        'x-user-id': parsed.profile.id,
+        'x-user-role': parsed.role
+      };
+    } catch (e) {
+      console.error('Error reading auth headers', e);
+    }
+  }
+  return {};
+};
+
+// Local mock fallbacks for offline resilience
 const MOCK_WELLNESS_LOCAL: WellnessMetric = {
   dietAdherence: 85,
   exerciseProgress: 90,
@@ -68,71 +88,53 @@ const MOCK_RECORDS_LOCAL: MedicalRecord[] = [
     doctorName: 'Dr. Vikram Chauhan',
     fileSize: '2.4 MB',
     fileUrl: '#'
-  },
-  {
-    id: 'rec-doc-2',
-    title: 'PCOS Hormone Analysis Summary',
-    type: 'Report',
-    date: '2026-04-12',
-    doctorName: 'Dr. Smita Naram',
-    fileSize: '1.8 MB',
-    fileUrl: '#'
-  },
-  {
-    id: 'rec-doc-3',
-    title: 'Vata-Reducing Herbal Decoction Guide',
-    type: 'Prescription',
-    date: '2026-05-15',
-    doctorName: 'Dr. Vikram Chauhan',
-    fileSize: '840 KB',
-    fileUrl: '#'
   }
 ];
 
-const getActivePatient = (): Patient => {
-  const active = localStorage.getItem('activeUser');
-  if (active) {
-    try {
-      const parsed = JSON.parse(active);
-      if (parsed.role === 'patient') {
-        return parsed.profile;
-      }
-    } catch (e) {
-      console.error('Error reading active patient', e);
-    }
-  }
-  return MOCK_PROFILE_LOCAL;
-};
-
 export const patientApi = {
   getPatientDashboard: async (): Promise<ApiResponse<PatientDashboardData>> => {
+    try {
+      const response = await client.get('/patient/dashboard', { headers: getAuthHeaders() });
+      if (response.data && response.data.success) {
+        return { data: response.data.data, isFallback: false };
+      }
+      throw new Error('Failed to load patient dashboard from backend');
+    } catch (err: any) {
+      console.warn('Backend patient dashboard failed, using mock fallbacks:', err.message);
       return {
         data: {
-          profile: getActivePatient(),
+          profile: MOCK_PROFILE_LOCAL,
           wellness: MOCK_WELLNESS_LOCAL,
           aiRecommendations: MOCK_AI_RECOMMENDATIONS_LOCAL,
           healthGoals: MOCK_HEALTH_GOALS_LOCAL,
           records: MOCK_RECORDS_LOCAL
         },
-        isFallback: true
+        isFallback: true,
+        error: err.message
       };
+    }
   },
 
   getPatientProfile: async (): Promise<ApiResponse<Patient>> => {
-<<<<<<< HEAD
-      return { data: MOCK_PROFILE_LOCAL, isFallback: true };
-=======
     try {
-      const res = await client.get('/patient/profile');
-      return { data: res.data, isFallback: false };
+      const response = await client.get('/patient/dashboard', { headers: getAuthHeaders() });
+      if (response.data && response.data.success) {
+        return { data: response.data.data.profile, isFallback: false };
+      }
+      throw new Error('Failed to load profile');
     } catch (err: any) {
-      console.warn('API /patient/profile failed, using local fallback. Error:', err.message);
-      return { data: getActivePatient(), isFallback: true, error: err.message };
+      return { data: MOCK_PROFILE_LOCAL, isFallback: true, error: err.message };
     }
->>>>>>> 74093ff7a890953922bb65b1d4a05f32a1be406a
   },
 
   uploadMedicalRecord: async (recordData: { title: string; type: string; doctorName?: string }): Promise<ApiResponse<MedicalRecord>> => {
+    try {
+      const response = await client.post('/patient/medical-records', recordData, { headers: getAuthHeaders() });
+      if (response.data && response.data.success) {
+        return { data: response.data.data, isFallback: false };
+      }
+      throw new Error('Failed to upload record to backend');
+    } catch (err: any) {
       const offlineRecord: MedicalRecord = {
         id: `rec-doc-${Date.now()}`,
         title: recordData.title || 'Uploaded Document',
@@ -142,14 +144,10 @@ export const patientApi = {
         fileSize: '1.2 MB',
         fileUrl: '#'
       };
-      // Keep local records up to date in cache
       MOCK_RECORDS_LOCAL.unshift(offlineRecord);
-      return { data: offlineRecord, isFallback: true };
+      return { data: offlineRecord, isFallback: true, error: err.message };
+    }
   }
 };
 
 export default patientApi;
-
-
-
-

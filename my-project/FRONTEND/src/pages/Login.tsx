@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Mail, Lock, User, ShieldAlert, Sparkles, ArrowRight } from 'lucide-react';
 
 export const Login: React.FC = () => {
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   // Form states
@@ -42,6 +42,32 @@ export const Login: React.FC = () => {
     } catch (err) {
       console.error(err);
       setError('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    const emailStr = prompt("Enter your Google Account email:", role === 'patient' ? "priyanshi@ayurvedaconnect.com" : "dr.arun@ayurvedaconnect.com");
+    if (!emailStr) return;
+    
+    setError(null);
+    setLoading(true);
+
+    try {
+      const result = await loginWithGoogle(emailStr, role);
+      if (result.success) {
+        if (role === 'patient') {
+          navigate('/dashboard');
+        } else {
+          navigate('/doctor-dashboard');
+        }
+      } else {
+        setError(result.error || 'Google Login failed.');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('An error occurred during Google authentication.');
     } finally {
       setLoading(false);
     }
@@ -193,6 +219,29 @@ export const Login: React.FC = () => {
                   <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
                 </>
               )}
+            </button>
+
+            {/* Divider */}
+            <div className="relative flex items-center justify-center my-4">
+              <div className="border-t border-gray-150 w-full"></div>
+              <span className="absolute bg-[#FAF9F6] px-3 text-[10px] uppercase font-bold text-gray-400">
+                Or Continue With
+              </span>
+            </div>
+
+            {/* Google Sign In Button */}
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 font-bold text-xs py-3 rounded-xl shadow-sm transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer"
+            >
+              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
+                <path fill="#EA4335" d="M12 5.04c1.62 0 3.08.56 4.22 1.65l3.15-3.15C17.45 1.74 14.93 1 12 1 7.35 1 3.4 3.65 1.5 7.5l3.86 3C6.35 7.55 8.94 5.04 12 5.04z" />
+                <path fill="#4285F4" d="M23.49 12.27c0-.82-.07-1.61-.21-2.38H12v4.51h6.44c-.28 1.48-1.11 2.73-2.36 3.58l3.66 2.84c2.14-1.97 3.39-4.87 3.39-8.55z" />
+                <path fill="#FBBC05" d="M5.36 14.5c-.24-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29L1.5 7.06C.54 8.98 0 11.12 0 13.37s.54 4.39 1.5 6.31l3.86-3.18z" />
+                <path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.91l-3.66-2.84c-1.01.68-2.31 1.09-4.3 1.09-3.06 0-5.65-2.51-6.64-5.46L1.5 16.06C3.4 19.91 7.35 22.5 12 22.5z" />
+              </svg>
+              <span>Sign in with Google</span>
             </button>
           </form>
 

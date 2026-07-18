@@ -9,6 +9,8 @@ const categoryIcons: Record<string, React.ComponentType<any>> = {
   "Respiratory Disorders": Wind,
   "Lifestyle Diseases": Heart,
   "Mental Wellness": Brain,
+  "Bone & Joints": Activity,
+  "Nervous System": Brain,
 };
 
 interface DiseaseCategoryCardProps {

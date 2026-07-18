@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { X, CheckCircle2, AlertTriangle, ArrowRight, ShieldAlert, Sparkles, HelpCircle, UserCheck } from 'lucide-react';
+import { X, CheckCircle2, AlertTriangle, ArrowRight, ShieldAlert, Sparkles, HelpCircle, UserCheck, Bot } from 'lucide-react';
 import { Disease, DiseaseCategory } from '../../services/diseaseApi';
 import DiseaseTimeline from './DiseaseTimeline';
 import RelatedDiseases from './RelatedDiseases';
@@ -28,7 +28,7 @@ export const DiseaseDetail: React.FC<DiseaseDetailProps> = ({
         <div
           className="relative h-60 bg-primary text-white p-6 md:p-8 flex flex-col justify-end shrink-0"
           style={{
-            backgroundImage: `linear-gradient(rgba(46,125,50,0.7), rgba(46,125,50,0.95)), url(${disease.image})`,
+            backgroundImage: `linear-gradient(rgba(46,125,50,0.7), rgba(46,125,50,0.95)), url(${disease.modernData?.wikiImage || disease.image})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
@@ -92,6 +92,45 @@ export const DiseaseDetail: React.FC<DiseaseDetailProps> = ({
               </div>
             </div>
           </div>
+
+          {/* 1b. Modern Medical Perspective (Wikipedia & openFDA) */}
+          {disease.modernData && (
+            <div className="bg-white border border-accent/20 p-6 rounded-2xl shadow-sm space-y-4">
+              <h3 className="font-serif text-base font-bold text-primary flex items-center space-x-2">
+                <Bot className="w-5 h-5 text-accent" />
+                <span>Modern Medical Perspective (Real-Time API Data)</span>
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-2 space-y-2">
+                  <span className="block text-[9px] uppercase font-bold text-text-secondary">Wikipedia Medical Summary</span>
+                  <p className="text-xs text-text-secondary leading-relaxed bg-primary/5 p-4 rounded-2xl border border-primary/10">
+                    {disease.modernData.wikiExtract || "No summary available."}
+                  </p>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <span className="block text-[9px] uppercase font-bold text-text-secondary">openFDA Approved Active Ingredients</span>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {disease.modernData.fdaApprovedDrugs && disease.modernData.fdaApprovedDrugs.length > 0 ? (
+                        disease.modernData.fdaApprovedDrugs.map((drug, i) => (
+                          <span key={i} className="text-[10px] font-semibold bg-accent/15 border border-accent/25 text-primary px-3 py-1.5 rounded-full">
+                            {drug}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-xs text-text-secondary italic">No drugs listed.</span>
+                      )}
+                    </div>
+                  </div>
+                  {disease.modernData.lastSynced && (
+                    <span className="block text-[9px] text-text-secondary italic">
+                      Last Synced: {new Date(disease.modernData.lastSynced).toLocaleString()}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* 2. Symptoms Checklist */}
           <div className="space-y-3">

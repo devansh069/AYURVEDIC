@@ -1,5 +1,5 @@
+import axios from 'axios';
 import { RecoveryProgress } from '../types';
-
 
 export interface RecoveryProgressApiResponse {
   data: RecoveryProgress & {
@@ -10,6 +10,26 @@ export interface RecoveryProgressApiResponse {
   error?: string;
 }
 
+const client = axios.create({
+  baseURL: 'http://localhost:5174/api',
+  timeout: 25000
+});
+
+const getAuthHeaders = () => {
+  const active = localStorage.getItem('activeUser');
+  if (active) {
+    try {
+      const parsed = JSON.parse(active);
+      return {
+        'x-user-id': parsed.profile.id,
+        'x-user-role': parsed.role
+      };
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  return {};
+};
 
 const MOCK_RECOVERY_LOCAL = {
   id: "rec-1",
@@ -19,27 +39,35 @@ const MOCK_RECOVERY_LOCAL = {
   expectedCompletion: "2026-08-10",
   weeklyMetrics: [
     { name: "Wk 1", progress: 10, target: 15 },
-    { name: "Wk 2", progress: 25, target: 30 },
-    { name: "Wk 3", progress: 42, target: 45 },
-    { name: "Wk 4", progress: 55, target: 60 },
-    { name: "Wk 5", progress: 62, target: 70 },
-    { name: "Wk 6", progress: 72, target: 80 }
+    { name: "Wk 2", progress: 25, target: 30 }
   ],
   monthlyMetrics: [
-    { name: "Apr", progress: 30, target: 40 },
-    { name: "May", progress: 60, target: 70 },
-    { name: "Jun", progress: 72, target: 80 }
+    { name: "Apr", progress: 30, target: 40 }
   ]
 };
 
 export const patientRecoveryApi = {
   getRecoveryProgress: async (): Promise<RecoveryProgressApiResponse> => {
-      return { data: MOCK_RECOVERY_LOCAL, isFallback: true };
+    try {
+      const response = await client.get('/patient/recovery', { headers: getAuthHeaders() });
+      if (response.data && response.data.success) {
+        return { data: response.data.data, isFallback: false };
+      }
+      throw new Error('Failed to load recovery details');
+    } catch (err: any) {
+      return { data: MOCK_RECOVERY_LOCAL, isFallback: true, error: err.message };
+    }
+  },
+
+  updateWellness: async (wellnessData: { dietAdherence: number; exerciseProgress: number; sleepQuality: number; waterIntake: number }): Promise<{ success: boolean }> => {
+    try {
+      const response = await client.post('/patient/wellness', wellnessData, { headers: getAuthHeaders() });
+      return { success: response.data && response.data.success };
+    } catch (err) {
+      console.error('Failed to update wellness indicators', err);
+      return { success: false };
+    }
   }
 };
 
 export default patientRecoveryApi;
-
-
-
-

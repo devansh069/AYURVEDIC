@@ -2,13 +2,18 @@ import React from 'react';
 import { Filter, Star } from 'lucide-react';
 import { DiseaseCategory } from '../../services/diseaseApi';
 
+export interface PopularDiseaseItem {
+  name: string;
+  slug: string;
+}
+
 interface DiseaseFilterProps {
   categories: DiseaseCategory[];
   selectedCategory: string | null;
   onSelectCategory: (cat: string | null) => void;
   selectedSeverity: string | null;
   onSelectSeverity: (sev: string | null) => void;
-  popularDiseases: string[];
+  popularDiseases: PopularDiseaseItem[];
   onSelectPopular: (slug: string) => void;
 }
 
@@ -67,13 +72,13 @@ export const DiseaseFilter: React.FC<DiseaseFilterProps> = ({
           <span>Popular Diagnostics</span>
         </span>
         <div className="flex flex-wrap gap-1.5">
-          {popularDiseases.map((name) => (
+          {popularDiseases.map((item) => (
             <button
-              key={name}
-              onClick={() => onSelectPopular(name.toLowerCase())}
+              key={item.slug}
+              onClick={() => onSelectPopular(item.slug)}
               className="text-[10px] bg-[#F8FFF8] hover:bg-primary/5 border border-primary/15 text-primary font-semibold px-2.5 py-1.5 rounded-full transition-colors"
             >
-              {name}
+              {item.name}
             </button>
           ))}
         </div>

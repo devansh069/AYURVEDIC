@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 import { Patient, DoctorProfileModel } from '../types';
 
 interface AuthContextType {
@@ -8,6 +9,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string, role: 'patient' | 'doctor') => Promise<{ success: boolean; error?: string }>;
   signup: (userData: any, password: string, role: 'patient' | 'doctor') => Promise<{ success: boolean; error?: string }>;
+  loginWithGoogle: (email: string, role: 'patient' | 'doctor') => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
@@ -86,98 +88,92 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string, role: 'patient' | 'doctor') => {
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800)); // Smooth transitions
+    try {
+      const response = await axios.post(`http://localhost:5174/api/auth/${role}/login`, {
+        email,
+        password
+      });
 
-    const dbKey = `users_${role}`;
-    const usersRaw = localStorage.getItem(dbKey);
-    const users = usersRaw ? JSON.parse(usersRaw) : [];
-
-    const foundUser = users.find(
-      (u: any) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-    );
-
-    if (foundUser) {
-      setUser(foundUser.profile);
-      setUserRole(role);
-      setIsAuthenticated(true);
-      localStorage.setItem(
-        'activeUser',
-        JSON.stringify({ role, profile: foundUser.profile })
-      );
+      if (response.data && response.data.success) {
+        const { profile } = response.data.data;
+        setUser(profile);
+        setUserRole(role);
+        setIsAuthenticated(true);
+        localStorage.setItem(
+          'activeUser',
+          JSON.stringify({ role, profile })
+        );
+        setLoading(false);
+        return { success: true };
+      }
+      throw new Error('Authentication failed');
+    } catch (err: any) {
       setLoading(false);
-      return { success: true };
-    } else {
-      setLoading(false);
-      return { success: false, error: 'Invalid email, password, or chosen role.' };
+      return {
+        success: false,
+        error: err.response?.data?.error || 'Invalid email, password, or chosen role.'
+      };
     }
   };
 
   const signup = async (userData: any, password: string, role: 'patient' | 'doctor') => {
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000)); // Smooth transitions
+    try {
+      const response = await axios.post(`http://localhost:5174/api/auth/${role}/signup`, {
+        ...userData,
+        password
+      });
 
-    const dbKey = `users_${role}`;
-    const usersRaw = localStorage.getItem(dbKey);
-    const users = usersRaw ? JSON.parse(usersRaw) : [];
-
-    const emailExists = users.some(
-      (u: any) => u.email.toLowerCase() === userData.email.toLowerCase()
-    );
-
-    if (emailExists) {
+      if (response.data && response.data.success) {
+        const { profile } = response.data.data;
+        setUser(profile);
+        setUserRole(role);
+        setIsAuthenticated(true);
+        localStorage.setItem(
+          'activeUser',
+          JSON.stringify({ role, profile })
+        );
+        setLoading(false);
+        return { success: true };
+      }
+      throw new Error('Registration failed');
+    } catch (err: any) {
       setLoading(false);
-      return { success: false, error: 'This email is already registered.' };
-    }
-
-    const id = `${role === 'patient' ? 'pat' : 'dr'}-${Date.now()}`;
-    let profile: Patient | DoctorProfileModel;
-
-    if (role === 'patient') {
-      profile = {
-        id,
-        name: userData.name,
-        email: userData.email,
-        phone: userData.phone || '',
-        age: Number(userData.age) || 25,
-        gender: userData.gender || 'Female',
-        profilePhoto: userData.gender === 'Male' 
-          ? 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&q=80' 
-          : 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&q=80',
-        city: userData.city || 'Unknown',
-        doshaType: userData.doshaType || 'Pitta',
-        healthGoals: userData.healthGoals || ['Stress Reduction'],
-        joinedDate: new Date().toISOString().split('T')[0]
-      };
-    } else {
-      profile = {
-        id,
-        name: userData.name,
-        photo: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=256&q=80',
-        specialization: userData.specialization || 'Ayurvedic Medicine',
-        qualification: userData.qualification || 'BAMS',
-        experience: userData.experience || '5+ Years',
-        rating: 5.0,
-        clinicName: userData.clinicName || 'AyurVeda Wellness Center',
-        city: userData.city || 'Unknown',
-        email: userData.email,
-        phone: userData.phone || ''
+      return {
+        success: false,
+        error: err.response?.data?.error || 'Registration failed. Please try again.'
       };
     }
+  };
 
-    const newUsersList = [...users, { email: userData.email, password, profile }];
-    localStorage.setItem(dbKey, JSON.stringify(newUsersList));
+  const loginWithGoogle = async (email: string, role: 'patient' | 'doctor') => {
+    setLoading(true);
+    try {
+      const response = await axios.post('http://localhost:5174/api/auth/google', {
+        email,
+        role
+      });
 
-    // Log them in immediately
-    setUser(profile);
-    setUserRole(role);
-    setIsAuthenticated(true);
-    localStorage.setItem(
-      'activeUser',
-      JSON.stringify({ role, profile })
-    );
-
-    setLoading(false);
-    return { success: true };
+      if (response.data && response.data.success) {
+        const { profile } = response.data.data;
+        setUser(profile);
+        setUserRole(role);
+        setIsAuthenticated(true);
+        localStorage.setItem(
+          'activeUser',
+          JSON.stringify({ role, profile })
+        );
+        setLoading(false);
+        return { success: true };
+      }
+      throw new Error('Google login failed');
+    } catch (err: any) {
+      setLoading(false);
+      return {
+        success: false,
+        error: err.response?.data?.error || 'Google login failed.'
+      };
+    }
   };
 
   const logout = () => {
@@ -188,7 +184,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, userRole, loading, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, userRole, loading, login, signup, loginWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );

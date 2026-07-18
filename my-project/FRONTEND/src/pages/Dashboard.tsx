@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import { 
   Calendar, 
   Activity, 
@@ -122,6 +123,27 @@ export const Dashboard: React.FC = () => {
             recoveryRes.isFallback ||
             notificationsRes.isFallback
           );
+
+          // Fetch chat messages from backend
+          try {
+            const active = localStorage.getItem('activeUser');
+            let headers = {};
+            if (active) {
+              const parsed = JSON.parse(active);
+              headers = { 'x-user-id': parsed.profile.id, 'x-user-role': parsed.role };
+            }
+            const chatRes = await axios.get('http://localhost:5174/api/patient/chat', { headers });
+            if (chatRes.data && chatRes.data.success) {
+              setChatMessages(chatRes.data.data.map((m: any) => ({
+                id: m.id,
+                sender: m.sender,
+                text: m.text,
+                time: m.time
+              })));
+            }
+          } catch (chatErr) {
+            console.warn('Could not load chat history from backend:', chatErr);
+          }
         }
       } catch (err) {
         console.error('Fatal failure fetching patient portal data, using fallbacks.', err);
@@ -184,45 +206,60 @@ export const Dashboard: React.FC = () => {
   };
 
   // Chat message submit
-  const handleSendChatMessage = (e: React.FormEvent) => {
+  const handleSendChatMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatInput.trim()) return;
 
-    const userMsg: ChatMessage = {
-      id: Date.now().toString(),
-      sender: 'patient',
-      text: chatInput,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-
-    setChatMessages(prev => [...prev, userMsg]);
-    const query = chatInput;
+    const userText = chatInput;
     setChatInput('');
     setAiTyping(true);
 
-    // AI simulated response
-    setTimeout(() => {
-      let reply = "I've logged your request. To pacify Pitta dosha, focus on sweet cooling substances like coconut water, and practice breathing exercises. For PCOS care, regular consumption of Shatavari and Kanchnar decoctions is highly beneficial.";
-      const qLower = query.toLowerCase();
-      if (qLower.includes('diet') || qLower.includes('food') || qLower.includes('eat')) {
-        reply = "For your Pitta-Kapha dosha, favor cooling yet light foods. Organic barley grains, boiled quinoa, and sweet melons are excellent. Strictly avoid spicy peppers, sour pickles, and heavy cold yogurt after sunset as they increase mucus and heat.";
-      } else if (qLower.includes('pcos') || qLower.includes('irregular') || qLower.includes('hormon')) {
-        reply = "PCOS stems from Kapha blockages in the Artava Srotas (reproductive channels). I recommend Shatavari powder with warm water before sleep to nourish tissues, and daily butterfly poses (Baddha Konasana) to improve pelvic blood circulation.";
-      } else if (qLower.includes('stress') || qLower.includes('sleep') || qLower.includes('insomnia')) {
-        reply = "To reduce mental stress (aggravated Vata-Pitta in the mind), perform a gentle scalp massage using warm Brahmi or coconut oil. Sleep before 10:30 PM, and practice 10 minutes of Anulom Vilom pranayama before retiring.";
-      }
+    const tempUserMsg: ChatMessage = {
+      id: Date.now().toString(),
+      sender: 'patient',
+      text: userText,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    setChatMessages(prev => [...prev, tempUserMsg]);
 
-      setChatMessages(prev => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          sender: 'ai',
-          text: reply,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        }
-      ]);
+    try {
+      const active = localStorage.getItem('activeUser');
+      let headers = {};
+      if (active) {
+        const parsed = JSON.parse(active);
+        headers = { 'x-user-id': parsed.profile.id, 'x-user-role': parsed.role };
+      }
+      const response = await axios.post(
+        'http://localhost:5174/api/patient/chat',
+        { text: userText },
+        { headers }
+      );
+
+      if (response.data && response.data.success) {
+        const { patientMessage, aiResponse } = response.data.data;
+        setChatMessages(prev => [
+          ...prev.filter(m => m.id !== tempUserMsg.id),
+          { id: patientMessage.id, sender: 'patient', text: patientMessage.text, time: patientMessage.time },
+          { id: aiResponse.id, sender: 'ai', text: aiResponse.text, time: aiResponse.time }
+        ]);
+      }
+    } catch (err) {
+      console.error('Failed to post message to backend:', err);
+      // Fallback response if offline
+      setTimeout(() => {
+        setChatMessages(prev => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            sender: 'ai',
+            text: "I've logged your request. To pacify Pitta dosha, focus on sweet cooling substances like coconut water, and practice breathing exercises.",
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }
+        ]);
+      }, 1000);
+    } finally {
       setAiTyping(false);
-    }, 1200);
+    }
   };
 
   if (loading || !patient || !wellness || !aiRecommendations) {

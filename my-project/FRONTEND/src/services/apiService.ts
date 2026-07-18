@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BACKEND_URL = '';
+const BACKEND_URL = 'http://localhost:5174/api';
 
 // Static local mock data for fallback or offline mode
 export const MOCK_STATS = {
@@ -1031,27 +1031,57 @@ const client = axios.create({
 
 export const apiService = {
   getStats: async (): Promise<ApiResponse<typeof MOCK_STATS>> => {
-      return { data: MOCK_STATS, isFallback: true };
+    try {
+      const response = await client.get('/stats');
+      return { data: response.data, isFallback: false };
+    } catch (err: any) {
+      return { data: MOCK_STATS, isFallback: true, error: err.message };
+    }
   },
 
   getDiseases: async (): Promise<ApiResponse<typeof MOCK_DISEASES>> => {
-      return { data: MOCK_DISEASES, isFallback: true };
+    try {
+      const response = await client.get('/diseases');
+      return { data: response.data, isFallback: false };
+    } catch (err: any) {
+      return { data: MOCK_DISEASES, isFallback: true, error: err.message };
+    }
   },
 
   getTreatments: async (): Promise<ApiResponse<typeof MOCK_TREATMENTS>> => {
-      return { data: MOCK_TREATMENTS, isFallback: true };
+    try {
+      const response = await client.get('/treatments');
+      return { data: response.data, isFallback: false };
+    } catch (err: any) {
+      return { data: MOCK_TREATMENTS, isFallback: true, error: err.message };
+    }
   },
 
   getDoctors: async (): Promise<ApiResponse<typeof MOCK_DOCTORS>> => {
-      return { data: MOCK_DOCTORS, isFallback: true };
+    try {
+      const response = await client.get('/doctors');
+      return { data: response.data, isFallback: false };
+    } catch (err: any) {
+      return { data: MOCK_DOCTORS, isFallback: true, error: err.message };
+    }
   },
 
   getClinics: async (): Promise<ApiResponse<typeof MOCK_CLINICS>> => {
-      return { data: MOCK_CLINICS, isFallback: true };
+    try {
+      const response = await client.get('/clinics');
+      return { data: response.data, isFallback: false };
+    } catch (err: any) {
+      return { data: MOCK_CLINICS, isFallback: true, error: err.message };
+    }
   },
 
   getTestimonials: async (): Promise<ApiResponse<typeof MOCK_TESTIMONIALS>> => {
-      return { data: MOCK_TESTIMONIALS, isFallback: true };
+    try {
+      const response = await client.get('/testimonials');
+      return { data: response.data, isFallback: false };
+    } catch (err: any) {
+      return { data: MOCK_TESTIMONIALS, isFallback: true, error: err.message };
+    }
   }
 };
 

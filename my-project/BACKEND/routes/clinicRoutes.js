@@ -15,5 +15,6 @@ router.get('/clinics/:id/reviews', clinicController.getClinicReviews);
 router.get('/clinics/:id/gallery', clinicController.getClinicGallery);
 router.get('/clinics/:id/packages', clinicController.getClinicPackages);
 router.get('/testimonials', clinicController.getTestimonials);
+router.put('/clinics/:id/location', clinicController.updateLocation);
 
 module.exports = router;

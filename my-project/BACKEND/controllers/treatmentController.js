@@ -1,170 +1,268 @@
 // BACKEND/controllers/treatmentController.js
-const { MOCK_TREATMENT_CATEGORIES, MOCK_TREATMENTS } = require('../models/treatmentModel');
-const { MOCK_DOCTORS } = require('../models/doctorModel');
+const { getPool } = require('../config/db');
+const fs = require('fs');
+const path = require('path');
 
-exports.getTreatmentCategories = (req, res, next) => {
-  try {
-    res.json(MOCK_TREATMENT_CATEGORIES);
-  } catch (err) {
-    next(err);
-  }
-};
-
-exports.getTreatments = (req, res, next) => {
-  try {
-    res.json(MOCK_TREATMENTS);
-  } catch (err) {
-    next(err);
-  }
-};
-
-exports.getTreatmentById = (req, res, next) => {
-  try {
-    const trt = MOCK_TREATMENTS.find(t => t.id === req.params.id || t.slug === req.params.id);
-    if (trt) {
-      res.json(trt);
+const parseTreatmentJsonFields = (trt) => {
+  if (!trt) return trt;
+  const parsed = { ...trt };
+  const jsonFields = [
+    'benefits', 'suitableFor', 'contraindications', 'precautions', 'steps', 'faq', 'modernData'
+  ];
+  jsonFields.forEach(field => {
+    if (parsed[field]) {
+      if (typeof parsed[field] === 'string') {
+        try {
+          parsed[field] = JSON.parse(parsed[field]);
+        } catch (e) {
+          parsed[field] = field === 'modernData' ? null : [];
+        }
+      }
     } else {
-      res.status(404).json({ error: "Treatment not found" });
+      parsed[field] = field === 'modernData' ? null : [];
     }
-  } catch (err) {
-    next(err);
-  }
+  });
+  return parsed;
 };
 
-exports.getTreatmentDoctors = (req, res, next) => {
+// Fallback arrays loaded from json seed files if database is offline
+const loadSeedData = (filename) => {
   try {
-    const trt = MOCK_TREATMENTS.find(t => t.id === req.params.id || t.slug === req.params.id);
-    if (!trt) {
-      return res.status(404).json({ error: "Treatment not found" });
+    const filePath = path.join(__dirname, '..', 'data', filename);
+    if (fs.existsSync(filePath)) {
+      return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
     }
-    const matched = MOCK_DOCTORS.filter(doc => {
-      const spec = doc.specialization.toLowerCase();
-      const exp = doc.specialExpertise.map(e => e.toLowerCase());
-      const cat = trt.category.toLowerCase();
-      return spec.includes(cat) || 
-             spec.includes("general") || 
-             spec.includes("kayachikitsa") || 
-             exp.some(e => e.includes(trt.name.toLowerCase()) || e.includes(cat));
-    });
-    const results = matched.length > 0 ? matched.slice(0, 6) : MOCK_DOCTORS.slice(0, 6);
-    res.json(results);
-  } catch (err) {
-    next(err);
+  } catch (e) {
+    console.error(`Error loading seed fallback data for ${filename}:`, e.message);
   }
+  return [];
 };
 
-exports.getTreatmentFaqs = (req, res, next) => {
+exports.getTreatmentCategories = async (req, res, next) => {
   try {
-    const trt = MOCK_TREATMENTS.find(t => t.id === req.params.id || t.slug === req.params.id);
-    if (trt) {
-      res.json(trt.faq || []);
+    const pool = getPool();
+    if (!pool) {
+      return res.json(loadSeedData('treatment_categories.json'));
+    }
+    const [rows] = await pool.query("SELECT * FROM treatment_categories");
+    if (rows && rows.length > 0) {
+      res.json(rows);
     } else {
-      res.status(404).json({ error: "Treatment not found" });
+      res.json(loadSeedData('treatment_categories.json'));
     }
   } catch (err) {
     next(err);
   }
 };
 
-exports.getTreatmentRecoveryTimeline = (req, res, next) => {
+exports.getTreatments = async (req, res, next) => {
   try {
-    const trt = MOCK_TREATMENTS.find(t => t.id === req.params.id || t.slug === req.params.id);
-    if (!trt) {
-      return res.status(404).json({ error: "Treatment not found" });
+    const pool = getPool();
+    if (!pool) {
+      return res.json(loadSeedData('treatments.json'));
     }
-    const timeline = [
-      { step: "Week 1", description: `Primary response initiation. Digestive adjustments and body adapting to the therapeutic inputs of ${trt.name}.` },
-      { step: "Week 2", description: `Active channel purification. Cleansing of toxins (Ama) starts, which might cause mild healing fatigue.` },
-      { step: "Week 4", description: `Dosha stabilization and system rebalancing. Notable improvement in digestive fire (Agni) and general energy.` },
-      { step: "Month 2", description: `Deep tissue (Dhatu) rejuvenation and cell repair. Targeted chronic symptoms begin to fade.` },
-      { step: "Month 3", description: "Establishment of dynamic health balance, complete vitality, and ongoing maintenance through seasonal diet guidelines." }
-    ];
-    res.json(timeline);
+    const [rows] = await pool.query("SELECT * FROM treatments");
+    if (rows && rows.length > 0) {
+      res.json(rows.map(parseTreatmentJsonFields));
+    } else {
+      res.json(loadSeedData('treatments.json').map(parseTreatmentJsonFields));
+    }
   } catch (err) {
     next(err);
   }
 };
 
-exports.getTreatmentPersonalizedPlan = (req, res, next) => {
+exports.getTreatmentById = async (req, res, next) => {
   try {
-    const trt = MOCK_TREATMENTS.find(t => t.id === req.params.id || t.slug === req.params.id);
-    if (!trt) {
-      return res.status(404).json({ error: "Treatment not found" });
-    }
-    const age = parseInt(req.query.age) || 30;
-    const goal = req.query.goal || "Restore systemic energy balance";
-    const dosha = (req.query.dosha || "Vata").toLowerCase();
+    const pool = getPool();
+    const id = req.params.id;
 
-    let diet = [];
-    let lifestyle = [];
-    let timeline = "";
-
-    if (dosha === "vata") {
-      diet = [
-        "Warm, freshly cooked grounding foods (basmati rice, warm soups, oats).",
-        "Incorporate healthy fats like raw Ghee, sesame oil, and almond oil.",
-        "Sweet, sour, and salty tastes; avoid dry, cold, or carbonated items."
-      ];
-      lifestyle = [
-        "Perform a 10-minute self-Abhyanga massage with warm sesame oil before bathing.",
-        "Practice 15 minutes of calming Nadi Shodhana (breath balancing) pranayama.",
-        "Strict sleep hygiene: retire by 10:00 PM and protect your joints from cold drafts."
-      ];
-      timeline = "6 Weeks. Focus is on nourishing bodily tissues and grounding nervous energy.";
-    } else if (dosha === "pitta") {
-      diet = [
-        "Cooling, soothing, and moderately heavy foods (sweet fruits, leafy greens, coconut).",
-        "Favor sweet, bitter, and astringent tastes; strictly avoid spicy, fried, or fermented foods.",
-        "Drink refreshing herbal teas like peppermint, coriander seeds, or rose infusions."
-      ];
-      lifestyle = [
-        "Massage the soles of your feet and scalp with organic coconut oil before bed.",
-        "Practice sheetali (cooling breath) pranayama and light, non-competitive yoga.",
-        "Avoid direct mid-day sun exposure and balance intense work cycles with leisure."
-      ];
-      timeline = "8 Weeks. Focus is on cooling metabolic fire, purifying the blood, and soothing skin/liver channels.";
-    } else { // kapha
-      diet = [
-        "Warm, dry, light, and spicy foods (barley, quinoa, steamed vegetables).",
-        "Favor spicy, bitter, and astringent tastes; restrict heavy dairy, sugars, and salt.",
-        "Sip warm ginger-cinnamon tea throughout the day to boost sluggish metabolism."
-      ];
-      lifestyle = [
-        "Perform dry skin brushing (Garshana) each morning to stimulate lymphatic circulation.",
-        "Engage in 30-45 minutes of active, vigorous physical yoga or brisk walking.",
-        "Avoid daytime sleeping, keep warm, and maintain a highly active daily routine."
-      ];
-      timeline = "12 Weeks. Focus is on reducing tissue congestion, eliminating excess phlegm/fat, and accelerating internal heat.";
+    if (pool) {
+      const [rows] = await pool.query("SELECT * FROM treatments WHERE id = ? OR slug = ?", [id, id]);
+      if (rows && rows.length > 0) {
+        return res.json(parseTreatmentJsonFields(rows[0]));
+      }
     }
 
-    const plan = {
-      patientAge: age,
-      healthGoal: goal,
-      doshaType: dosha.charAt(0).toUpperCase() + dosha.slice(1),
-      suggestedTherapy: `${trt.name} specialized protocol`,
-      suggestedDiet: diet,
-      suggestedLifestyle: lifestyle,
-      expectedTimeline: timeline
+    const treatments = loadSeedData('treatments.json');
+    const found = treatments.find(t => t.id === id || t.slug === id);
+    if (found) {
+      res.json(parseTreatmentJsonFields(found));
+    } else {
+      res.status(404).json({ error: "Treatment profile not found" });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getPopularTreatments = async (req, res, next) => {
+  try {
+    const pool = getPool();
+    if (pool) {
+      const [rows] = await pool.query("SELECT * FROM treatments WHERE rating >= 4.9");
+      if (rows && rows.length > 0) {
+        return res.json(rows.map(parseTreatmentJsonFields));
+      }
+    }
+
+    const treatments = loadSeedData('treatments.json');
+    const popular = treatments.filter(t => t.rating >= 4.9);
+    res.json(popular.map(parseTreatmentJsonFields));
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getRecommendedTreatments = async (req, res, next) => {
+  try {
+    const pool = getPool();
+    if (pool) {
+      const [rows] = await pool.query("SELECT * FROM treatments LIMIT 5 OFFSET 4");
+      if (rows && rows.length > 0) {
+        return res.json(rows.map(parseTreatmentJsonFields));
+      }
+    }
+
+    const treatments = loadSeedData('treatments.json');
+    const recommended = treatments.slice(4, 9);
+    res.json(recommended.map(parseTreatmentJsonFields));
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.syncTreatments = async (req, res, next) => {
+  try {
+    const pool = getPool();
+    if (!pool) {
+      return res.status(500).json({ error: "MySQL database pool is offline." });
+    }
+
+    const [rows] = await pool.query("SELECT * FROM treatments");
+    if (rows.length === 0) {
+      return res.status(400).json({ error: "No treatments found in database to sync." });
+    }
+
+    const WIKI_MAPPING = {
+      'panchakarma': 'Panchakarma',
+      'vamana': 'Vamana',
+      'virechana': 'Virechana',
+      'basti': 'Basti_(treatment)',
+      'nasya': 'Nasya',
+      'raktamokshana': 'Bloodletting',
+      'abhyanga': 'Abhyanga',
+      'shirodhara': 'Shirodhara',
+      'udvartana': 'Udvartana',
+      'herbal-therapy': 'Herbal_medicine',
+      'detox-therapy': 'Detoxification',
+      'yoga-therapy': 'Yoga_as_therapy',
+      'stress-management-program': 'Stress_management',
+      'weight-management-program': 'Weight_management',
+      'pcos-wellness-program': 'Polycystic_ovary_syndrome'
     };
 
-    res.json(plan);
+    const syncedTreatments = [];
+
+    for (const row of rows) {
+      const wikiTerm = WIKI_MAPPING[row.slug] || row.name;
+
+      let wikiExtract = null;
+      let wikiImage = null;
+
+      // Fetch from Wikipedia
+      try {
+        const wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiTerm)}`);
+        if (wikiRes.ok) {
+          const wikiData = await wikiRes.json();
+          wikiExtract = wikiData.extract || null;
+          if (wikiData.thumbnail && wikiData.thumbnail.source) {
+            wikiImage = wikiData.thumbnail.source;
+          }
+        }
+      } catch (err) {
+        console.error(`Wikipedia sync failed for ${row.name}:`, err.message);
+      }
+
+      const modernData = {
+        wikiExtract,
+        wikiImage,
+        lastSynced: new Date().toISOString()
+      };
+
+      // Save into MySQL
+      await pool.query(
+        "UPDATE treatments SET modernData = ? WHERE id = ?",
+        [JSON.stringify(modernData), row.id]
+      );
+
+      syncedTreatments.push({
+        id: row.id,
+        name: row.name,
+        modernData
+      });
+    }
+
+    res.json({
+      message: "Successfully synced real-time Wikipedia data for all treatments.",
+      count: syncedTreatments.length,
+      treatments: syncedTreatments
+    });
   } catch (err) {
     next(err);
   }
 };
 
-exports.getPopularTreatments = (req, res, next) => {
+exports.bookTreatment = async (req, res, next) => {
   try {
-    const popular = MOCK_TREATMENTS.filter(t => t.rating >= 4.9);
-    res.json(popular);
+    const pool = getPool();
+    if (!pool) {
+      return res.status(500).json({ error: "MySQL database pool is offline." });
+    }
+
+    const {
+      treatmentId,
+      treatmentName,
+      patientName,
+      patientEmail,
+      patientPhone,
+      preferredDate,
+      preferredTime,
+      notes
+    } = req.body;
+
+    if (!patientName || !patientEmail || !preferredDate) {
+      return res.status(400).json({ error: "Missing required patient name, email, or preferred date." });
+    }
+
+    const id = `bk-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+    await pool.query(`
+      INSERT INTO treatment_bookings (
+        id, treatmentId, treatmentName, patientName, patientEmail, patientPhone, preferredDate, preferredTime, notes
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      id, treatmentId, treatmentName, patientName, patientEmail, patientPhone, preferredDate, preferredTime, notes
+    ]);
+
+    const [rows] = await pool.query("SELECT * FROM treatment_bookings WHERE id = ?", [id]);
+    res.status(201).json({
+      message: "Treatment booking successfully created in real time.",
+      booking: rows[0]
+    });
   } catch (err) {
     next(err);
   }
 };
 
-exports.getRecommendedTreatments = (req, res, next) => {
+exports.getBookings = async (req, res, next) => {
   try {
-    res.json(MOCK_TREATMENTS.slice(4, 9));
+    const pool = getPool();
+    if (!pool) {
+      return res.status(500).json({ error: "MySQL database pool is offline." });
+    }
+    const [rows] = await pool.query("SELECT * FROM treatment_bookings ORDER BY createdAt DESC");
+    res.json(rows);
   } catch (err) {
     next(err);
   }

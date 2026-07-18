@@ -48,6 +48,9 @@ export const Treatments: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isFallback, setIsFallback] = useState(false);
 
+  // Syncing States
+  const [syncing, setSyncing] = useState(false);
+
   // Filter States
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -229,6 +232,25 @@ export const Treatments: React.FC = () => {
     }
   };
 
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      const res = await treatmentApi.syncTreatments();
+      if (res.data && !res.isFallback) {
+        // Re-load treatments from MySQL to update client state
+        const trtRes = await treatmentApi.getTreatments();
+        setTreatments(trtRes.data);
+        alert("Real-time treatment data successfully fetched from Wikipedia and stored in MySQL!");
+      } else {
+        alert("Sync failed: " + (res.error || "Unknown error"));
+      }
+    } catch (err: any) {
+      alert("Sync failed: " + err.message);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <div className="bg-background min-h-screen text-text-primary">
       {/* SECURE FALLBACK WARNING BANNER */}
@@ -383,7 +405,21 @@ export const Treatments: React.FC = () => {
           <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-primary/10 pb-4 gap-4">
             <div className="space-y-1">
               <span className="text-accent text-[9px] font-bold uppercase tracking-widest block">Complete Registry</span>
-              <h2 className="font-serif text-2xl md:text-3xl font-bold text-primary">Treatment Library Grid</h2>
+              <div className="flex items-center space-x-3">
+                <h2 className="font-serif text-2xl md:text-3xl font-bold text-primary">Treatment Library Grid</h2>
+                <button
+                  onClick={handleSync}
+                  disabled={syncing}
+                  className={`text-[9px] font-bold uppercase px-3 py-1.5 rounded-full border transition-all flex items-center space-x-1 ${
+                    syncing
+                      ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                      : 'bg-primary/5 hover:bg-primary/10 border-primary/20 text-primary hover:border-primary/30'
+                  }`}
+                >
+                  <Sparkles className={`w-3 h-3 ${syncing ? 'animate-spin' : ''}`} />
+                  <span>{syncing ? 'Syncing...' : 'Sync Real-Time Data'}</span>
+                </button>
+              </div>
             </div>
             <div className="text-xs font-semibold text-text-secondary bg-primary/5 py-1.5 px-4 rounded-full border border-primary/5">
               Showing <span className="text-primary font-black">{filteredTreatments.length}</span> of {treatments.length} matching treatments

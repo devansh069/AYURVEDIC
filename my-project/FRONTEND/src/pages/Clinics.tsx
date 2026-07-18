@@ -67,6 +67,10 @@ export const Clinics: React.FC = () => {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
 
+  // Geolocation and proximity states
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [locPermissionState, setLocPermissionState] = useState<'prompt' | 'granted' | 'denied' | 'checking'>('prompt');
+
   // Fetch initial data
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -89,12 +93,61 @@ export const Clinics: React.FC = () => {
         setLoading(false);
       }
     };
+
     fetchInitialData();
   }, []);
 
-  // Filter calculation logic
+  const detectUserLocation = () => {
+    setLocPermissionState('checking');
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          });
+          setLocPermissionState('granted');
+        },
+        (err) => {
+          // Fall back gracefully
+          setLocPermissionState('denied');
+        },
+        { enableHighAccuracy: false, timeout: 6000 }
+      );
+    } else {
+      setLocPermissionState('denied');
+    }
+  };
+
+  // Haversine distance formula in km
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371; // Radius of the earth in km
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  // Filter & Proximity Sort calculation logic
   const filteredClinics = useMemo(() => {
-    return clinics.filter((c) => {
+    let results = clinics.map((c) => {
+      let distanceKm: number | null = null;
+      if (userLocation && c.latitude && c.longitude) {
+        distanceKm = calculateDistance(
+          userLocation.latitude,
+          userLocation.longitude,
+          parseFloat(c.latitude as any),
+          parseFloat(c.longitude as any)
+        );
+      }
+      return { ...c, distanceKm };
+    });
+
+    results = results.filter((c) => {
       // Hero queries
       const matchesHeroName = !nameQuery || c.name.toLowerCase().includes(nameQuery.toLowerCase());
       const matchesHeroCity = !cityQuery || c.city.toLowerCase() === cityQuery.toLowerCase();
@@ -125,6 +178,17 @@ export const Clinics: React.FC = () => {
         matchesAge
       );
     });
+
+    // If user has location, sort by nearest
+    if (userLocation) {
+      results.sort((a, b) => {
+        if (a.distanceKm === null) return 1;
+        if (b.distanceKm === null) return -1;
+        return a.distanceKm - b.distanceKm;
+      });
+    }
+
+    return results;
   }, [
     clinics,
     nameQuery,
@@ -135,7 +199,8 @@ export const Clinics: React.FC = () => {
     selectedType,
     selectedRating,
     selectedService,
-    selectedYears
+    selectedYears,
+    userLocation
   ]);
 
   // Unique States list for filter dropdown
@@ -309,6 +374,62 @@ export const Clinics: React.FC = () => {
             </div>
           </div>
 
+          {/* Geospatial Geolocation Status Banner */}
+          <div className="bg-[#FAF9F6] border border-[#2E7D32]/10 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold">
+            <div className="flex items-start space-x-3 text-left">
+              <span className="text-xl shrink-0 mt-0.5">📍</span>
+              <div className="space-y-0.5">
+                <h4 className="font-bold text-primary">Suggest Closest Healing Centers?</h4>
+                <p className="text-[10px] text-text-secondary leading-relaxed">
+                  {locPermissionState === 'prompt' && "Click detect to allow Chrome location access and instantly sort clinics by proximity."}
+                  {locPermissionState === 'checking' && "Connecting to browser GPS satellites, please stand by..."}
+                  {locPermissionState === 'granted' && "Successfully connected! Nearby clinics are now sorted by distance to your live location."}
+                  {locPermissionState === 'denied' && (
+                    <span>
+                      GPS permission blocked. To reset, click the <b>Tune/Lock icon</b> next to the URL, set Location to 'Allow', and reload.
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+            
+            {locPermissionState === 'prompt' && (
+              <button
+                onClick={detectUserLocation}
+                className="bg-primary hover:bg-primary-light text-white text-[10px] font-black uppercase tracking-wider px-5 py-2.5 rounded-full shadow-sm shrink-0 transition-all flex items-center space-x-1 cursor-pointer"
+              >
+                <span>Detect My Location</span>
+              </button>
+            )}
+            
+            {locPermissionState === 'checking' && (
+              <button
+                disabled
+                className="bg-gray-200 text-gray-400 text-[10px] font-black uppercase tracking-wider px-5 py-2.5 rounded-full shrink-0 flex items-center space-x-1.5 cursor-not-allowed"
+              >
+                <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                <span>Detecting...</span>
+              </button>
+            )}
+
+            {locPermissionState === 'granted' && (
+              <div className="bg-emerald-50 text-emerald-800 border border-emerald-250 py-1.5 px-3 rounded-full text-[10px] uppercase font-bold shrink-0 flex items-center space-x-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                <span>Sorted By Proximity</span>
+              </div>
+            )}
+
+            {locPermissionState === 'denied' && (
+              <button
+                onClick={detectUserLocation}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 text-[10px] font-black uppercase tracking-wider px-4 py-2.5 rounded-full shrink-0 transition-all cursor-pointer"
+              >
+                <span>Retry Detect</span>
+              </button>
+            )}
+          </div>
+
+
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
             {/* Left Sidebar Filter (1/4 width) */}
             <div className="lg:col-span-1">
@@ -362,7 +483,14 @@ export const Clinics: React.FC = () => {
 
         {/* 8. INTERACTIVE MAP PREVIEW */}
         {!loading && clinics.length > 0 && (
-          <ClinicMapPreview clinics={filteredClinics.length > 0 ? filteredClinics : clinics} />
+          <ClinicMapPreview 
+            clinics={filteredClinics.length > 0 ? filteredClinics : clinics} 
+            userLocation={userLocation}
+            onRefresh={async () => {
+              const clinicsRes = await clinicApi.getClinics();
+              setClinics(clinicsRes.data);
+            }}
+          />
         )}
 
         {/* 12. WHY CHOOSE VERIFIED CLINICS */}

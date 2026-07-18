@@ -64,9 +64,16 @@ export const ClinicCard: React.FC<ClinicCardProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center space-x-1 text-[10px] text-text-secondary font-bold">
-            <MapPin className="w-3.5 h-3.5 text-secondary shrink-0" />
-            <span className="truncate">{clinic.address}, {clinic.city}</span>
+          <div className="flex justify-between items-center text-[10px] text-text-secondary font-bold">
+            <div className="flex items-center space-x-1 truncate max-w-[70%]">
+              <MapPin className="w-3.5 h-3.5 text-secondary shrink-0" />
+              <span className="truncate">{clinic.address}, {clinic.city}</span>
+            </div>
+            {(clinic as any).distanceKm !== undefined && (clinic as any).distanceKm !== null && (
+              <span className="bg-primary/10 text-primary font-black px-2 py-0.5 rounded text-[8.5px] uppercase tracking-wider shrink-0 flex items-center space-x-0.5 border border-primary/15">
+                <span>📍 {(clinic as any).distanceKm.toFixed(1)} km</span>
+              </span>
+            )}
           </div>
 
           <p className="text-[11px] text-text-secondary leading-relaxed line-clamp-2 font-medium">

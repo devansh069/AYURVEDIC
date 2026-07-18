@@ -7,6 +7,8 @@ const MOCK_DISEASE_CATEGORIES = [
   { id: 'cat-4', name: "Respiratory Disorders", description: "Breath channel (Prana Vaha Srotas) blockages causing wheezing.", icon: "Wind" },
   { id: 'cat-5', name: "Lifestyle Diseases", description: "Metabolic and cardiovascular issues originating from poor lifestyle habits.", icon: "Heart" },
   { id: 'cat-6', name: "Mental Wellness", description: "Restoring psychological calmness and quality sleep cycles.", icon: "Brain" },
+  { id: 'cat-7', name: "Bone & Joints", description: "Joint mobility, lubrication, and skeletal integrity therapies.", icon: "Activity" },
+  { id: 'cat-8', name: "Nervous System", description: "Neurological pathways, sensory restoration, and nerve system stability.", icon: "Brain" },
 ];
 
 const MOCK_DISEASES = [

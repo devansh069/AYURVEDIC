@@ -1,88 +1,152 @@
+import axios from 'axios';
 import { FullUserProfile, AccountOverview, ActivityLog, SavedContentItem, WellnessGoalItem } from '../types';
 
+const client = axios.create({
+  baseURL: 'http://localhost:5174/api',
+  timeout: 25000
+});
+
+const getAuthHeaders = () => {
+  const active = localStorage.getItem('activeUser');
+  if (active) {
+    try {
+      const parsed = JSON.parse(active);
+      return {
+        'x-user-id': parsed.profile.id,
+        'x-user-role': parsed.role
+      };
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  return {};
+};
 
 export const MOCK_FULL_PROFILE: FullUserProfile = {
-  id: 'user-1',
+  id: 'pat-123',
   fullName: 'Priyanshi Sharma',
-  email: 'priyanshi.sharma@email.com',
+  email: 'priyanshi@ayurvedaconnect.com',
   phone: '+91 98765 43210',
   gender: 'Female',
   dateOfBirth: '2002-03-15',
-  age: 24,
+  age: 28,
   profilePhoto: '',
-  city: 'Jaipur',
-  state: 'Rajasthan',
+  city: 'New Delhi',
+  state: 'Delhi',
   country: 'India',
-  doshaType: 'Pitta-Vata',
-  healthGoals: ['Hormonal Balance', 'Stress Management', 'Digestive Health'],
-  medicalConditions: ['PCOS', 'Mild Anxiety'],
-  joinedDate: '2025-11-10',
+  doshaType: 'Pitta-Kapha',
+  healthGoals: ['PCOS Management', 'Stress Reduction', 'Improved Digestion'],
+  medicalConditions: ['PCOS'],
+  joinedDate: '2026-01-15',
   lifestylePreference: 'Active',
   dietPreference: 'Vegetarian',
-  exercisePreference: 'Yoga & Walking',
-
+  exercisePreference: 'Yoga & Walking'
 };
 
 export const MOCK_ACCOUNT_OVERVIEW: AccountOverview = {
-  appointments: 12,
-
-  savedTreatments: 8,
-  medicalRecords: 15,
-  recoveryPlans: 3,
+  appointments: 3,
+  savedTreatments: 4,
+  medicalRecords: 3,
+  recoveryPlans: 1
 };
 
 export const MOCK_ACTIVITY_LOGS: ActivityLog[] = [
   { id: 'al-1', title: 'Profile Updated', type: 'Profile Update', timestamp: '2026-06-12T10:30:00Z', details: 'Updated health goals and diet preferences', icon: '✏️' },
-  { id: 'al-2', title: 'Appointment Booked', type: 'Appointment', timestamp: '2026-06-11T14:15:00Z', details: 'Dr. Arun Sharma - Panchakarma Consultation', icon: '📅' },
-  { id: 'al-3', title: 'Successful Login', type: 'Login', timestamp: '2026-06-11T09:00:00Z', details: 'Chrome on Windows - Jaipur, India', icon: '🔐' },
-  { id: 'al-4', title: 'Report Downloaded', type: 'Download', timestamp: '2026-06-10T16:45:00Z', details: 'Blood Test Report - June 2026', icon: '📥' },
-  { id: 'al-5', title: 'Settings Changed', type: 'Settings', timestamp: '2026-06-09T11:20:00Z', details: 'Enabled two-factor authentication', icon: '⚙️' },
-  { id: 'al-6', title: 'Successful Login', type: 'Login', timestamp: '2026-06-08T08:30:00Z', details: 'Safari on iPhone - Jaipur, India', icon: '🔐' },
+  { id: 'al-3', title: 'Successful Login', type: 'Login', timestamp: '2026-06-11T09:00:00Z', details: 'Chrome on Windows - Delhi, India', icon: '🔐' }
 ];
 
 export const MOCK_SAVED_CONTENT: SavedContentItem[] = [
-  { id: 'sc-1', title: 'Dr. Arun Sharma', type: 'Doctor', subtitle: 'Panchakarma Specialist • Jaipur', savedDate: '2026-06-10' },
-  { id: 'sc-2', title: 'AyurVeda Wellness Center', type: 'Clinic', subtitle: 'Multi-specialty Clinic • Delhi', savedDate: '2026-06-08' },
-  { id: 'sc-3', title: 'Shirodhara Therapy', type: 'Treatment', subtitle: 'Stress Relief & Mental Clarity', savedDate: '2026-06-05' },
-  { id: 'sc-4', title: 'Pitta Diet Guide', type: 'Article', subtitle: 'Complete Pitta pacifying food list', savedDate: '2026-06-01' },
-  { id: 'sc-5', title: 'Dr. Meera Patel', type: 'Doctor', subtitle: 'Gynecology Ayurveda • Mumbai', savedDate: '2026-05-28' },
-  { id: 'sc-6', title: 'Abhyanga Massage', type: 'Treatment', subtitle: 'Full body oil therapy', savedDate: '2026-05-25' },
+  { id: 'sc-1', title: 'Dr. Vikram Chauhan', type: 'Doctor', subtitle: 'Kayachikitsa Expert • Delhi', savedDate: '2026-06-10' },
+  { id: 'sc-3', title: 'Shirodhara Therapy', type: 'Treatment', subtitle: 'Stress Relief & Mental Clarity', savedDate: '2026-06-05' }
 ];
 
 export const MOCK_WELLNESS_GOALS: WellnessGoalItem[] = [
   { id: 'wg-1', title: 'Weight Management', category: 'Weight', target: '58 kg', current: '62 kg', progress: 65, unit: 'kg' },
-  { id: 'wg-2', title: 'PCOS Recovery', category: 'Recovery', target: 'Balanced Hormones', current: 'Improving', progress: 45, unit: '' },
-  { id: 'wg-3', title: 'Daily Sattvic Diet', category: 'Diet', target: '100% Compliance', current: '78%', progress: 78, unit: '%' },
-  { id: 'wg-4', title: 'Yoga Practice', category: 'Exercise', target: '30 min/day', current: '20 min/day', progress: 67, unit: 'min' },
+  { id: 'wg-2', title: 'PCOS Recovery', category: 'Recovery', target: 'Balanced Hormones', current: 'Improving', progress: 45, unit: '' }
 ];
 
 export const profileSettingsApi = {
   async getProfile(): Promise<{ data: FullUserProfile; isFallback: boolean }> {
+    try {
+      const response = await client.get('/patient/dashboard', { headers: getAuthHeaders() });
+      if (response.data && response.data.success) {
+        const dbPat = response.data.data.profile;
+        const profile: FullUserProfile = {
+          ...MOCK_FULL_PROFILE,
+          id: dbPat.id,
+          fullName: dbPat.name,
+          email: dbPat.email,
+          phone: dbPat.phone,
+          age: dbPat.age,
+          gender: dbPat.gender,
+          city: dbPat.city,
+          doshaType: dbPat.doshaType,
+          healthGoals: dbPat.healthGoals
+        };
+        return { data: profile, isFallback: false };
+      }
+      throw new Error('Fallback to local mock profile');
+    } catch (err) {
       return { data: MOCK_FULL_PROFILE, isFallback: true };
+    }
   },
 
   async updateProfile(profile: Partial<FullUserProfile>): Promise<{ data: FullUserProfile; isFallback: boolean }> {
+    try {
+      const dbFormat = {
+        name: profile.fullName,
+        phone: profile.phone,
+        age: profile.age,
+        gender: profile.gender,
+        city: profile.city,
+        doshaType: profile.doshaType,
+        healthGoals: profile.healthGoals
+      };
+      const response = await client.put('/patient/profile', dbFormat, { headers: getAuthHeaders() });
+      if (response.data && response.data.success) {
+        // Also update local storage session profile
+        const active = localStorage.getItem('activeUser');
+        if (active) {
+          try {
+            const parsed = JSON.parse(active);
+            parsed.profile = {
+              ...parsed.profile,
+              name: profile.fullName || parsed.profile.name,
+              phone: profile.phone || parsed.profile.phone,
+              age: Number(profile.age) || parsed.profile.age,
+              gender: profile.gender || parsed.profile.gender,
+              city: profile.city || parsed.profile.city,
+              doshaType: profile.doshaType || parsed.profile.doshaType,
+              healthGoals: profile.healthGoals || parsed.profile.healthGoals
+            };
+            localStorage.setItem('activeUser', JSON.stringify(parsed));
+          } catch (e) {
+            console.error(e);
+          }
+        }
+        return { data: { ...MOCK_FULL_PROFILE, ...profile }, isFallback: false };
+      }
+      throw new Error('Failed backend profile update');
+    } catch (err) {
       return { data: { ...MOCK_FULL_PROFILE, ...profile }, isFallback: true };
+    }
   },
 
   async getAccountOverview(): Promise<{ data: AccountOverview; isFallback: boolean }> {
-      return { data: MOCK_ACCOUNT_OVERVIEW, isFallback: true };
+    return { data: MOCK_ACCOUNT_OVERVIEW, isFallback: true };
   },
 
   async getActivityLogs(): Promise<{ data: ActivityLog[]; isFallback: boolean }> {
-      return { data: MOCK_ACTIVITY_LOGS, isFallback: true };
+    return { data: MOCK_ACTIVITY_LOGS, isFallback: true };
   },
 
   async getSavedContent(): Promise<{ data: SavedContentItem[]; isFallback: boolean }> {
-      return { data: MOCK_SAVED_CONTENT, isFallback: true };
+    return { data: MOCK_SAVED_CONTENT, isFallback: true };
   },
 
   async getWellnessGoals(): Promise<{ data: WellnessGoalItem[]; isFallback: boolean }> {
-      return { data: MOCK_WELLNESS_GOALS, isFallback: true };
+    return { data: MOCK_WELLNESS_GOALS, isFallback: true };
   },
 };
 
 export default profileSettingsApi;
-
-
-

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "t-1",
+    "patientName": "Rohit Malhotra",
+    "disease": "Type 2 Diabetes",
+    "treatment": "Panchakarma & Diet shifts",
+    "recoveryTime": "3 Months",
+    "text": "Dr. Vikram Singh's guidelines completely regulated my HbA1c levels. The customized diet coupled with metabolic herbs restored my stamina!",
+    "rating": 5,
+    "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&q=80"
+  },
+  {
+    "id": "t-2",
+    "patientName": "Priya Varghese",
+    "disease": "Sciatic Spine Pain",
+    "treatment": "Kativasti & Herbal Oils",
+    "recoveryTime": "4 Weeks",
+    "text": "Authentic warm oil pooling therapies at the Kerala Zen center relieved my intense back and leg stiffness. I am pain-free and walking comfortably.",
+    "rating": 5,
+    "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&q=80"
+  },
+  {
+    "id": "t-3",
+    "patientName": "Smriti Mishra",
+    "disease": "Severe PCOS & Bloating",
+    "treatment": "Hormonal Herbal Teas",
+    "recoveryTime": "6 Months",
+    "text": "I struggled with cystic acne and irregular periods. Rejuvenation herbs normalized my cycle naturally and cleared my skin thoroughly.",
+    "rating": 5,
+    "avatar": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&q=80"
+  }
+]

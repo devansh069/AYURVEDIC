@@ -1,7 +1,28 @@
-// dietApi.ts — Pure mock-data service (no backend required)
+import axios from 'axios';
 import { UserProfile, DietPlan, Meal, DietHistory, ApiResponse } from '../types';
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
+const client = axios.create({
+  baseURL: 'http://localhost:5174/api',
+  timeout: 25000
+});
+
+const getAuthHeaders = () => {
+  const active = localStorage.getItem('activeUser');
+  if (active) {
+    try {
+      const parsed = JSON.parse(active);
+      return {
+        'x-user-id': parsed.profile.id,
+        'x-user-role': parsed.role
+      };
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  return {};
+};
+
+// ─── Local Mock Fallbacks ────────────────────────────────────────────────────
 
 export const MOCK_DIET_USER_PROFILE_LOCAL: UserProfile = {
   id: "profile-1",
@@ -20,60 +41,42 @@ export const MOCK_DIET_USER_PROFILE_LOCAL: UserProfile = {
 export const MOCK_DIET_PLAN_LOCAL: DietPlan = {
   id: "plan-active-1",
   planName: "Active Pitta-Pacifying Meal Schedule",
-  doshaType: "Pitta",
+  doshaType: "Pitta-Kapha",
   goal: "Hormonal Balance",
-  dailyCalories: 1690,
+  dailyCalories: 1800,
   duration: "30 Days",
   meals: [
-    { id: "m-1", mealType: "Breakfast", mealName: "Cooling Barley Flakes & Cardamom Porridge", time: "08:00 AM", calories: 320, ingredients: ["Barley flakes", "Whole milk", "Cardamom", "Raisins"], benefits: ["Cools stomach heat", "Restores metabolic balance"] },
-    { id: "m-2", mealType: "Mid-Morning Snack", mealName: "Fresh Cucumber & Mint Juice", time: "11:00 AM", calories: 90, ingredients: ["Cucumber", "Fresh mint", "Lime juice"], benefits: ["Highly hydrating", "Neutralizes excess bile acids"] },
-    { id: "m-3", mealType: "Lunch", mealName: "Bitter Greens & Steamed Quinoa Bowl", time: "01:00 PM", calories: 450, ingredients: ["Quinoa", "Kale", "Asparagus", "Fennel seeds"], benefits: ["Cooling and alkalizing", "Supports reproductive health"] },
-    { id: "m-4", mealType: "Evening Snack", mealName: "Sweet Watermelon Skewers", time: "04:30 PM", calories: 120, ingredients: ["Fresh sweet watermelon", "Mint"], benefits: ["Reduces heat pressure", "Flushes metabolic tracts"] },
-    { id: "m-5", mealType: "Dinner", mealName: "Yellow Lentil Soup & Basmati Rice", time: "07:30 PM", calories: 400, ingredients: ["Yellow split lentils", "Basmati rice", "Coriander", "Ghee"], benefits: ["Light digestive load", "Nourishes tissues without heating"] },
-    { id: "m-6", mealType: "Bedtime Drink", mealName: "Cooling Cardamom Fennel Milk", time: "09:45 PM", calories: 110, ingredients: ["Cardamom", "Fennel seed", "Warm milk"], benefits: ["Pacifies Pitta fire", "Soothes central nervous system"] }
+    { id: "m-1", mealType: "Breakfast", mealName: "Spiced Barley Porridge with Almonds & Cardamom", time: "08:30 AM", calories: 380, ingredients: ["Barley flakes", "Almond milk", "Cardamom"], benefits: ["Cools stomach heat"] },
+    { id: "m-2", mealType: "Lunch", mealName: "Mung Dal Khichdi with Steamed Zucchini & Ghee", time: "01:00 PM", calories: 520, ingredients: ["Quinoa", "Mung dal", "Ghee"], benefits: ["Supports digestive health"] },
+    { id: "m-3", mealType: "Evening Snack", mealName: "Stewed Apple with Cinnamon & Warm Ginger Water", time: "04:30 PM", calories: 180, ingredients: ["Apples", "Cinnamon"], benefits: ["Fires up sluggish digestion"] },
+    { id: "m-4", mealType: "Dinner", mealName: "Butternut Squash Soup & Quinoa Salad", time: "07:30 PM", calories: 420, ingredients: ["Squash", "Quinoa"], benefits: ["Light digestive load"] }
   ],
   nutritionSummary: {
-    calories: 1690,
+    calories: 1800,
     protein: 65,
-    carbs: 230,
+    carbs: 220,
     fats: 45,
-    waterTarget: 2500
+    waterTarget: 3200
   }
 };
-
-export const MOCK_DIET_HISTORY_LOCAL: DietHistory[] = [
-  { id: "plan-hist-1", planName: "Metabolic Fire Reset (Vata)", dateGenerated: "2026-05-12", goal: "Metabolic Reset", calories: 1850, duration: "14 Days" },
-  { id: "plan-hist-2", planName: "Pitta Balance Plan", dateGenerated: "2026-05-26", goal: "Hormonal Balance", calories: 1690, duration: "30 Days" }
-];
 
 const LOCAL_MEALS_DATABASE: Record<string, Record<string, Omit<Meal, 'id' | 'mealType' | 'time'>>> = {
   "Vata": {
-    Breakfast: { mealName: "Warming Almond & Spice Oatmeal", calories: 350, ingredients: ["Organic rolled oats", "Almond milk", "Slivered almonds", "Cinnamon", "Ghee"], benefits: ["Calms Vata winds", "Provides warm energy"] },
-    "Mid-Morning Snack": { mealName: "Stewed Sweet Apples", calories: 150, ingredients: ["Fresh apples", "Cloves", "Cardamom"], benefits: ["Stirs light digestion", "Soothes stomach"] },
-    Lunch: { mealName: "Yellow Mung Kitchari", calories: 480, ingredients: ["Yellow mung beans", "Basmati rice", "Ghee & cumin"], benefits: ["Highly digestible", "Removes toxic Ama"] },
-    "Evening Snack": { mealName: "Warm Sesame Almond Milk", calories: 180, ingredients: ["Almonds", "Sesame powder", "Milk"], benefits: ["Lubricates joint spaces"] },
-    Dinner: { mealName: "Baked Sweet Potato Stew", calories: 380, ingredients: ["Sweet potato", "Asparagus", "Olive oil"], benefits: ["Grounding and nourishing"] },
-    "Bedtime Drink": { mealName: "Nutmeg Sleepy Milk", calories: 120, ingredients: ["Warm milk", "Nutmeg powder", "Honey"], benefits: ["Promotes deep sleep"] }
+    Breakfast: { mealName: "Warming Almond & Spice Oatmeal", calories: 350, ingredients: ["Organic rolled oats", "Almond milk", "Ghee"], benefits: ["Calms Vata winds"] },
+    Lunch: { mealName: "Yellow Mung Kitchari", calories: 480, ingredients: ["Yellow mung beans", "Basmati rice", "Ghee"], benefits: ["Removes toxic Ama"] },
+    Dinner: { mealName: "Baked Sweet Potato Stew", calories: 380, ingredients: ["Sweet potato", "Asparagus"], benefits: ["Grounding and nourishing"] }
   },
   "Pitta": {
-    Breakfast: { mealName: "Cooling Barley Porridge", calories: 320, ingredients: ["Barley flakes", "Whole milk", "Cardamom"], benefits: ["Cools stomach heat", "Soothes liver"] },
-    "Mid-Morning Snack": { mealName: "Cucumber Mint Drink", calories: 90, ingredients: ["Cucumber", "Fresh mint", "Lime juice"], benefits: ["Cooling and refreshing"] },
-    Lunch: { mealName: "Quinoa Greens Bowl", calories: 450, ingredients: ["Quinoa", "Kale", "Asparagus", "Zucchini"], benefits: ["Cooling and alkalizing"] },
-    "Evening Snack": { mealName: "Fresh Melon Medley", calories: 120, ingredients: ["Watermelon", "Cantaloupe"], benefits: ["Flushes kidney tracts"] },
-    Dinner: { mealName: "Mung Dal Soup & Rice", calories: 400, ingredients: ["Split lentils", "Rice", "Fennel seeds"], benefits: ["Nourishing and calming"] },
-    "Bedtime Drink": { mealName: "Fennel Milk Infusion", calories: 110, ingredients: ["Cardamom", "Fennel seeds", "Warm milk"], benefits: ["Pacifies Pitta heat"] }
+    Breakfast: { mealName: "Cooling Barley Porridge", calories: 320, ingredients: ["Barley flakes", "Whole milk", "Cardamom"], benefits: ["Cools stomach heat"] },
+    Lunch: { mealName: "Quinoa Greens Bowl", calories: 450, ingredients: ["Quinoa", "Kale", "Asparagus"], benefits: ["Alkalizing"] },
+    Dinner: { mealName: "Mung Dal Soup & Rice", calories: 400, ingredients: ["Split lentils", "Rice"], benefits: ["Nourishing and calming"] }
   },
   "Kapha": {
-    Breakfast: { mealName: "Buckwheat Cranberry Flakes", calories: 280, ingredients: ["Buckwheat", "Water", "Cranberries", "Ginger"], benefits: ["Light and dry to clear mucus"] },
-    "Mid-Morning Snack": { mealName: "Ginger Tulsi Tea", calories: 40, ingredients: ["Ginger", "Tulsi", "Honey"], benefits: ["Liquifies congestion"] },
-    Lunch: { mealName: "Spiced Chickpea Salad", calories: 420, ingredients: ["Chickpeas", "Broccoli", "Mustard seeds", "Turmeric"], benefits: ["Scrapes lymph blockages"] },
-    "Evening Snack": { mealName: "Roasted Pumpkin Seeds", calories: 140, ingredients: ["Pumpkin seeds", "Sunflower seeds", "Black pepper"], benefits: ["Warm and dry snack"] },
-    Dinner: { mealName: "Red Lentil Squash Soup", calories: 350, ingredients: ["Red lentils", "Squash", "Garlic", "Ginger"], benefits: ["Clears metabolic channels"] },
-    "Bedtime Drink": { mealName: "Turmeric Spiced Water", calories: 30, ingredients: ["Turmeric", "Cardamom", "Ginger root"], benefits: ["Boosts immunity"] }
+    Breakfast: { mealName: "Buckwheat Cranberry Flakes", calories: 280, ingredients: ["Buckwheat", "Water", "Cranberries"], benefits: ["Light and dry to clear mucus"] },
+    Lunch: { mealName: "Spiced Chickpea Salad", calories: 420, ingredients: ["Chickpeas", "Broccoli", "Turmeric"], benefits: ["Scrapes lymph blockages"] },
+    Dinner: { mealName: "Red Lentil Squash Soup", calories: 350, ingredients: ["Red lentils", "Squash", "Garlic"], benefits: ["Clears metabolic channels"] }
   }
 };
-
-// ─── API (mock-only, no network calls) ──────────────────────────────────────
 
 export const dietApi = {
   getProfile: async (): Promise<ApiResponse<UserProfile>> => {
@@ -81,11 +84,41 @@ export const dietApi = {
   },
 
   getPlans: async (): Promise<ApiResponse<DietPlan[]>> => {
-    return { data: [MOCK_DIET_PLAN_LOCAL], isFallback: true };
+    try {
+      const response = await client.get('/patient/diet', { headers: getAuthHeaders() });
+      if (response.data && response.data.success) {
+        const dbPlan = response.data.data;
+        const mappedPlan: DietPlan = {
+          id: "plan-active-db",
+          planName: `Active ${dbPlan.doshaType}-Pacifying Meal Schedule`,
+          doshaType: dbPlan.doshaType,
+          goal: "Hormonal Balance",
+          dailyCalories: dbPlan.dailyCaloriesTarget,
+          duration: "30 Days",
+          meals: [
+            { id: "m-1", mealType: "Breakfast", mealName: dbPlan.meals.breakfast.name, time: dbPlan.meals.breakfast.time, calories: dbPlan.meals.breakfast.calories, ingredients: [], benefits: [dbPlan.guidelines[0]] },
+            { id: "m-2", mealType: "Lunch", mealName: dbPlan.meals.lunch.name, time: dbPlan.meals.lunch.time, calories: dbPlan.meals.lunch.calories, ingredients: [], benefits: [dbPlan.guidelines[1]] },
+            { id: "m-3", mealType: "Evening Snack", mealName: dbPlan.meals.snack.name, time: dbPlan.meals.snack.time, calories: dbPlan.meals.snack.calories, ingredients: [], benefits: [] },
+            { id: "m-4", mealType: "Dinner", mealName: dbPlan.meals.dinner.name, time: dbPlan.meals.dinner.time, calories: dbPlan.meals.dinner.calories, ingredients: [], benefits: [dbPlan.guidelines[2]] }
+          ],
+          nutritionSummary: {
+            calories: dbPlan.dailyCaloriesTarget,
+            protein: dbPlan.proteinTarget,
+            carbs: dbPlan.carbsTarget,
+            fats: dbPlan.fatTarget,
+            waterTarget: dbPlan.waterTarget * 1000
+          }
+        };
+        return { data: [mappedPlan], isFallback: false };
+      }
+      throw new Error('No diet plan loaded');
+    } catch (err: any) {
+      return { data: [MOCK_DIET_PLAN_LOCAL], isFallback: true, error: err.message };
+    }
   },
 
   getHistory: async (): Promise<ApiResponse<DietHistory[]>> => {
-    return { data: [...MOCK_DIET_HISTORY_LOCAL], isFallback: true };
+    return { data: [], isFallback: true };
   },
 
   generatePlan: async (profile: Omit<UserProfile, 'id'>): Promise<ApiResponse<DietPlan>> => {
@@ -94,48 +127,57 @@ export const dietApi = {
     if (!LOCAL_MEALS_DATABASE[lookupDosha]) lookupDosha = 'Pitta';
 
     const baseMeals = LOCAL_MEALS_DATABASE[lookupDosha];
-    let calTarget = 1800;
-    if (profile.healthGoals.includes("Weight Loss") || profile.healthGoals.includes("Weight Management")) {
-      calTarget = 1500;
-    } else if (profile.healthGoals.includes("Muscle Gain")) {
-      calTarget = 2200;
-    }
+    const calTarget = 1800;
 
-    let p = 60, c = 210, f = 40;
-    if (lookupDosha === 'Pitta') { p = 65; c = 230; f = 45; }
-    else if (lookupDosha === 'Kapha') { p = 75; c = 180; f = 35; }
-    else { p = 55; c = 240; f = 50; }
-
-    const generatedMeals: Meal[] = [
-      { id: `gm-1`, mealType: "Breakfast", mealName: baseMeals.Breakfast.mealName, time: "08:00 AM", calories: baseMeals.Breakfast.calories, ingredients: baseMeals.Breakfast.ingredients, benefits: baseMeals.Breakfast.benefits },
-      { id: `gm-2`, mealType: "Mid-Morning Snack", mealName: baseMeals["Mid-Morning Snack"].mealName, time: "11:00 AM", calories: baseMeals["Mid-Morning Snack"].calories, ingredients: baseMeals["Mid-Morning Snack"].ingredients, benefits: baseMeals["Mid-Morning Snack"].benefits },
-      { id: `gm-3`, mealType: "Lunch", mealName: baseMeals.Lunch.mealName, time: "01:00 PM", calories: baseMeals.Lunch.calories, ingredients: baseMeals.Lunch.ingredients, benefits: baseMeals.Lunch.benefits },
-      { id: `gm-4`, mealType: "Evening Snack", mealName: baseMeals["Evening Snack"].mealName, time: "04:30 PM", calories: baseMeals["Evening Snack"].calories, ingredients: baseMeals["Evening Snack"].ingredients, benefits: baseMeals["Evening Snack"].benefits },
-      { id: `gm-5`, mealType: "Dinner", mealName: baseMeals.Dinner.mealName, time: "07:30 PM", calories: baseMeals.Dinner.calories, ingredients: baseMeals.Dinner.ingredients, benefits: baseMeals.Dinner.benefits },
-      { id: `gm-6`, mealType: "Bedtime Drink", mealName: baseMeals["Bedtime Drink"].mealName, time: "09:45 PM", calories: baseMeals["Bedtime Drink"].calories, ingredients: baseMeals["Bedtime Drink"].ingredients, benefits: baseMeals["Bedtime Drink"].benefits }
-    ];
-
-    const clientGeneratedPlan: DietPlan = {
-      id: `plan-active-${Date.now()}`,
-      planName: `Customized ${lookupDosha}-Pacifying Nutrition Plan`,
+    const generated: DietPlan = {
+      id: `plan-gen-${Date.now()}`,
+      planName: `Custom Generated ${profile.doshaType} Routine`,
       doshaType: profile.doshaType,
-      goal: profile.healthGoals[0] || "General Health",
+      goal: profile.healthGoals.join(', '),
       dailyCalories: calTarget,
       duration: "30 Days",
-      meals: generatedMeals,
-      nutritionSummary: { calories: calTarget, protein: p, carbs: c, fats: f, waterTarget: 2500 }
+      meals: [
+        { id: "gm-1", mealType: "Breakfast", mealName: baseMeals.Breakfast.mealName, time: "08:00 AM", calories: baseMeals.Breakfast.calories, ingredients: baseMeals.Breakfast.ingredients, benefits: baseMeals.Breakfast.benefits },
+        { id: "gm-2", mealType: "Lunch", mealName: baseMeals.Lunch.mealName, time: "01:00 PM", calories: baseMeals.Lunch.calories, ingredients: baseMeals.Lunch.ingredients, benefits: baseMeals.Lunch.benefits },
+        { id: "gm-3", mealType: "Dinner", mealName: baseMeals.Dinner.mealName, time: "07:30 PM", calories: baseMeals.Dinner.calories, ingredients: baseMeals.Dinner.ingredients, benefits: baseMeals.Dinner.benefits }
+      ],
+      nutritionSummary: {
+        calories: calTarget,
+        protein: 70,
+        carbs: 230,
+        fats: 50,
+        waterTarget: 3000
+      }
     };
 
-    MOCK_DIET_HISTORY_LOCAL.unshift({
-      id: clientGeneratedPlan.id,
-      planName: clientGeneratedPlan.planName,
-      dateGenerated: new Date().toISOString().split('T')[0],
-      goal: clientGeneratedPlan.goal,
-      calories: clientGeneratedPlan.dailyCalories,
-      duration: clientGeneratedPlan.duration
-    });
+    // Save generated plan to backend in real time
+    try {
+      const dbPlanFormat = {
+        doshaType: generated.doshaType,
+        dailyCaloriesTarget: generated.dailyCalories,
+        proteinTarget: generated.nutritionSummary.protein,
+        carbsTarget: generated.nutritionSummary.carbs,
+        fatTarget: generated.nutritionSummary.fats,
+        waterTarget: generated.nutritionSummary.waterTarget / 1000,
+        guidelines: [
+          generated.meals[0].benefits?.[0] || 'Follow custom meal timing.',
+          generated.meals[1].benefits?.[0] || 'Keep lunch heavy to leverage strong pitta agni.',
+          generated.meals[2].benefits?.[0] || 'Keep dinner extremely light.'
+        ],
+        meals: {
+          breakfast: { time: generated.meals[0].time, name: generated.meals[0].mealName, calories: generated.meals[0].calories },
+          lunch: { time: generated.meals[1].time, name: generated.meals[1].mealName, calories: generated.meals[1].calories },
+          snack: { time: '04:30 PM', name: 'Ayurvedic Herbal Tulsi infusion', calories: 50 },
+          dinner: { time: generated.meals[2].time, name: generated.meals[2].mealName, calories: generated.meals[2].calories }
+        }
+      };
 
-    return { data: clientGeneratedPlan, isFallback: true };
+      await client.post('/patient/diet', dbPlanFormat, { headers: getAuthHeaders() });
+    } catch (err) {
+      console.warn('Failed to save generated plan to backend:', err);
+    }
+
+    return { data: generated, isFallback: false };
   }
 };
 

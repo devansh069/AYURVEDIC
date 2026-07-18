@@ -17,6 +17,8 @@ const recoveryRoutes = require("./routes/recoveryRoutes");
 const recordRoutes = require("./routes/recordRoutes");
 const doshaRoutes = require("./routes/doshaRoutes");
 const dietRoutes = require("./routes/dietRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 // Connect to Database
 connectDB();
@@ -25,7 +27,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ["http://localhost:5173", "http://127.0.0.1:5173"], // Allow requests from Frontend
+  origin: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
@@ -38,6 +40,7 @@ app.get("/health", (req, res) => {
 });
 
 // API Routes Mounting
+app.use("/api/auth", authRoutes);
 app.use("/api", statsRoutes);
 app.use("/api", diseaseRoutes);
 app.use("/api", treatmentRoutes);
@@ -48,6 +51,7 @@ app.use("/api", recoveryRoutes);
 app.use("/api", recordRoutes);
 app.use("/api", doshaRoutes);
 app.use("/api", dietRoutes);
+app.use("/api", dashboardRoutes);
 
 // Global Error Handler
 app.use(errorHandler);

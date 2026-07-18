@@ -1,7 +1,8 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { X, Star, Clock, Heart, ShieldAlert, CheckCircle2, ChevronRight, UserCheck, Calendar } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { X, Star, Clock, Heart, ShieldAlert, CheckCircle2, ChevronRight, UserCheck, Calendar, ArrowLeft, Loader } from 'lucide-react';
 import { Treatment } from '../../types';
+import { treatmentApi } from '../../services/treatmentApi';
 
 interface TreatmentDetailProps {
   treatment: Treatment | null;
@@ -12,12 +13,59 @@ interface TreatmentDetailProps {
 export const TreatmentDetail: React.FC<TreatmentDetailProps> = ({ treatment, isOpen, onClose }) => {
   const navigate = useNavigate();
 
+  // Booking states
+  const [bookingMode, setBookingMode] = useState(false);
+  const [patientName, setPatientName] = useState('');
+  const [patientEmail, setPatientEmail] = useState('');
+  const [patientPhone, setPatientPhone] = useState('');
+  const [preferredDate, setPreferredDate] = useState('');
+  const [preferredTime, setPreferredTime] = useState('Morning (9 AM - 12 PM)');
+  const [notes, setNotes] = useState('');
+  const [bookingStatus, setBookingStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [bookingId, setBookingId] = useState('');
+
   if (!isOpen || !treatment) return null;
 
   const handleFindDoctors = () => {
     onClose();
-    // Navigate to doctors page and search by specialization/category
     navigate(`/doctors`);
+  };
+
+  const handleBookingSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBookingStatus('submitting');
+    setErrorMessage('');
+    
+    try {
+      const res = await treatmentApi.bookTreatment({
+        treatmentId: treatment.id,
+        treatmentName: treatment.name,
+        patientName,
+        patientEmail,
+        patientPhone,
+        preferredDate,
+        preferredTime,
+        notes
+      });
+      
+      if (res.data && !res.isFallback) {
+        setBookingId(res.data.booking.id);
+        setBookingStatus('success');
+        // Clear form
+        setPatientName('');
+        setPatientEmail('');
+        setPatientPhone('');
+        setPreferredDate('');
+        setNotes('');
+      } else {
+        setErrorMessage(res.error || "Booking transaction failed.");
+        setBookingStatus('error');
+      }
+    } catch (err: any) {
+      setErrorMessage(err.message || "An unexpected error occurred.");
+      setBookingStatus('error');
+    }
   };
 
   return (
@@ -35,7 +83,11 @@ export const TreatmentDetail: React.FC<TreatmentDetailProps> = ({ treatment, isO
         >
           {/* Close button */}
           <button
-            onClick={onClose}
+            onClick={() => {
+              setBookingMode(false);
+              setBookingStatus('idle');
+              onClose();
+            }}
             className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 p-2 rounded-full backdrop-blur-md text-white transition-colors"
           >
             <X className="w-5 h-5" />
@@ -120,84 +172,233 @@ export const TreatmentDetail: React.FC<TreatmentDetailProps> = ({ treatment, isO
 
           </div>
 
-          {/* Right Column (Specifications & CTAs) */}
+          {/* Right Column (Specifications or Bookings Form) */}
           <div className="space-y-6">
             
-            {/* Quick specifications panel */}
-            <div className="bg-white border border-[#2E7D32]/10 p-5 rounded-2xl space-y-4 shadow-sm">
-              <span className="text-[9px] font-bold text-text-secondary uppercase tracking-widest block">Therapy Metrics</span>
-              
-              <div className="space-y-3.5 text-xs text-text-secondary">
-                <div className="flex items-center space-x-2.5">
-                  <Clock className="w-4.5 h-4.5 text-primary shrink-0" />
-                  <div>
-                    <span className="text-[9px] block font-bold uppercase">Duration</span>
-                    <span className="font-bold text-primary text-[11px]">{treatment.duration}</span>
+            {bookingMode ? (
+              // BOOKING FORM MODE
+              <div className="bg-white border border-accent/20 p-5 rounded-2xl shadow-sm space-y-4">
+                {bookingStatus === 'success' ? (
+                  // SUCCESS PANEL
+                  <div className="text-center py-6 space-y-4 animate-fade-in-up">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center text-primary mx-auto">
+                      <CheckCircle2 className="w-7 h-7 text-accent" />
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-bold text-primary font-serif">Booking Confirmed!</h4>
+                      <p className="text-[10px] text-text-secondary leading-normal">
+                        Your session has been registered in real time. Our clinic coordinator will contact you shortly.
+                      </p>
+                    </div>
+                    <div className="bg-primary/5 p-3 rounded-xl border border-primary/10 text-left space-y-1">
+                      <span className="text-[8px] uppercase font-bold text-text-secondary block">Booking Reference ID</span>
+                      <code className="text-[10px] font-mono font-bold text-primary block break-all">{bookingId}</code>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setBookingMode(false);
+                        setBookingStatus('idle');
+                      }}
+                      className="w-full bg-primary hover:bg-primary-light text-white text-[10px] font-bold py-2.5 rounded-xl uppercase tracking-wider shadow-sm transition-colors"
+                    >
+                      Back to Specifications
+                    </button>
                   </div>
-                </div>
+                ) : (
+                  // INPUT FORM
+                  <form onSubmit={handleBookingSubmit} className="space-y-3.5">
+                    <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+                      <h4 className="font-serif text-sm font-bold text-primary">Book Treatment</h4>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setBookingMode(false);
+                          setBookingStatus('idle');
+                        }}
+                        className="text-[9px] font-bold uppercase text-accent hover:text-primary transition-colors flex items-center space-x-0.5"
+                      >
+                        <ArrowLeft className="w-3 h-3" />
+                        <span>Cancel</span>
+                      </button>
+                    </div>
 
-                <div className="flex items-center space-x-2.5">
-                  <Heart className="w-4.5 h-4.5 text-primary shrink-0" />
-                  <div>
-                    <span className="text-[9px] block font-bold uppercase">Recovery Period</span>
-                    <span className="font-bold text-primary text-[11px]">{treatment.recoveryTime}</span>
-                  </div>
-                </div>
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-bold text-text-secondary uppercase">Your Full Name *</label>
+                      <input
+                        type="text"
+                        required
+                        value={patientName}
+                        onChange={e => setPatientName(e.target.value)}
+                        placeholder="e.g. John Doe"
+                        className="w-full bg-[#F8FFF8] border border-[#2E7D32]/10 rounded-xl py-2 px-3 text-xs focus:outline-none focus:border-primary font-medium"
+                      />
+                    </div>
 
-                <div className="flex items-center space-x-2.5">
-                  <span className="text-primary text-[16px] font-bold shrink-0">₹</span>
-                  <div>
-                    <span className="text-[9px] block font-bold uppercase">Cost Estimate</span>
-                    <span className="font-bold text-primary text-[11px]">₹{treatment.costEstimate.toLocaleString('en-IN')}</span>
-                  </div>
-                </div>
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-bold text-text-secondary uppercase">Email Address *</label>
+                      <input
+                        type="email"
+                        required
+                        value={patientEmail}
+                        onChange={e => setPatientEmail(e.target.value)}
+                        placeholder="e.g. john@example.com"
+                        className="w-full bg-[#F8FFF8] border border-[#2E7D32]/10 rounded-xl py-2 px-3 text-xs focus:outline-none focus:border-primary font-medium"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-bold text-text-secondary uppercase">Phone Number</label>
+                      <input
+                        type="tel"
+                        value={patientPhone}
+                        onChange={e => setPatientPhone(e.target.value)}
+                        placeholder="e.g. +91 9876543210"
+                        className="w-full bg-[#F8FFF8] border border-[#2E7D32]/10 rounded-xl py-2 px-3 text-xs focus:outline-none focus:border-primary font-medium"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-bold text-text-secondary uppercase">Preferred Date *</label>
+                        <input
+                          type="date"
+                          required
+                          value={preferredDate}
+                          onChange={e => setPreferredDate(e.target.value)}
+                          className="w-full bg-[#F8FFF8] border border-[#2E7D32]/10 rounded-xl py-2 px-3 text-xs focus:outline-none focus:border-primary font-medium"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-bold text-text-secondary uppercase">Preferred Slot</label>
+                        <select
+                          value={preferredTime}
+                          onChange={e => setPreferredTime(e.target.value)}
+                          className="w-full bg-[#F8FFF8] border border-[#2E7D32]/10 rounded-xl py-2 px-3 text-xs focus:outline-none focus:border-primary font-medium"
+                        >
+                          <option>Morning (9 AM - 12 PM)</option>
+                          <option>Afternoon (12 PM - 4 PM)</option>
+                          <option>Evening (4 PM - 7 PM)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-bold text-text-secondary uppercase">Special Notes</label>
+                      <textarea
+                        rows={2}
+                        value={notes}
+                        onChange={e => setNotes(e.target.value)}
+                        placeholder="Any symptoms, medical history, or requests..."
+                        className="w-full bg-[#F8FFF8] border border-[#2E7D32]/10 rounded-xl py-2 px-3 text-xs focus:outline-none focus:border-primary font-medium resize-none"
+                      />
+                    </div>
+
+                    {bookingStatus === 'error' && (
+                      <span className="text-[9px] font-bold text-red-500 block">
+                        ⚠ {errorMessage}
+                      </span>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={bookingStatus === 'submitting'}
+                      className="w-full bg-primary hover:bg-primary-light text-white font-bold text-[10px] py-3 rounded-xl shadow-md uppercase tracking-wider flex items-center justify-center space-x-1.5 transition-colors disabled:bg-gray-250 disabled:cursor-not-allowed"
+                    >
+                      {bookingStatus === 'submitting' ? (
+                        <>
+                          <Loader className="w-3.5 h-3.5 animate-spin" />
+                          <span>Booking Session...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Calendar className="w-3.5 h-3.5 text-accent" />
+                          <span>Confirm Booking</span>
+                        </>
+                      )}
+                    </button>
+                  </form>
+                )}
               </div>
-            </div>
+            ) : (
+              // STANDARD SPECIFICATIONS MODE
+              <>
+                {/* Quick specifications panel */}
+                <div className="bg-white border border-[#2E7D32]/10 p-5 rounded-2xl space-y-4 shadow-sm">
+                  <span className="text-[9px] font-bold text-text-secondary uppercase tracking-widest block">Therapy Metrics</span>
+                  
+                  <div className="space-y-3.5 text-xs text-text-secondary">
+                    <div className="flex items-center space-x-2.5">
+                      <Clock className="w-4.5 h-4.5 text-primary shrink-0" />
+                      <div>
+                        <span className="text-[9px] block font-bold uppercase">Duration</span>
+                        <span className="font-bold text-primary text-[11px]">{treatment.duration}</span>
+                      </div>
+                    </div>
 
-            {/* Suitability & Contraindications */}
-            <div className="bg-white border border-[#2E7D32]/5 p-5 rounded-2xl space-y-4 shadow-sm text-xs">
-              <div className="space-y-2">
-                <span className="text-[9px] font-bold text-[#2E7D32] uppercase tracking-wider block">Suitable Conditions</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {treatment.suitableFor.map((item, i) => (
-                    <span key={i} className="bg-[#2E7D32]/5 text-primary py-1 px-2.5 rounded-lg font-bold text-[9px]">
-                      {item}
+                    <div className="flex items-center space-x-2.5">
+                      <Heart className="w-4.5 h-4.5 text-primary shrink-0" />
+                      <div>
+                        <span className="text-[9px] block font-bold uppercase">Recovery Period</span>
+                        <span className="font-bold text-primary text-[11px]">{treatment.recoveryTime}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2.5">
+                      <span className="text-primary text-[16px] font-bold shrink-0">₹</span>
+                      <div>
+                        <span className="text-[9px] block font-bold uppercase">Cost Estimate</span>
+                        <span className="font-bold text-primary text-[11px]">₹{treatment.costEstimate.toLocaleString('en-IN')}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Suitability & Contraindications */}
+                <div className="bg-white border border-[#2E7D32]/5 p-5 rounded-2xl space-y-4 shadow-sm text-xs">
+                  <div className="space-y-2">
+                    <span className="text-[9px] font-bold text-[#2E7D32] uppercase tracking-wider block">Suitable Conditions</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {treatment.suitableFor.map((item, i) => (
+                        <span key={i} className="bg-[#2E7D32]/5 text-primary py-1 px-2.5 rounded-lg font-bold text-[9px]">
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 pt-3 border-t border-gray-50">
+                    <span className="text-[9px] font-bold text-amber-600 uppercase tracking-wider block flex items-center space-x-1">
+                      <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
+                      <span>Precautions</span>
                     </span>
-                  ))}
+                    <ul className="space-y-1 text-[10px] text-text-secondary list-disc list-inside leading-relaxed">
+                      {treatment.precautions.map((item, i) => (
+                        <li key={i} className="font-medium">{item}</li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-2 pt-3 border-t border-gray-50">
-                <span className="text-[9px] font-bold text-amber-600 uppercase tracking-wider block flex items-center space-x-1">
-                  <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Precautions</span>
-                </span>
-                <ul className="space-y-1 text-[10px] text-text-secondary list-disc list-inside leading-relaxed">
-                  {treatment.precautions.map((item, i) => (
-                    <li key={i} className="font-medium">{item}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+                {/* Booking Actions */}
+                <div className="space-y-3 pt-2">
+                  <button
+                    onClick={() => setBookingMode(true)}
+                    className="w-full bg-primary hover:bg-primary-light text-white font-bold text-xs py-3.5 rounded-xl shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center space-x-2 uppercase tracking-wider"
+                  >
+                    <Calendar className="w-4 h-4 text-accent" />
+                    <span>Book Treatment Session</span>
+                  </button>
 
-            {/* Booking Actions */}
-            <div className="space-y-3 pt-2">
-              <button
-                onClick={handleFindDoctors}
-                className="w-full bg-primary hover:bg-primary-light text-white font-bold text-xs py-3.5 rounded-xl shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center space-x-2 uppercase tracking-wider"
-              >
-                <Calendar className="w-4 h-4 text-accent" />
-                <span>Book Consultation</span>
-              </button>
-
-              <button
-                onClick={handleFindDoctors}
-                className="w-full bg-white hover:bg-gray-50 border border-primary text-primary font-bold text-xs py-3.5 rounded-xl transition-all flex items-center justify-center space-x-2 uppercase tracking-wider"
-              >
-                <UserCheck className="w-4 h-4 text-accent" />
-                <span>Recommended Doctors</span>
-              </button>
-            </div>
+                  <button
+                    onClick={handleFindDoctors}
+                    className="w-full bg-white hover:bg-gray-50 border border-primary text-primary font-bold text-xs py-3.5 rounded-xl transition-all flex items-center justify-center space-x-2 uppercase tracking-wider"
+                  >
+                    <UserCheck className="w-4 h-4 text-accent" />
+                    <span>Recommended Doctors</span>
+                  </button>
+                </div>
+              </>
+            )}
 
           </div>
 

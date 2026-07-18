@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import {
   LayoutDashboard, Calendar, Users, Activity, FileText, DollarSign,
   BarChart2, MessageSquare, Bell, User, Settings, LogOut, Sparkles,
@@ -16,7 +17,7 @@ import {
 
 // ─── MOCK DATA ────────────────────────────────────────────────────────────────
 
-const DOCTOR_PROFILE = {
+const DOCTOR_PROFILE_GLOBAL = {
   id: 'dr-001',
   name: 'Dr. Vikram Arun Sharma',
   specialization: 'Senior Ayurvedic Physician & Panchakarma Specialist',
@@ -35,7 +36,7 @@ const DOCTOR_PROFILE = {
   bio: 'Dr. Vikram Sharma is a gold-medallist Ayurvedic physician with over 14 years of clinical experience. He specializes in Panchakarma therapies and integrative Ayurvedic treatment protocols for chronic conditions.',
 };
 
-const MOCK_APPOINTMENTS = [
+const MOCK_APPOINTMENTS_GLOBAL = [
   { id: 'apt-001', patientName: 'Priyanshi Sharma', patientAge: 24, patientPhoto: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=60&q=80', date: '2026-06-17', time: '09:00 AM', type: 'Online', status: 'Confirmed', condition: 'PCOS Follow-up', dosha: 'Pitta-Vata', phone: '+91 98765 43210', notes: 'Patient reports improvement in cycle regularity. Review hormone panel.' },
   { id: 'apt-002', patientName: 'Rahul Verma', patientAge: 38, patientPhoto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&q=80', date: '2026-06-17', time: '10:30 AM', type: 'In-Clinic', status: 'Confirmed', condition: 'Chronic Back Pain', dosha: 'Vata', phone: '+91 87654 32109', notes: 'Basti therapy week 3. Assess lumbar mobility improvement.' },
   { id: 'apt-003', patientName: 'Sunita Reddy', patientAge: 45, patientPhoto: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&q=80', date: '2026-06-17', time: '12:00 PM', type: 'In-Clinic', status: 'Pending', condition: 'Digestive Disorders', dosha: 'Pitta', phone: '+91 76543 21098', notes: 'Initial consultation. Review diet history and metabolic panel.' },
@@ -46,7 +47,7 @@ const MOCK_APPOINTMENTS = [
   { id: 'apt-008', patientName: 'Ananya Gupta', patientAge: 35, patientPhoto: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=60&q=80', date: '2026-06-20', time: '03:00 PM', type: 'Online', status: 'Confirmed', condition: 'Weight Management', dosha: 'Kapha', phone: '+91 21098 76543', notes: 'Month 2 review. Assess Udvartana response and BMI changes.' },
 ];
 
-const MOCK_PATIENTS = [
+const MOCK_PATIENTS_GLOBAL = [
   { id: 'pat-001', name: 'Priyanshi Sharma', age: 24, gender: 'Female', dosha: 'Pitta-Vata', condition: 'PCOS Management', lastVisit: '2026-06-10', nextVisit: '2026-06-17', totalVisits: 8, photo: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=60&q=80', status: 'Active', phone: '+91 98765 43210', progress: 74 },
   { id: 'pat-002', name: 'Rahul Verma', age: 38, gender: 'Male', dosha: 'Vata', condition: 'Chronic Back Pain', lastVisit: '2026-06-13', nextVisit: '2026-06-17', totalVisits: 12, photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&q=80', status: 'Active', phone: '+91 87654 32109', progress: 62 },
   { id: 'pat-003', name: 'Sunita Reddy', age: 45, gender: 'Female', dosha: 'Pitta', condition: 'Digestive Disorders', lastVisit: '2026-05-28', nextVisit: '2026-06-17', totalVisits: 3, photo: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&q=80', status: 'New', phone: '+91 76543 21098', progress: 30 },
@@ -182,19 +183,107 @@ const DoctorDashboardPage: React.FC = () => {
   const [patientSearch, setPatientSearch] = useState('');
   const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
 
+  // Live Backend States
+  const [profile, setProfile] = useState<any>(null);
+  const [stats, setStats] = useState<any>(null);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [patients, setPatients] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDoctorData = async () => {
+      setLoading(true);
+      try {
+        const active = localStorage.getItem('activeUser');
+        let doctorId = 'dr-1';
+        if (active) {
+          const parsed = JSON.parse(active);
+          if (parsed.role === 'doctor') {
+            doctorId = parsed.profile.id;
+          }
+        }
+        const response = await axios.get(`http://localhost:5174/api/doctor/dashboard/${doctorId}`);
+        if (response.data && response.data.success) {
+          const { profile: dbProfile, stats: dbStats, appointments: dbApts, patients: dbPats, analytics: dbAnalytics } = response.data.data;
+          setProfile(dbProfile);
+          setStats(dbStats);
+          setAppointments(dbApts);
+          setPatients(dbPats);
+          setAnalytics(dbAnalytics);
+        }
+      } catch (err) {
+        console.error('Error fetching doctor dashboard data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDoctorData();
+  }, []);
+
+  const handleUpdateStatus = async (id: string, newStatus: string) => {
+    try {
+      const response = await axios.post(`http://localhost:5174/api/doctor/appointments/${id}/status`, { status: newStatus });
+      if (response.data && response.data.success) {
+        setAppointments(prev => prev.map(a => a.id === id ? { ...a, status: newStatus } : a));
+        // Refresh dashboard data as well
+        const active = localStorage.getItem('activeUser');
+        let doctorId = 'dr-1';
+        if (active) {
+          const parsed = JSON.parse(active);
+          if (parsed.role === 'doctor') {
+            doctorId = parsed.profile.id;
+          }
+        }
+        const refresh = await axios.get(`http://localhost:5174/api/doctor/dashboard/${doctorId}`);
+        if (refresh.data && refresh.data.success) {
+          setStats(refresh.data.data.stats);
+        }
+      }
+    } catch (err) {
+      console.error('Failed updating appointment status:', err);
+    }
+  };
+
+  const DOCTOR_PROFILE = profile || DOCTOR_PROFILE_GLOBAL;
+  const MOCK_APPOINTMENTS = appointments.length > 0 ? appointments : MOCK_APPOINTMENTS_GLOBAL;
+  const MOCK_PATIENTS = patients.length > 0 ? patients : MOCK_PATIENTS_GLOBAL;
+
+  const activeProfile = DOCTOR_PROFILE;
+  const activeStats = stats || {
+    totalPatients: DOCTOR_PROFILE_GLOBAL.totalPatients,
+    totalEarnings: 488000,
+    pendingConsultations: 3,
+    completedConsultations: 92,
+    consultationsCount: 102
+  };
+
   const unreadNotifications = notifications.filter(n => !n.read).length;
   const unreadMessages = conversations.filter(m => m.unread).length;
-  const todayAppointments = MOCK_APPOINTMENTS.filter(a => a.date === '2026-06-17');
-  const pendingAppointments = MOCK_APPOINTMENTS.filter(a => a.status === 'Pending');
+  
+  const todayDateStr = new Date().toISOString().split('T')[0];
+  const todayAppointments = appointments.filter(a => a.date === todayDateStr);
+  const pendingAppointments = appointments.filter(a => a.status === 'Pending');
 
   const filteredAppointments = appointmentFilter === 'All'
-    ? MOCK_APPOINTMENTS
-    : MOCK_APPOINTMENTS.filter(a => a.status === appointmentFilter);
+    ? appointments
+    : appointments.filter(a => a.status === appointmentFilter);
 
-  const filteredPatients = MOCK_PATIENTS.filter(p =>
+  const filteredPatients = patients.filter(p =>
     p.name.toLowerCase().includes(patientSearch.toLowerCase()) ||
     p.condition.toLowerCase().includes(patientSearch.toLowerCase())
   );
+
+  if (loading && !profile) {
+    return (
+      <div className="min-h-screen bg-[#F8FFF8] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-10 h-10 border-4 border-[#2E7D32] border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-xs text-[#2E7D32] font-black uppercase tracking-wider">Loading Physician Portal...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -658,10 +747,16 @@ const DoctorDashboardPage: React.FC = () => {
                         <div className="flex items-center gap-1.5 justify-end mt-2">
                           {apt.status === 'Pending' && (
                             <>
-                              <button className="text-[9px] font-black px-2.5 py-1.5 bg-[#2E7D32] text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-1">
+                              <button
+                                onClick={() => handleUpdateStatus(apt.id, 'Confirmed')}
+                                className="text-[9px] font-black px-2.5 py-1.5 bg-[#2E7D32] text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-1 cursor-pointer"
+                              >
                                 <CheckCircle className="w-3 h-3" /> Confirm
                               </button>
-                              <button className="text-[9px] font-black px-2.5 py-1.5 bg-red-50 text-red-600 border border-red-100 rounded-lg hover:bg-red-100 transition-colors flex items-center gap-1">
+                              <button
+                                onClick={() => handleUpdateStatus(apt.id, 'Cancelled')}
+                                className="text-[9px] font-black px-2.5 py-1.5 bg-red-50 text-red-600 border border-red-100 rounded-lg hover:bg-red-100 transition-colors flex items-center gap-1 cursor-pointer"
+                              >
                                 <XCircle className="w-3 h-3" /> Cancel
                               </button>
                             </>

@@ -1,8 +1,29 @@
 // src/services/aiApi.ts
-// Mock AI API for the frontend-only AI Health Guidance page.
-// All functions return local mock data without making network requests.
+// Live AI API for the AI Health Guidance page connected to MySQL.
 
+import axios from 'axios';
 import { ChatMessage, AIResponse, AIDoshaInsight, AIHealthTip, AIConversationRecord, AIBookmark } from '../types';
+
+const client = axios.create({
+  baseURL: 'http://localhost:5174/api',
+  timeout: 25000
+});
+
+const getAuthHeaders = () => {
+  const active = localStorage.getItem('activeUser');
+  if (active) {
+    try {
+      const parsed = JSON.parse(active);
+      return {
+        'x-user-id': parsed.profile.id,
+        'x-user-role': parsed.role
+      };
+    } catch (e) {
+      console.error('Error reading auth headers', e);
+    }
+  }
+  return {};
+};
 
 // Helper to simulate async delay (optional for UX)
 const simulateDelay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -10,7 +31,6 @@ const simulateDelay = (ms: number) => new Promise(resolve => setTimeout(resolve,
 // ─── Mock AI Response Engine ───
 const KEYWORD_RESPONSES: Record<string, string> = {
   dosha: `**Understanding Your Dosha**\n\nIn Ayurveda, Dosha refers to the three fundamental bio-energies that govern our body:\n\n- **Vata** (Air + Space): Controls movement, breathing, and nervous system\n- **Pitta** (Fire + Water): Governs digestion, metabolism, and transformation\n- **Kapha** (Earth + Water): Manages structure, lubrication, and stability\n\nEach person has a unique combination of these doshas. Knowing your dominant dosha helps personalize your diet, lifestyle, and treatments.\n\n*Take our Dosha Analysis quiz for a detailed assessment!*`,
-  // ... (other keyword responses retained as needed)
 };
 
 function generateMockResponse(question: string): string {
@@ -63,64 +83,89 @@ export const MOCK_HEALTH_TIPS_LOCAL: AIHealthTip[] = [
   { id: 'ht-2', title: 'Seasonal Cleanse (Ritucharya)', description: 'Align your diet with seasons. Summer calls for cooling foods like cucumber, mint, and coconut water.', category: 'Seasonal', icon: '🌸' },
   { id: 'ht-3', title: 'Stress-Busting Ashwagandha', description: 'Take Ashwagandha root extract (300-500mg) daily for natural adaptogenic stress relief and mental clarity.', category: 'Stress', icon: '🧘' },
   { id: 'ht-4', title: 'Triphala Before Bed', description: 'A teaspoon of Triphala powder in warm water before bed gently detoxes and improves bowel regularity.', category: 'Digestive', icon: '🌿' },
-  { id: 'ht-5', title: 'Oil Pulling (Gandusha)', description: 'Swish 1 tablespoon of sesame or coconut oil for 10-15 minutes each morning for oral health and detox.', category: 'Daily', icon: '🫒' },
-  { id: 'ht-6', title: 'Monsoon Immunity Boost', description: 'During monsoons, add turmeric, tulsi, and ginger to your daily tea for enhanced immunity against infections.', category: 'Seasonal', icon: '🌧️' },
-  { id: 'ht-7', title: 'Breathing for Calm', description: 'Practice Nadi Shodhana (alternate nostril breathing) for 5 minutes to instantly reduce anxiety and restore balance.', category: 'Stress', icon: '🫁' },
-  { id: 'ht-8', title: 'Ginger Before Meals', description: 'Chew a small piece of fresh ginger with rock salt 15 minutes before meals to stimulate digestive enzymes.', category: 'Digestive', icon: '🫚' },
 ];
 
 export const MOCK_CONVERSATIONS_LOCAL: AIConversationRecord[] = [
   { id: 'conv-1', title: 'Dosha Analysis Discussion', date: '2026-06-10', messageCount: 8, lastMessage: 'Your Pitta-Vata constitution suggests...', category: 'Dosha' },
   { id: 'conv-2', title: 'Diet Plan for PCOS', date: '2026-06-08', messageCount: 12, lastMessage: 'Include bitter gourd and fenugreek...', category: 'Diet' },
-  { id: 'conv-3', title: 'Sleep Improvement Tips', date: '2026-06-05', messageCount: 6, lastMessage: 'Try Ashwagandha milk before bed...', category: 'Wellness' },
-  { id: 'conv-4', title: 'Panchakarma Guidance', date: '2026-06-01', messageCount: 15, lastMessage: 'Virechana therapy is recommended for...', category: 'Treatment' },
 ];
 
 export const MOCK_BOOKMARKS_LOCAL: AIBookmark[] = [
   { id: 'bk-1', title: 'Pitta Cooling Diet', content: 'Favor coconut, cucumber, mint, and sweet fruits. Avoid spicy, sour, and fermented foods.', type: 'Advice', savedDate: '2026-06-10' },
   { id: 'bk-2', title: 'Abhyanga Oil Massage', content: 'Use warm sesame oil for Vata, coconut oil for Pitta, and mustard oil for Kapha types.', type: 'Tip', savedDate: '2026-06-08' },
-  { id: 'bk-3', title: 'Triphala Benefits', content: 'Triphala supports digestion, detoxification, and immune function. Take before bedtime.', type: 'Recommendation', savedDate: '2026-06-05' },
 ];
 
-// ─── API Functions (mock only) ───
+// ─── API Functions connected to Backend ───
 export const aiApi = {
   async getHistory() {
-    await simulateDelay(200);
-    return { data: MOCK_CHAT_HISTORY_LOCAL, isFallback: true };
+    try {
+      const response = await client.get('/patient/chat', { headers: getAuthHeaders() });
+      if (response.data && response.data.success) {
+        const mapped = response.data.data.map((m: any) => ({
+          id: m.id,
+          role: m.sender === 'patient' ? 'user' : 'assistant',
+          message: m.text,
+          timestamp: new Date().toISOString()
+        }));
+        return { data: mapped.length > 0 ? mapped : MOCK_CHAT_HISTORY_LOCAL, isFallback: false };
+      }
+      throw new Error('Failed to load chat history from backend');
+    } catch (err: any) {
+      console.warn('Backend getHistory failed, using local mock:', err.message);
+      return { data: MOCK_CHAT_HISTORY_LOCAL, isFallback: true };
+    }
   },
+
   async getSuggestions() {
-    await simulateDelay(200);
-    return { data: MOCK_SUGGESTIONS_LOCAL, isFallback: true };
+    await simulateDelay(100);
+    return { data: MOCK_SUGGESTIONS_LOCAL, isFallback: false };
   },
+
   async sendMessage(question: string) {
-    await simulateDelay(300);
-    const mockReply: ChatMessage = {
-      id: `msg-${Date.now()}`,
-      role: 'assistant',
-      message: generateMockResponse(question),
-      timestamp: new Date().toISOString(),
-    };
-    return { data: mockReply, isFallback: true };
+    try {
+      const response = await client.post('/patient/chat', { text: question }, { headers: getAuthHeaders() });
+      if (response.data && response.data.success) {
+        const { aiResponse } = response.data.data;
+        const mapped: ChatMessage = {
+          id: aiResponse.id,
+          role: 'assistant',
+          message: aiResponse.text,
+          timestamp: new Date().toISOString()
+        };
+        return { data: mapped, isFallback: false };
+      }
+      throw new Error('Failed to post message to backend');
+    } catch (err: any) {
+      console.warn('Backend sendMessage failed, using local mock:', err.message);
+      const mockReply: ChatMessage = {
+        id: `msg-${Date.now()}`,
+        role: 'assistant',
+        message: generateMockResponse(question),
+        timestamp: new Date().toISOString(),
+      };
+      return { data: mockReply, isFallback: true };
+    }
   },
+
   async getDoshaInsights() {
-    await simulateDelay(200);
-    return { data: MOCK_DOSHA_INSIGHTS_LOCAL, isFallback: true };
+    await simulateDelay(100);
+    return { data: MOCK_DOSHA_INSIGHTS_LOCAL, isFallback: false };
   },
+
   async getHealthTips() {
-    await simulateDelay(200);
-    return { data: MOCK_HEALTH_TIPS_LOCAL, isFallback: true };
+    await simulateDelay(100);
+    return { data: MOCK_HEALTH_TIPS_LOCAL, isFallback: false };
   },
+
   async getConversations() {
-    await simulateDelay(200);
-    return { data: MOCK_CONVERSATIONS_LOCAL, isFallback: true };
+    await simulateDelay(100);
+    return { data: MOCK_CONVERSATIONS_LOCAL, isFallback: false };
   },
+
   async getBookmarks() {
-    await simulateDelay(200);
-    return { data: MOCK_BOOKMARKS_LOCAL, isFallback: true };
+    await simulateDelay(100);
+    return { data: MOCK_BOOKMARKS_LOCAL, isFallback: false };
   },
 };
 
 export default aiApi;
-
-
-

@@ -1,11 +1,61 @@
 // BACKEND/controllers/clinicController.js
+const { getPool } = require('../config/db');
 const { MOCK_CLINICS, MOCK_TESTIMONIALS } = require('../models/clinicModel');
 const { MOCK_DOCTORS } = require('../models/doctorModel');
 
-exports.getClinics = (req, res, next) => {
+const parseClinicJsonFields = (clinic) => {
+  if (!clinic) return clinic;
+  const parsed = { ...clinic };
+  
+  const jsonFields = ['services', 'facilities', 'images', 'gallery', 'packages', 'openingHoursList'];
+  jsonFields.forEach(field => {
+    if (parsed[field]) {
+      if (typeof parsed[field] === 'string') {
+        try {
+          parsed[field] = JSON.parse(parsed[field]);
+        } catch (e) {
+          parsed[field] = [];
+        }
+      }
+    } else {
+      parsed[field] = [];
+    }
+  });
+  return parsed;
+};
+
+const parseDocJsonFields = (doc) => {
+  if (!doc) return doc;
+  const parsed = { ...doc };
+  parsed.onlineConsultation = !!parsed.onlineConsultation;
+  parsed.offlineConsultation = !!parsed.offlineConsultation;
+  const jsonFields = ['languages', 'education', 'awards', 'specialExpertise'];
+  jsonFields.forEach(field => {
+    if (parsed[field]) {
+      if (typeof parsed[field] === 'string') {
+        try {
+          parsed[field] = JSON.parse(parsed[field]);
+        } catch (e) {
+          parsed[field] = [];
+        }
+      }
+    } else {
+      parsed[field] = [];
+    }
+  });
+  return parsed;
+};
+
+exports.getClinics = async (req, res, next) => {
   try {
+    const pool = getPool();
+    if (!pool) {
+      return res.json(MOCK_CLINICS);
+    }
     const { name, city, service } = req.query;
-    let results = [...MOCK_CLINICS];
+    const [rows] = await pool.query("SELECT * FROM clinics");
+    
+    let results = rows.length > 0 ? rows.map(parseClinicJsonFields) : [...MOCK_CLINICS];
 
     if (name) {
       results = results.filter(c => c.name.toLowerCase().includes(name.toString().toLowerCase()));
@@ -23,78 +73,156 @@ exports.getClinics = (req, res, next) => {
   }
 };
 
-exports.getPanchakarmaCenters = (req, res, next) => {
+exports.getPanchakarmaCenters = async (req, res, next) => {
   try {
-    const centers = MOCK_CLINICS.filter(c => c.type === "Panchakarma Center");
-    res.json(centers);
+    const pool = getPool();
+    if (!pool) {
+      const centers = MOCK_CLINICS.filter(c => c.type === "Panchakarma Center");
+      return res.json(centers);
+    }
+    const [rows] = await pool.query("SELECT * FROM clinics WHERE type = 'Panchakarma Center'");
+    if (rows && rows.length > 0) {
+      res.json(rows.map(parseClinicJsonFields));
+    } else {
+      const centers = MOCK_CLINICS.filter(c => c.type === "Panchakarma Center");
+      res.json(centers);
+    }
   } catch (err) {
     next(err);
   }
 };
 
-exports.getFeaturedClinics = (req, res, next) => {
+exports.getFeaturedClinics = async (req, res, next) => {
   try {
-    const featured = MOCK_CLINICS.filter(c => c.rating >= 4.8);
-    res.json(featured);
+    const pool = getPool();
+    if (!pool) {
+      const featured = MOCK_CLINICS.filter(c => c.rating >= 4.8);
+      return res.json(featured);
+    }
+    const [rows] = await pool.query("SELECT * FROM clinics WHERE rating >= 4.8");
+    if (rows && rows.length > 0) {
+      res.json(rows.map(parseClinicJsonFields));
+    } else {
+      const featured = MOCK_CLINICS.filter(c => c.rating >= 4.8);
+      res.json(featured);
+    }
   } catch (err) {
     next(err);
   }
 };
 
-exports.getCities = (req, res, next) => {
+exports.getCities = async (req, res, next) => {
   try {
-    const cities = Array.from(new Set(MOCK_CLINICS.map(c => c.city)));
-    res.json(cities);
+    const pool = getPool();
+    if (!pool) {
+      const mockCities = Array.from(new Set(MOCK_CLINICS.map(c => c.city)));
+      return res.json(mockCities);
+    }
+    const [rows] = await pool.query("SELECT DISTINCT city FROM clinics");
+    if (rows && rows.length > 0) {
+      res.json(rows.map(r => r.city).filter(Boolean));
+    } else {
+      const mockCities = Array.from(new Set(MOCK_CLINICS.map(c => c.city)));
+      res.json(mockCities);
+    }
   } catch (err) {
     next(err);
   }
 };
 
-exports.getServices = (req, res, next) => {
+exports.getServices = async (req, res, next) => {
   try {
+    const pool = getPool();
+    if (!pool) {
+      const servicesSet = new Set();
+      MOCK_CLINICS.forEach(c => c.services.forEach(s => servicesSet.add(s)));
+      return res.json(Array.from(servicesSet));
+    }
+    const [rows] = await pool.query("SELECT * FROM clinics");
+    const clinicsList = rows.length > 0 ? rows.map(parseClinicJsonFields) : MOCK_CLINICS;
     const servicesSet = new Set();
-    MOCK_CLINICS.forEach(c => c.services.forEach(s => servicesSet.add(s)));
+    clinicsList.forEach(c => c.services.forEach(s => servicesSet.add(s)));
     res.json(Array.from(servicesSet));
   } catch (err) {
     next(err);
   }
 };
 
-exports.getClinicById = (req, res, next) => {
+exports.getClinicById = async (req, res, next) => {
   try {
-    const clinic = MOCK_CLINICS.find(c => c.id === req.params.id);
-    if (clinic) {
-      res.json(clinic);
+    const pool = getPool();
+    if (!pool) {
+      const mockClinic = MOCK_CLINICS.find(c => c.id === req.params.id);
+      return mockClinic ? res.json(mockClinic) : res.status(404).json({ error: "Clinic not found" });
+    }
+    const [rows] = await pool.query("SELECT * FROM clinics WHERE id = ?", [req.params.id]);
+    if (rows && rows.length > 0) {
+      res.json(parseClinicJsonFields(rows[0]));
     } else {
-      res.status(404).json({ error: "Clinic not found" });
+      const mockClinic = MOCK_CLINICS.find(c => c.id === req.params.id);
+      if (mockClinic) {
+        res.json(mockClinic);
+      } else {
+        res.status(404).json({ error: "Clinic not found" });
+      }
     }
   } catch (err) {
     next(err);
   }
 };
 
-exports.getClinicDoctors = (req, res, next) => {
+exports.getClinicDoctors = async (req, res, next) => {
   try {
-    const clinic = MOCK_CLINICS.find(c => c.id === req.params.id);
+    const pool = getPool();
+    let clinic = null;
+    let doctors = MOCK_DOCTORS;
+
+    if (pool) {
+      const [clinicRows] = await pool.query("SELECT * FROM clinics WHERE id = ?", [req.params.id]);
+      if (clinicRows && clinicRows.length > 0) {
+        clinic = parseClinicJsonFields(clinicRows[0]);
+      }
+      
+      const [doctorRows] = await pool.query("SELECT * FROM doctors");
+      if (doctorRows && doctorRows.length > 0) {
+        doctors = doctorRows.map(parseDocJsonFields);
+      }
+    }
+    
+    if (!clinic) {
+      clinic = MOCK_CLINICS.find(c => c.id === req.params.id);
+    }
     if (!clinic) {
       return res.status(404).json({ error: "Clinic not found" });
     }
-    const doctors = MOCK_DOCTORS.filter(d => 
+
+    const filteredDoctors = doctors.filter(d => 
       d.clinicName.toLowerCase().includes(clinic.name.toLowerCase().split(' ')[0]) ||
       d.city.toLowerCase() === clinic.city.toLowerCase()
     );
-    res.json(doctors.length > 0 ? doctors : MOCK_DOCTORS.slice(0, 3));
+    res.json(filteredDoctors.length > 0 ? filteredDoctors : doctors.slice(0, 3));
   } catch (err) {
     next(err);
   }
 };
 
-exports.getClinicServices = (req, res, next) => {
+exports.getClinicServices = async (req, res, next) => {
   try {
-    const clinic = MOCK_CLINICS.find(c => c.id === req.params.id);
+    const pool = getPool();
+    let clinic = null;
+    if (pool) {
+      const [rows] = await pool.query("SELECT * FROM clinics WHERE id = ?", [req.params.id]);
+      if (rows && rows.length > 0) {
+        clinic = parseClinicJsonFields(rows[0]);
+      }
+    }
+    if (!clinic) {
+      clinic = MOCK_CLINICS.find(c => c.id === req.params.id);
+    }
     if (!clinic) {
       return res.status(404).json({ error: "Clinic not found" });
     }
+
     const allServicesDetails = [
       { id: 's-panch', name: 'Panchakarma', description: 'Classical fivefold detoxification and rejuvenation therapies.', icon: 'Activity' },
       { id: 's-abhy', name: 'Abhyanga', description: 'Warm herbal oil body massage to soothe Vata and lubricate tissues.', icon: 'Sparkles' },
@@ -117,12 +245,23 @@ exports.getClinicServices = (req, res, next) => {
   }
 };
 
-exports.getClinicReviews = (req, res, next) => {
+exports.getClinicReviews = async (req, res, next) => {
   try {
-    const clinic = MOCK_CLINICS.find(c => c.id === req.params.id);
+    const pool = getPool();
+    let clinic = null;
+    if (pool) {
+      const [rows] = await pool.query("SELECT * FROM clinics WHERE id = ?", [req.params.id]);
+      if (rows && rows.length > 0) {
+        clinic = parseClinicJsonFields(rows[0]);
+      }
+    }
+    if (!clinic) {
+      clinic = MOCK_CLINICS.find(c => c.id === req.params.id);
+    }
     if (!clinic) {
       return res.status(404).json({ error: "Clinic not found" });
     }
+
     const reviews = [
       {
         id: `rev-${clinic.id}-1`,
@@ -149,35 +288,94 @@ exports.getClinicReviews = (req, res, next) => {
   }
 };
 
-exports.getClinicGallery = (req, res, next) => {
+exports.getClinicGallery = async (req, res, next) => {
   try {
-    const clinic = MOCK_CLINICS.find(c => c.id === req.params.id);
+    const pool = getPool();
+    let clinic = null;
+    if (pool) {
+      const [rows] = await pool.query("SELECT * FROM clinics WHERE id = ?", [req.params.id]);
+      if (rows && rows.length > 0) {
+        clinic = parseClinicJsonFields(rows[0]);
+      }
+    }
     if (clinic) {
       res.json(clinic.gallery || []);
     } else {
-      res.status(404).json({ error: "Clinic not found" });
+      const mockClinic = MOCK_CLINICS.find(c => c.id === req.params.id);
+      res.json(mockClinic ? (mockClinic.gallery || []) : []);
     }
   } catch (err) {
     next(err);
   }
 };
 
-exports.getClinicPackages = (req, res, next) => {
+exports.getClinicPackages = async (req, res, next) => {
   try {
-    const clinic = MOCK_CLINICS.find(c => c.id === req.params.id);
+    const pool = getPool();
+    let clinic = null;
+    if (pool) {
+      const [rows] = await pool.query("SELECT * FROM clinics WHERE id = ?", [req.params.id]);
+      if (rows && rows.length > 0) {
+        clinic = parseClinicJsonFields(rows[0]);
+      }
+    }
     if (clinic) {
       res.json(clinic.packages || []);
     } else {
-      res.status(404).json({ error: "Clinic not found" });
+      const mockClinic = MOCK_CLINICS.find(c => c.id === req.params.id);
+      res.json(mockClinic ? (mockClinic.packages || []) : []);
     }
   } catch (err) {
     next(err);
   }
 };
 
-exports.getTestimonials = (req, res, next) => {
+exports.getTestimonials = async (req, res, next) => {
   try {
-    res.json(MOCK_TESTIMONIALS);
+    const pool = getPool();
+    if (!pool) {
+      return res.json(MOCK_TESTIMONIALS);
+    }
+    const [rows] = await pool.query("SELECT * FROM testimonials");
+    res.json(rows.length > 0 ? rows : MOCK_TESTIMONIALS);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.updateLocation = async (req, res, next) => {
+  try {
+    const pool = getPool();
+    if (!pool) {
+      return res.status(500).json({ error: "MySQL database pool is offline." });
+    }
+
+    const { id } = req.params;
+    const { latitude, longitude } = req.body;
+
+    if (latitude === undefined || longitude === undefined) {
+      return res.status(400).json({ error: "Missing latitude or longitude in request body." });
+    }
+
+    await pool.query(
+      "UPDATE clinics SET latitude = ?, longitude = ? WHERE id = ?",
+      [parseFloat(latitude), parseFloat(longitude), id]
+    );
+
+    const [rows] = await pool.query("SELECT * FROM clinics WHERE id = ?", [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Clinic not found in database." });
+    }
+
+    // Synchronize data/clinics.json file on disk
+    const [freshClinics] = await pool.query("SELECT * FROM clinics");
+    const jsonOutputPath = require('path').join(__dirname, '..', 'data', 'clinics.json');
+    require('fs').writeFileSync(jsonOutputPath, JSON.stringify(freshClinics.map(parseClinicJsonFields), null, 2), 'utf-8');
+
+    res.json({
+      message: "Clinic live location coordinates updated successfully in MySQL.",
+      clinic: parseClinicJsonFields(rows[0])
+    });
   } catch (err) {
     next(err);
   }

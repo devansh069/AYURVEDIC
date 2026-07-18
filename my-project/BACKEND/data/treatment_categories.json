@@ -1,0 +1,38 @@
+[
+  {
+    "id": "cat-panch",
+    "name": "Panchakarma",
+    "description": "Classical fivefold detoxification and rejuvenation therapies.",
+    "icon": "Activity"
+  },
+  {
+    "id": "cat-detox",
+    "name": "Detox Therapy",
+    "description": "Cleansing body channels of accumulated toxins (Ama).",
+    "icon": "Sparkles"
+  },
+  {
+    "id": "cat-herb",
+    "name": "Herbal Therapy",
+    "description": "Botanical formulations custom-tailored for organ system healing.",
+    "icon": "Sprout"
+  },
+  {
+    "id": "cat-yoga",
+    "name": "Yoga Therapy",
+    "description": "Pranayama and alignment postures to stabilize nervous energy.",
+    "icon": "Compass"
+  },
+  {
+    "id": "cat-life",
+    "name": "Lifestyle Therapy",
+    "description": "Adapting daily schedules (Dinacharya) to match body constitution.",
+    "icon": "Clock"
+  },
+  {
+    "id": "cat-prog",
+    "name": "Wellness Programs",
+    "description": "Multidisciplinary health restoration plans for chronic conditions.",
+    "icon": "Heart"
+  }
+]

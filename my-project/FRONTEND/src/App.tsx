@@ -19,11 +19,16 @@ import ProfileSettingsDashboard from './pages/ProfileSettingsDashboard';
 import DoctorDashboardPage from './pages/DoctorDashboardPage';
 import About from './pages/About';
 import DoctorProfileSettingsPage from './pages/DoctorProfileSettingsPage';
+import { AuthProvider } from './context/AuthContext';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import SymptomChecker from './pages/SymptomChecker';
 
 function App() {
   return (
-    <Router>
-      <div className="font-sans bg-background min-h-screen flex flex-col">
+    <AuthProvider>
+      <Router>
+        <div className="font-sans bg-background min-h-screen flex flex-col">
         <Navbar />
         <div className="flex-grow pt-20"> {/* PT matches Navbar height roughly */}
           <Routes>
@@ -44,11 +49,15 @@ function App() {
             <Route path="/doctors" element={<Doctors />} />
             <Route path="/doctor/:id" element={<DoctorProfile />} />
             <Route path="/about" element={<About />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/symptom-checker" element={<SymptomChecker />} />
           </Routes>
         </div>
         <Footer />
       </div>
     </Router>
+  </AuthProvider>
   );
 }
 

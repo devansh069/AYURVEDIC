@@ -10,6 +10,7 @@ import {
 import { MdVerified, MdLanguage, MdChat, MdVideoCall, MdOutlineRateReview, MdOutlineDone } from 'react-icons/md';
 import { FiPhone, FiMail, FiMapPin, FiSearch } from 'react-icons/fi';
 import { MOCK_DIRECTORY_DOCTORS, TOP_SPECIALIZATIONS, TOP_CITIES, FAQS, MOCK_REVIEWS_DIRECTORY, DirectoryDoctor } from '../data/directoryMockData';
+import doctorApi from '../services/doctorApi';
 
 // Animations Config
 const fadeInUp = {
@@ -29,6 +30,11 @@ const staggerContainer = {
 
 export const Doctors: React.FC = () => {
   // Directory & Search State
+  const [doctors, setDoctors] = useState<DirectoryDoctor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isFallback, setIsFallback] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+
   const [searchName, setSearchName] = useState('');
   const [searchCity, setSearchCity] = useState('');
   const [searchClinic, setSearchClinic] = useState('');
@@ -62,9 +68,13 @@ export const Doctors: React.FC = () => {
   });
 
   // Profile Modal State
-  const [activeProfile, setActiveProfile] = useState<DirectoryDoctor | null>(null);
+  const [activeProfile, setActiveProfile] = useState<any | null>(null);
   // Booking confirmation status
   const [bookingCompleted, setBookingCompleted] = useState<boolean>(false);
+  const [bookingResult, setBookingResult] = useState<any>(null);
+  const [bookingLoading, setBookingLoading] = useState(false);
+  const [bookingError, setBookingError] = useState('');
+
   const [bookingFormData, setBookingFormData] = useState({
     patientName: '',
     phone: '',
@@ -75,6 +85,24 @@ export const Doctors: React.FC = () => {
   });
 
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
+  // Fetch live doctors on mount
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      setLoading(true);
+      try {
+        const res = await doctorApi.getDoctors();
+        setDoctors(res.data);
+        setIsFallback(res.isFallback);
+      } catch (err) {
+        console.error("Failed to load doctors:", err);
+        setIsFallback(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDoctors();
+  }, []);
 
   // Handle Save Doctor Toggle
   const toggleSaveDoctor = (id: string, e: React.MouseEvent) => {
@@ -105,7 +133,7 @@ export const Doctors: React.FC = () => {
 
   // Perform search / filter operations in frontend
   const processedDoctors = useMemo(() => {
-    let result = [...MOCK_DIRECTORY_DOCTORS];
+    let result = [...doctors];
 
     // 1. Text Search (Doctor Name, Specialization, Clinic)
     if (searchName) {
@@ -144,7 +172,7 @@ export const Doctors: React.FC = () => {
     }
 
     // 7. Max Fee Filter
-    if (filterMaxFee < 1500) {
+    if (filterMaxFee > 0) {
       result = result.filter(doc => doc.consultationFee <= filterMaxFee);
     }
 
@@ -204,39 +232,84 @@ export const Doctors: React.FC = () => {
 
     return result;
   }, [
-    searchName, searchCity, searchClinic, selectedSpecialization, selectedLocation,
+    doctors, searchName, searchCity, searchClinic, selectedSpecialization, selectedLocation,
     filterExperience, filterRating, filterMaxFee, filterGender, filterConsultationType,
     filterLanguage, filterAvailability, sortBy
   ]);
 
   // Featured Doctors: Top 8 rated doctors from the list
   const featuredDoctors = useMemo(() => {
-    return [...MOCK_DIRECTORY_DOCTORS]
+    return [...doctors]
       .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount)
       .slice(0, 8);
-  }, []);
+  }, [doctors]);
+
+  // Sync Wikipedia specialization insights
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      const res = await doctorApi.syncDoctors();
+      if (res.data && !res.isFallback) {
+        // Re-load doctors to update frontend state
+        const fresh = await doctorApi.getDoctors();
+        setDoctors(fresh.data);
+        alert("Real-time doctor specialization insights successfully fetched from Wikipedia and stored in MySQL!");
+      } else {
+        alert("Sync failed: " + (res.error || "Unknown error"));
+      }
+    } catch (err: any) {
+      alert("Sync failed: " + err.message);
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   // Submit Booking Form
-  const handleConfirmBooking = (e: React.FormEvent) => {
+  const handleConfirmBooking = async (e: React.FormEvent) => {
     e.preventDefault();
-    setBookingCompleted(true);
-    setTimeout(() => {
-      // Auto close and reset after a delay
-      setActiveProfile(null);
-      setBookingCompleted(false);
-      setBookingFormData({
-        patientName: '',
-        phone: '',
-        email: '',
-        date: '',
-        time: '10:00 AM',
-        type: 'Online Video'
+    if (!activeProfile) return;
+    setBookingLoading(true);
+    setBookingError('');
+
+    const fee = bookingFormData.type === 'Online Video'
+      ? activeProfile.onlineConsultationFee
+      : activeProfile.consultationFee;
+
+    try {
+      const res = await doctorApi.bookConsultation({
+        doctorId: activeProfile.id,
+        doctorName: activeProfile.name,
+        patientName: bookingFormData.patientName,
+        patientEmail: bookingFormData.email,
+        patientPhone: bookingFormData.phone,
+        appointmentDate: bookingFormData.date,
+        appointmentTime: bookingFormData.time,
+        consultationType: bookingFormData.type,
+        consultationFee: fee
       });
-    }, 4000);
+
+      if (res.data && !res.isFallback) {
+        setBookingResult(res.data.booking);
+        setBookingCompleted(true);
+      } else {
+        setBookingError(res.error || "Booking failed.");
+      }
+    } catch (err: any) {
+      setBookingError(err.message || "An unexpected error occurred.");
+    } finally {
+      setBookingLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#F8FFF8] text-[#1A1A1A] font-sans antialiased overflow-hidden">
+      {isFallback && (
+        <div className="sticky top-[72px] z-40 w-full px-4 pt-2">
+          <div className="bg-amber-500/10 border border-amber-500/20 text-amber-800 text-[11px] font-black px-4 py-2.5 rounded-2xl flex items-center justify-center space-x-2">
+            <span>⚠ Database Connection Offline. Using Local Directory Fallback.</span>
+          </div>
+        </div>
+      )}
       
       {/* 2. Hero Section */}
       <section className="relative pt-32 pb-24 px-6 md:px-12 bg-gradient-to-br from-[#2E7D32]/10 via-[#F8FFF8] to-[#D4AF37]/5 overflow-hidden">
@@ -558,7 +631,20 @@ export const Doctors: React.FC = () => {
       <section id="directory-results" className="py-20 px-6 md:px-12 max-w-7xl mx-auto">
         <div className="text-center space-y-3 mb-16">
           <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-widest">Complete Directory</span>
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#2E7D32]">Find & Filter Doctors</h2>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#2E7D32]">Find & Filter Doctors</h2>
+            <button
+              onClick={handleSync}
+              disabled={syncing}
+              className={`text-[9px] font-bold uppercase px-3 py-1.5 rounded-full border transition-all flex items-center space-x-1 ${
+                syncing
+                  ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                  : 'bg-[#2E7D32]/5 hover:bg-[#2E7D32]/10 border-[#2E7D32]/20 text-[#2E7D32] hover:border-[#2E7D32]/30'
+              }`}
+            >
+              <span>{syncing ? 'Syncing...' : 'Sync Wikipedia Insights'}</span>
+            </button>
+          </div>
           <p className="text-xs text-gray-500 max-w-md mx-auto">Use filters and sort parameters to select the best physician fit for your body constitution.</p>
         </div>
 
@@ -748,11 +834,17 @@ export const Doctors: React.FC = () => {
             </div>
 
             {/* Doctors Grid */}
-            <motion.div 
-              layout
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            >
-              <AnimatePresence mode="popLayout">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-20 space-y-4">
+                <div className="w-10 h-10 border-4 border-[#2E7D32] border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">Loading Vaidyas Registry...</p>
+              </div>
+            ) : (
+              <motion.div 
+                layout
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                <AnimatePresence mode="popLayout">
                 {processedDoctors.map((doc) => (
                   <motion.div
                     layout
@@ -874,6 +966,7 @@ export const Doctors: React.FC = () => {
                 ))}
               </AnimatePresence>
             </motion.div>
+          )}
           </div>
 
         </div>
@@ -1095,7 +1188,7 @@ export const Doctors: React.FC = () => {
                 <FaTimes className="w-3.5 h-3.5" />
               </button>
 
-              {bookingCompleted ? (
+              {bookingCompleted && bookingResult ? (
                 /* Animated Booking Success View */
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -1106,14 +1199,49 @@ export const Doctors: React.FC = () => {
                     <FaCheckCircle />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="font-serif text-2xl font-bold text-[#2E7D32]">Appointment Request Submitted!</h3>
+                    <h3 className="font-serif text-2xl font-bold text-[#2E7D32]">Appointment Booked Successfully!</h3>
                     <p className="text-xs text-gray-500 max-w-md">
-                      Thank you <span className="font-bold text-gray-800">{bookingFormData.patientName}</span>. Your consultation booking request for <span className="font-bold text-gray-800">{bookingFormData.date} at {bookingFormData.time}</span> with {activeProfile.name} has been securely logged. A verification SMS and email have been sent to you.
+                      Thank you <span className="font-bold text-gray-800">{bookingResult.patientName}</span>. Your consultation for <span className="font-bold text-gray-800">{bookingResult.appointmentDate.split('T')[0]} at {bookingResult.appointmentTime}</span> with {bookingResult.doctorName} has been logged in MySQL.
                     </p>
                   </div>
-                  <div className="p-4 bg-[#F8FFF8] border border-[#2E7D32]/10 rounded-2xl text-[11px] text-[#2E7D32] font-semibold">
-                    🌿 Standard consultation fees of ₹{activeProfile.consultationFee} is payable directly at the clinic check-in counter or online portal.
+                  
+                  {/* Paytm Payment receipt details */}
+                  <div className="w-full max-w-md bg-[#F8FFF8] border border-[#2E7D32]/15 p-5 rounded-2xl text-left space-y-3.5 shadow-sm text-xs">
+                    <span className="text-[9px] uppercase font-bold text-gray-400 tracking-wider block border-b border-gray-100 pb-1.5">Paytm Transaction Receipt</span>
+                    <div className="grid grid-cols-2 gap-y-2 text-[11px] text-gray-650 font-semibold">
+                      <span>Transaction ID:</span>
+                      <code className="text-[10.5px] font-mono text-gray-800 font-bold text-right break-all">{bookingResult.paymentTxnId}</code>
+
+                      <span>Consultation Fee:</span>
+                      <span className="text-gray-950 font-bold text-right">₹{bookingResult.consultationFee}</span>
+
+                      <span>Payment Method:</span>
+                      <span className="text-gray-950 font-bold text-right">{bookingResult.paymentMethod}</span>
+
+                      <span>Payment Status:</span>
+                      <span className="text-emerald-650 font-bold text-right">{bookingResult.paymentStatus}</span>
+                    </div>
+
+                    <div className="border-t border-[#2E7D32]/10 pt-3.5 space-y-2 bg-[#2E7D32]/5 p-3 rounded-xl text-xs">
+                      <span className="text-[8.5px] uppercase font-black text-[#2E7D32] tracking-wider block">Split Revenue Distribution</span>
+                      <div className="grid grid-cols-2 text-[10.5px] text-[#2E7D32] font-extrabold">
+                        <span>Doctor Share (85%):</span>
+                        <span className="text-right">₹{bookingResult.doctorRevenue}</span>
+                        <span>Platform Fee (15%):</span>
+                        <span className="text-right">₹{bookingResult.platformRevenue}</span>
+                      </div>
+                    </div>
                   </div>
+                  <button
+                    onClick={() => {
+                      setActiveProfile(null);
+                      setBookingCompleted(false);
+                      setBookingResult(null);
+                    }}
+                    className="bg-[#2E7D32] hover:bg-[#1B4D20] text-white text-[10px] font-bold py-2.5 px-6 rounded-xl uppercase tracking-wider"
+                  >
+                    Done
+                  </button>
                 </motion.div>
               ) : (
                 /* Profile & Booking Form View */
@@ -1167,8 +1295,21 @@ export const Doctors: React.FC = () => {
                     {/* About */}
                     <div className="space-y-2">
                       <h4 className="font-serif text-xs font-bold text-gray-800 uppercase tracking-wider">About Doctor</h4>
-                      <p className="text-xs text-gray-600 leading-relaxed">{activeProfile.bio}</p>
+                      <p className="text-xs text-gray-600 leading-relaxed">{activeProfile.about || activeProfile.bio}</p>
                     </div>
+
+                    {/* Scientific specialization insight from Wikipedia */}
+                    {activeProfile.scientificData?.wikiExtract && (
+                      <div className="space-y-2.5 pt-4 border-t border-gray-150 text-xs">
+                        <h4 className="font-serif text-xs font-bold text-[#2E7D32] uppercase tracking-wider flex items-center gap-1.5">
+                          <MdVerified className="text-[#D4AF37] w-4 h-4 shrink-0" />
+                          <span>Specialization Insight (Wikipedia)</span>
+                        </h4>
+                        <p className="text-xs text-gray-650 leading-relaxed italic bg-amber-50/20 p-3.5 rounded-2xl border border-[#D4AF37]/15">
+                          {activeProfile.scientificData.wikiExtract}
+                        </p>
+                      </div>
+                    )}
 
                     {/* Qualifications & Education */}
                     <div className="space-y-2">
@@ -1296,6 +1437,18 @@ export const Doctors: React.FC = () => {
 
                       {/* Email & Phone */}
                       <div className="space-y-1">
+                        <label className="text-[9px] font-bold text-gray-400 uppercase">Contact Email</label>
+                        <input 
+                          type="email" 
+                          required
+                          placeholder="patient@example.com"
+                          value={bookingFormData.email}
+                          onChange={(e) => setBookingFormData(prev => ({ ...prev, email: e.target.value }))}
+                          className="w-full bg-white border border-gray-250 rounded-xl py-2 px-3 text-xs text-gray-800 focus:outline-none focus:border-[#2E7D32]"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
                         <label className="text-[9px] font-bold text-gray-400 uppercase">Contact Number</label>
                         <input 
                           type="tel" 
@@ -1307,12 +1460,19 @@ export const Doctors: React.FC = () => {
                         />
                       </div>
 
+                      {bookingError && (
+                        <span className="text-[9.5px] font-bold text-red-500 block">
+                          ⚠ {bookingError}
+                        </span>
+                      )}
+
                       {/* Submit */}
                       <button 
                         type="submit"
-                        className="w-full bg-[#2E7D32] hover:bg-[#1B4D20] text-white font-bold text-xs py-3.5 rounded-xl shadow-md transition-colors cursor-pointer uppercase tracking-wider"
+                        disabled={bookingLoading}
+                        className="w-full bg-[#2E7D32] hover:bg-[#1B4D20] text-white font-bold text-xs py-3.5 rounded-xl shadow-md transition-colors cursor-pointer uppercase tracking-wider disabled:bg-gray-300 disabled:cursor-not-allowed"
                       >
-                        Confirm Booking request
+                        {bookingLoading ? 'Booking Consultation...' : 'Confirm Booking request'}
                       </button>
                     </form>
                   </div>
@@ -1323,7 +1483,7 @@ export const Doctors: React.FC = () => {
           </div>
         )}
       </AnimatePresence>
-
+      
     </div>
   );
 };
