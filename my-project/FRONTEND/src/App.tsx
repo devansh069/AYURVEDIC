@@ -23,6 +23,7 @@ import { AuthProvider } from './context/AuthContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import SymptomChecker from './pages/SymptomChecker';
+import AdminPanel from './pages/AdminPanel';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/diseases" element={<Diseases />} />
+            <Route path="/admin" element={<AdminPanel />} />
             <Route path="/treatments" element={<Treatments />} />
             <Route path="/treatments/:id" element={<TreatmentDetails />} />
             <Route path="/clinics" element={<Clinics />} />

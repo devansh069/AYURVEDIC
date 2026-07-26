@@ -4,6 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const connectDB = require("./config/db");
+const connectMongo = require("./config/mongo");
 const errorHandler = require("./middlewares/errorHandler");
 
 // Import Routes
@@ -20,8 +21,9 @@ const dietRoutes = require("./routes/dietRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const authRoutes = require("./routes/authRoutes");
 
-// Connect to Database
+// Connect to Databases
 connectDB();
+connectMongo();
 
 const app = express();
 

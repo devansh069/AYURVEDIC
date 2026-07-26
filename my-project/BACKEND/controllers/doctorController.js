@@ -43,15 +43,41 @@ const loadSeedData = (filename) => {
 exports.getDoctors = async (req, res, next) => {
   try {
     const pool = getPool();
+    const { specialization, city, search } = req.query;
+
+    let baseQuery = "SELECT * FROM doctors WHERE 1=1";
+    const queryParams = [];
+
+    if (specialization) {
+      baseQuery += " AND (specialization LIKE ? OR specialization LIKE ?)";
+      queryParams.push(`%${specialization}%`, `%${specialization.split(' ')[0]}%`);
+    }
+    if (city) {
+      baseQuery += " AND city = ?";
+      queryParams.push(city);
+    }
+    if (search) {
+      baseQuery += " AND (name LIKE ? OR specialization LIKE ? OR qualification LIKE ?)";
+      const sq = `%${search}%`;
+      queryParams.push(sq, sq, sq);
+    }
+
     if (!pool) {
-      return res.json(loadSeedData('doctors.json').map(parseDocJsonFields));
+      let list = loadSeedData('doctors.json').map(parseDocJsonFields);
+      if (specialization) {
+        list = list.filter(d => d.specialization.toLowerCase().includes(specialization.toLowerCase()));
+      }
+      if (city) {
+        list = list.filter(d => d.city.toLowerCase() === city.toLowerCase());
+      }
+      if (search) {
+        list = list.filter(d => d.name.toLowerCase().includes(search.toLowerCase()) || d.specialization.toLowerCase().includes(search.toLowerCase()));
+      }
+      return res.json(list);
     }
-    const [rows] = await pool.query("SELECT * FROM doctors");
-    if (rows && rows.length > 0) {
-      res.json(rows.map(parseDocJsonFields));
-    } else {
-      res.json(loadSeedData('doctors.json').map(parseDocJsonFields));
-    }
+
+    const [rows] = await pool.query(baseQuery, queryParams);
+    res.json(rows.map(parseDocJsonFields));
   } catch (err) {
     next(err);
   }
@@ -144,28 +170,86 @@ exports.getTopRatedDoctors = async (req, res, next) => {
   }
 };
 
-exports.getDoctorReviews = (req, res, next) => {
+exports.getDoctorReviews = async (req, res, next) => {
   try {
+    const pool = getPool();
     const doctorId = req.params.id;
-    const reviews = [
-      {
-        id: `rev-${doctorId}-1`,
-        doctorId,
-        patientName: "Ananya Mehta",
-        rating: 5,
-        comment: "Excellent consulting! The treatment plan was holistic and highly customized.",
-        date: "2026-06-05"
-      },
-      {
-        id: `rev-${doctorId}-2`,
-        doctorId,
-        patientName: "Rahul Sharma",
-        rating: 5,
-        comment: "Very detailed explanations about my dosha imbalance. Felt very secure.",
-        date: "2026-06-02"
+
+    if (!pool) {
+      return res.json([
+        { id: `rev-${doctorId}-1`, doctorId, patientName: "Ananya Mehta", rating: 5, comment: "Excellent consulting! The treatment plan was holistic and highly customized.", createdAt: "2026-06-05" },
+        { id: `rev-${doctorId}-2`, doctorId, patientName: "Rahul Sharma", rating: 5, comment: "Very detailed explanations about my dosha imbalance. Felt very secure.", createdAt: "2026-06-02" }
+      ]);
+    }
+
+    let [rows] = await pool.query("SELECT * FROM doctor_reviews WHERE doctorId = ? ORDER BY createdAt DESC", [doctorId]);
+
+    if (rows.length === 0) {
+      const sampleComments = [
+        "Highly experienced Vaidya. The pulse diagnosis (Nadi Pariksha) was spot on!",
+        "Excellent consultation. They explained the dietary pathya and apathya in great detail.",
+        "Very satisfied with the treatment plan. I've noticed a major improvement in my symptoms.",
+        "Great experience! The doctor was very patient and answered all my questions regarding my dosha imbalance.",
+        "A highly knowledgeable doctor who blends traditional healing with practical lifestyle advice."
+      ];
+      const names = ["Aarav Patel", "Priya Nair", "Vikram Singh", "Deepa Sharma", "Rohan Mehta"];
+
+      for (let i = 0; i < 3; i++) {
+        const id = `rev-${doctorId}-${i + 1}`;
+        const patientName = names[i % names.length];
+        const rating = (4.5 + Math.random() * 0.5);
+        const comment = sampleComments[i % sampleComments.length];
+        
+        await pool.query(
+          "INSERT INTO doctor_reviews (id, doctorId, patientName, rating, comment) VALUES (?, ?, ?, ?, ?)",
+          [id, doctorId, patientName, rating, comment]
+        );
       }
-    ];
-    res.json(reviews);
+
+      [rows] = await pool.query("SELECT * FROM doctor_reviews WHERE doctorId = ? ORDER BY createdAt DESC", [doctorId]);
+    }
+
+    res.json(rows);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.addDoctorReview = async (req, res, next) => {
+  try {
+    const pool = getPool();
+    const doctorId = req.params.id;
+    const { patientName, rating, comment } = req.body;
+
+    if (!patientName || !rating) {
+      return res.status(400).json({ error: "Patient name and rating are required." });
+    }
+
+    const id = `rev-user-${Date.now()}`;
+    if (!pool) {
+      return res.status(500).json({ error: "Database offline. Unable to save review." });
+    }
+
+    await pool.query(
+      "INSERT INTO doctor_reviews (id, doctorId, patientName, rating, comment) VALUES (?, ?, ?, ?, ?)",
+      [id, doctorId, patientName, parseFloat(rating), comment || '']
+    );
+
+    const [avgRows] = await pool.query(
+      "SELECT AVG(rating) as avgRating, COUNT(*) as count FROM doctor_reviews WHERE doctorId = ?",
+      [doctorId]
+    );
+    if (avgRows && avgRows[0].count > 0) {
+      await pool.query(
+        "UPDATE doctors SET rating = ?, reviewCount = ? WHERE id = ?",
+        [parseFloat(avgRows[0].avgRating || 5.0).toFixed(2), avgRows[0].count, doctorId]
+      );
+    }
+
+    res.status(201).json({
+      message: "Review added successfully.",
+      review: { id, doctorId, patientName, rating, comment }
+    });
   } catch (err) {
     next(err);
   }

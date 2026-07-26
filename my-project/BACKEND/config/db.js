@@ -367,6 +367,37 @@ const createTables = async () => {
     `);
 
 
+    // doctor_appointments table
+    await conn.query(`
+      CREATE TABLE IF NOT EXISTS doctor_appointments (
+        id VARCHAR(255) PRIMARY KEY,
+        doctorId VARCHAR(255) NOT NULL,
+        patientName VARCHAR(255) NOT NULL,
+        patientEmail VARCHAR(255) NOT NULL,
+        patientPhone VARCHAR(255),
+        appointmentDate DATE NOT NULL,
+        appointmentTime VARCHAR(100) NOT NULL,
+        consultationType VARCHAR(50) DEFAULT 'Online Video',
+        status VARCHAR(50) DEFAULT 'Scheduled',
+        consultationFee INT DEFAULT 0,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (doctorId) REFERENCES doctors(id) ON DELETE CASCADE
+      )
+    `);
+
+    // doctor_reviews table
+    await conn.query(`
+      CREATE TABLE IF NOT EXISTS doctor_reviews (
+        id VARCHAR(255) PRIMARY KEY,
+        doctorId VARCHAR(255) NOT NULL,
+        patientName VARCHAR(255) NOT NULL,
+        rating DECIMAL(3, 2) DEFAULT 5.0,
+        comment TEXT,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (doctorId) REFERENCES doctors(id) ON DELETE CASCADE
+      )
+    `);
+
     // Alter table schemas dynamically to add any missing columns in dev environment
     try {
       await conn.query("ALTER TABLE doctors ADD COLUMN email VARCHAR(255) UNIQUE");

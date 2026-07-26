@@ -1,4 +1,5 @@
 const { getPool } = require('../config/db');
+const { generateGeminiContent } = require('../config/gemini');
 
 // Helper to generate AI Vaidya response based on message query and dosha
 const getAIResponseText = (message, dosha = 'Pitta-Kapha') => {
@@ -409,7 +410,7 @@ exports.postChatMessage = async (req, res) => {
     const [patientRows] = await pool.query('SELECT doshaType FROM patients WHERE id = ?', [patientId]);
     const dosha = patientRows.length > 0 ? patientRows[0].doshaType : 'Pitta-Kapha';
 
-    // 2. Save Patient Message
+    // 2. Save Patient Message to MySQL
     const msgId = `chat-msg-${Date.now()}`;
     const nowTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     await pool.query(
@@ -417,8 +418,15 @@ exports.postChatMessage = async (req, res) => {
       [msgId, patientId, 'patient', text, nowTime]
     );
 
-    // 3. Generate AI Vaidya Reply
-    const aiText = getAIResponseText(text, dosha);
+    // 3. Generate AI Vaidya Reply dynamically via Gemini API
+    const systemPrompt = `You are Vaidya AI, a distinguished Senior Ayurvedic Physician & Healthcare Advisor. You specialize in classical Ayurveda, Panchakarma, Dosha balance (${dosha}), herbology, and Pathya (dietary rules). Provide clear, concise, compassionate, and structured guidance for patient queries.`;
+    
+    let aiText = await generateGeminiContent(text, systemPrompt);
+    if (!aiText) {
+      aiText = getAIResponseText(text, dosha);
+    }
+
+    // 4. Save Gemini AI Response to MySQL
     const aiMsgId = `chat-msg-${Date.now() + 1}`;
     await pool.query(
       'INSERT INTO ai_chat_messages (id, patientId, sender, text, time) VALUES (?, ?, ?, ?, ?)',

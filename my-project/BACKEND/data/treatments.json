@@ -1,317 +1,1007 @@
 [
   {
     "id": "trt-1",
-    "name": "Panchakarma",
+    "name": "Panchakarma Detox",
     "slug": "panchakarma",
     "category": "Panchakarma",
-    "description": "The ultimate 5-action deep tissue purification and cellular level detoxification regime.",
-    "overview": "Panchakarma is the cornerstone of Ayurvedic detoxification. It consists of five major procedures (Vamana, Virechana, Basti, Nasya, and Raktamokshana) designed to deep-cleanse body tissues, release accumulated metabolic waste (Ama), and restore primary dosha harmony.",
-    "benefits": ["Removes cellular toxins", "Balances Vata, Pitta, and Kapha", "Rejuvenates digestive fire (Agni)", "Strengthens immune system"],
-    "procedure": "Panchakarma involves three phases: Poorva Karma (preparatory oiling & sweating), Pradhana Karma (the main cleansing therapies), and Paschat Karma (dietary rehabilitation rules).",
-    "duration": "7 - 21 Days",
-    "recoveryTime": "3 - 7 Days",
-    "costEstimate": 15000,
-    "suitableFor": ["Chronic Digestive Issues", "Arthritis", "Skin Conditions", "Metabolic Disorders"],
-    "contraindications": ["Severe exhaustion", "Pregnancy", "Acute infectious fevers"],
-    "precautions": ["Strict diet rules must be followed", "Avoid direct cold draft winds", "Refrain from heavy exercise"],
-    "steps": ["Snehana (Internal & external oiling)", "Swedana (Herbal steam therapy)", "Pradhana Karma (Detoxification acts)", "Samsarjana Krama (Dietary return schedule)"],
+    "description": "Panchakarma Detox is an authentic Ayurvedic clinical procedure designed to expel deep metabolic toxins and restore dosha balance.",
+    "overview": "Panchakarma Detox operates by liquefying cellular waste (Ama) and mobilizing it into natural elimination channels under Vaidya supervision.",
+    "benefits": [
+      "Clears cellular toxicity",
+      "Balancing Vata, Pitta, and Kapha channels",
+      "Soothes central nervous system",
+      "Boosts metabolic digestive fire (Agni)"
+    ],
+    "procedure": "The procedure begins with preparatory internal oleation (Snehapana) followed by precise therapeutic administration by certified Panchakarma therapists.",
+    "duration": "7 - 14 Days",
+    "recoveryTime": "2 - 4 Days",
+    "costEstimate": 18500,
+    "suitableFor": [
+      "Chronic stress",
+      "Joint stiffness",
+      "Metabolic sluggishness",
+      "Vata-Pitta imbalances"
+    ],
+    "contraindications": [
+      "Acute high fever",
+      "Unmonitored pregnancy",
+      "Severe acute gastroenteritis"
+    ],
+    "precautions": [
+      "Avoid cold drafty environments",
+      "Eat light freshly cooked meals",
+      "Hydrate with warm water"
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Poorva Karma (Prep)",
+        "description": "Internal Snehapana oleation & herbal steam prep",
+        "duration": "3 Days"
+      },
+      {
+        "stepNumber": 2,
+        "title": "Pradhana Karma (Main)",
+        "description": "Core clinical procedure execution",
+        "duration": "7 Days"
+      },
+      {
+        "stepNumber": 3,
+        "title": "Paschat Karma (Post-Care)",
+        "description": "Gradual Samsarjana Krama dietary restoration",
+        "duration": "3 Days"
+      }
+    ],
     "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80",
     "rating": 4.9,
-    "reviewCount": 154,
-    "faq": [{ "question": "Is Panchakarma painful?", "answer": "No, the therapies consist of oil massages, herbal steams, and gentle elimination procedures designed for soothing detoxification." }]
+    "reviewCount": 142,
+    "faq": [
+      {
+        "question": "Is Panchakarma Detox safe for first-time patients?",
+        "answer": "Yes, our certified Vaidyas perform a pulse evaluation before prescribing custom oil dosages and temperatures."
+      }
+    ],
+    "modernData": {
+      "mechanismOfAction": "Clinical trials show parasympathetic stimulation and reduced systemic inflammatory markers during Panchakarma Detox.",
+      "lastSynced": "2026-07-21T14:29:43.764Z"
+    }
   },
   {
     "id": "trt-2",
-    "name": "Vamana",
-    "slug": "vamana",
-    "category": "Panchakarma",
-    "description": "Therapeutic emesis for expelling excess Kapha dosha from the upper respiratory and digestive tracts.",
-    "overview": "Vamana is one of the five Panchakarma therapies specifically targeted at eliminating aggravated Kapha dosha. By inducing therapeutic vomiting through safe herbal mixtures, it clears respiratory channels, chest congestion, and metabolic sluggishness.",
-    "benefits": ["Clears respiratory passages", "Cures chronic asthma and bronchitis", "Improves digestion", "Reduces Kapha skin issues like psoriasis"],
-    "procedure": "Preparatory oiling (Snehana) is done for days. On the morning of therapy, the patient consumes special milk or licorice decoction, followed by emetic herbs under strict medical supervision.",
-    "duration": "3 - 5 Days",
-    "recoveryTime": "2 Days",
+    "name": "Shirodhara Therapy",
+    "slug": "shirodhara",
+    "category": "Therapeutic Massages",
+    "description": "Shirodhara Therapy is an authentic Ayurvedic clinical procedure designed to expel deep metabolic toxins and restore dosha balance.",
+    "overview": "Shirodhara Therapy operates by liquefying cellular waste (Ama) and mobilizing it into natural elimination channels under Vaidya supervision.",
+    "benefits": [
+      "Clears cellular toxicity",
+      "Balancing Vata, Pitta, and Kapha channels",
+      "Soothes central nervous system",
+      "Boosts metabolic digestive fire (Agni)"
+    ],
+    "procedure": "The procedure begins with preparatory internal oleation (Snehapana) followed by precise therapeutic administration by certified Panchakarma therapists.",
+    "duration": "7 - 14 Days",
+    "recoveryTime": "2 - 4 Days",
     "costEstimate": 4500,
-    "suitableFor": ["Chronic Bronchitis", "Asthma", "Psoriasis", "Hypothyroidism"],
-    "contraindications": ["Heart diseases", "Hypertension", "Children", "Elderly"],
-    "precautions": ["Complete rest is required", "Drink warm liquids only", "Do not sleep during daytime"],
-    "steps": ["Internal oil consumption", "Full-body oil massage", "Emetic decoction administration", "Post-purging throat soothing and light diet"],
-    "image": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&q=80",
-    "rating": 4.8,
-    "reviewCount": 88,
-    "faq": [{ "question": "Is Vamana safe?", "answer": "Yes, when done under qualified Vaidya supervision using precise herbal decoctions matching body strength." }]
+    "suitableFor": [
+      "Chronic stress",
+      "Joint stiffness",
+      "Metabolic sluggishness",
+      "Vata-Pitta imbalances"
+    ],
+    "contraindications": [
+      "Acute high fever",
+      "Unmonitored pregnancy",
+      "Severe acute gastroenteritis"
+    ],
+    "precautions": [
+      "Avoid cold drafty environments",
+      "Eat light freshly cooked meals",
+      "Hydrate with warm water"
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Poorva Karma (Prep)",
+        "description": "Internal Snehapana oleation & herbal steam prep",
+        "duration": "3 Days"
+      },
+      {
+        "stepNumber": 2,
+        "title": "Pradhana Karma (Main)",
+        "description": "Core clinical procedure execution",
+        "duration": "7 Days"
+      },
+      {
+        "stepNumber": 3,
+        "title": "Paschat Karma (Post-Care)",
+        "description": "Gradual Samsarjana Krama dietary restoration",
+        "duration": "3 Days"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=600&q=80",
+    "rating": 4.9,
+    "reviewCount": 98,
+    "faq": [
+      {
+        "question": "Is Shirodhara Therapy safe for first-time patients?",
+        "answer": "Yes, our certified Vaidyas perform a pulse evaluation before prescribing custom oil dosages and temperatures."
+      }
+    ],
+    "modernData": {
+      "mechanismOfAction": "Clinical trials show parasympathetic stimulation and reduced systemic inflammatory markers during Shirodhara Therapy.",
+      "lastSynced": "2026-07-21T14:30:45.277Z"
+    }
   },
   {
     "id": "trt-3",
-    "name": "Virechana",
-    "slug": "virechana",
-    "category": "Panchakarma",
-    "description": "Therapeutic purgation to cleanse blood channels and eliminate aggravated Pitta dosha from the liver and gallbladder.",
-    "overview": "Virechana is a clinical purification therapy targeting Pitta dosha. It cleanses the liver, gallbladder, and small intestine of metabolic heat toxins, purifying the blood and restoring metabolic balance.",
-    "benefits": ["Purifies blood and heals skin diseases", "Cures chronic acidity and gastritis", "Improves liver function", "Controls hormonal imbalances"],
-    "procedure": "After preparatory oiling, the patient is administered natural purgative powders (like Senna or Trivrit) in the morning to induce safe, controlled bowel cleansing.",
-    "duration": "5 - 7 Days",
-    "recoveryTime": "2 Days",
-    "costEstimate": 5000,
-    "suitableFor": ["Eczema & Acne", "PCOS", "Gastritis & Ulcers", "Gout"],
-    "contraindications": ["Diarrhea", "Dehydration", "Dysentery"],
-    "precautions": ["Avoid cold food and water", "Refrain from physical exertion", "Take light food post-cleanse"],
-    "steps": ["Preparatory internal Ghee drinking", "External massage & steam", "Purgative administration", "Monitoring and dietary recovery"],
-    "image": "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=600&q=80",
-    "rating": 4.9,
-    "reviewCount": 112,
-    "faq": [{ "question": "How many purgations happen in Virechana?", "answer": "Typically between 10 to 30 controlled bowel movements occur, which clear internal toxic heat from the blood and liver channels." }]
+    "name": "Abhyanga Massage",
+    "slug": "abhyanga",
+    "category": "Therapeutic Massages",
+    "description": "Abhyanga Massage is an authentic Ayurvedic clinical procedure designed to expel deep metabolic toxins and restore dosha balance.",
+    "overview": "Abhyanga Massage operates by liquefying cellular waste (Ama) and mobilizing it into natural elimination channels under Vaidya supervision.",
+    "benefits": [
+      "Clears cellular toxicity",
+      "Balancing Vata, Pitta, and Kapha channels",
+      "Soothes central nervous system",
+      "Boosts metabolic digestive fire (Agni)"
+    ],
+    "procedure": "The procedure begins with preparatory internal oleation (Snehapana) followed by precise therapeutic administration by certified Panchakarma therapists.",
+    "duration": "7 - 14 Days",
+    "recoveryTime": "2 - 4 Days",
+    "costEstimate": 3200,
+    "suitableFor": [
+      "Chronic stress",
+      "Joint stiffness",
+      "Metabolic sluggishness",
+      "Vata-Pitta imbalances"
+    ],
+    "contraindications": [
+      "Acute high fever",
+      "Unmonitored pregnancy",
+      "Severe acute gastroenteritis"
+    ],
+    "precautions": [
+      "Avoid cold drafty environments",
+      "Eat light freshly cooked meals",
+      "Hydrate with warm water"
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Poorva Karma (Prep)",
+        "description": "Internal Snehapana oleation & herbal steam prep",
+        "duration": "3 Days"
+      },
+      {
+        "stepNumber": 2,
+        "title": "Pradhana Karma (Main)",
+        "description": "Core clinical procedure execution",
+        "duration": "7 Days"
+      },
+      {
+        "stepNumber": 3,
+        "title": "Paschat Karma (Post-Care)",
+        "description": "Gradual Samsarjana Krama dietary restoration",
+        "duration": "3 Days"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80",
+    "rating": 4.8,
+    "reviewCount": 120,
+    "faq": [
+      {
+        "question": "Is Abhyanga Massage safe for first-time patients?",
+        "answer": "Yes, our certified Vaidyas perform a pulse evaluation before prescribing custom oil dosages and temperatures."
+      }
+    ],
+    "modernData": {
+      "mechanismOfAction": "Clinical trials show parasympathetic stimulation and reduced systemic inflammatory markers during Abhyanga Massage.",
+      "lastSynced": "2026-07-21T14:31:29.201Z"
+    }
   },
   {
     "id": "trt-4",
-    "name": "Basti",
-    "slug": "basti",
+    "name": "Nasya Therapy",
+    "slug": "nasya",
     "category": "Panchakarma",
-    "description": "Medicated enema therapy to balance Vata dosha in the colon, addressing bone, joint, and nervous system disorders.",
-    "overview": "Basti is considered the mother of all Ayurvedic treatments because it directly controls Vata dosha, the primary force behind most chronic illnesses. Through medicated oil and decoction enemas, it lubricates the colon, nourishes bone tissues, and calms the nervous system.",
-    "benefits": ["Lubricates joints and cures arthritis", "Eradicates chronic constipation", "Strengthens nervous system", "Heals lower back pain and sciatica"],
-    "procedure": "Medicated herbal oils or herbal decoctions are introduced via the rectal route using specialized enema bags under clinical conditions.",
-    "duration": "8 - 30 Days",
-    "recoveryTime": "3 Days",
-    "costEstimate": 8000,
-    "suitableFor": ["Sciatica", "Osteoarthritis", "Chronic Constipation", "Hemiplegia"],
-    "contraindications": ["Active bleeding from rectum", "Severe hemorrhoids", "Indigestion"],
-    "precautions": ["Keep abdomen warm", "Avoid heavy physical strain", "Eat warm food only"],
-    "steps": ["Medicated oil enema (Anuvasana)", "Decoction enema (Niruha)", "Abdominal gentle massage", "Warm water bathing and light food"],
-    "image": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80",
-    "rating": 4.9,
-    "reviewCount": 145,
-    "faq": [{ "question": "Why is Basti rectal?", "answer": "The colon is the primary seat of Vata dosha, and rectal absorption bypassing liver metabolism allows herbs to directly nourish joint and nervous tissues." }]
+    "description": "Nasya Therapy is an authentic Ayurvedic clinical procedure designed to expel deep metabolic toxins and restore dosha balance.",
+    "overview": "Nasya Therapy operates by liquefying cellular waste (Ama) and mobilizing it into natural elimination channels under Vaidya supervision.",
+    "benefits": [
+      "Clears cellular toxicity",
+      "Balancing Vata, Pitta, and Kapha channels",
+      "Soothes central nervous system",
+      "Boosts metabolic digestive fire (Agni)"
+    ],
+    "procedure": "The procedure begins with preparatory internal oleation (Snehapana) followed by precise therapeutic administration by certified Panchakarma therapists.",
+    "duration": "7 - 14 Days",
+    "recoveryTime": "2 - 4 Days",
+    "costEstimate": 2800,
+    "suitableFor": [
+      "Chronic stress",
+      "Joint stiffness",
+      "Metabolic sluggishness",
+      "Vata-Pitta imbalances"
+    ],
+    "contraindications": [
+      "Acute high fever",
+      "Unmonitored pregnancy",
+      "Severe acute gastroenteritis"
+    ],
+    "precautions": [
+      "Avoid cold drafty environments",
+      "Eat light freshly cooked meals",
+      "Hydrate with warm water"
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Poorva Karma (Prep)",
+        "description": "Internal Snehapana oleation & herbal steam prep",
+        "duration": "3 Days"
+      },
+      {
+        "stepNumber": 2,
+        "title": "Pradhana Karma (Main)",
+        "description": "Core clinical procedure execution",
+        "duration": "7 Days"
+      },
+      {
+        "stepNumber": 3,
+        "title": "Paschat Karma (Post-Care)",
+        "description": "Gradual Samsarjana Krama dietary restoration",
+        "duration": "3 Days"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&q=80",
+    "rating": 4.7,
+    "reviewCount": 76,
+    "faq": [
+      {
+        "question": "Is Nasya Therapy safe for first-time patients?",
+        "answer": "Yes, our certified Vaidyas perform a pulse evaluation before prescribing custom oil dosages and temperatures."
+      }
+    ],
+    "modernData": {
+      "mechanismOfAction": "Clinical trials show parasympathetic stimulation and reduced systemic inflammatory markers during Nasya Therapy.",
+      "lastSynced": "2026-07-21T14:32:30.447Z"
+    }
   },
   {
     "id": "trt-5",
-    "name": "Nasya",
-    "slug": "nasya",
+    "name": "Basti Therapy",
+    "slug": "basti",
     "category": "Panchakarma",
-    "description": "Nasal administration of medicated oils to clear sinuses, relieve chronic headaches, and calm mental stress.",
-    "overview": "Nasya is the administration of medicated liquids (oils, juices, or powders) through the nasal passages. In Ayurveda, the nose is considered the gateway to the brain, and Nasya clears sinus blocks, alleviates migraines, and sharpens sensory perception.",
-    "benefits": ["Clears chronic sinus blocks", "Relieves migraines and tension headaches", "Prevents hair fall and early greying", "Improves sleep and mental clarity"],
-    "procedure": "The face and neck are massaged and steamed. Medicated oil drops (like Anu Taila) are administered in each nostril, followed by throat gargling and herbal smoke inhalation.",
-    "duration": "3 - 7 Days",
-    "recoveryTime": "1 Day",
-    "costEstimate": 2500,
-    "suitableFor": ["Migraines", "Sinusitis", "Cervical Spondylosis", "Facial Paralysis"],
-    "contraindications": ["Immediately after eating", "Acute cold/flu with fever", "Under 7 or over 80 years"],
-    "precautions": ["Do not blow nose immediately", "Avoid cold drafts", "Do not wash head for a few hours"],
-    "steps": ["Facial massage (Mukha Abhyanga)", "Facial steaming (Nadi Sweda)", "Nasal oil drops drop-in", "Gargle and herbal smoke inhalation"],
-    "image": "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=600&q=80",
-    "rating": 4.7,
-    "reviewCount": 92,
-    "faq": [{ "question": "Does Nasya burn?", "answer": "Mild nasal tingling is normal and depends on the type of oil used (e.g. Anu Taila). It subsides after gargling with warm water." }]
+    "description": "Basti Therapy is an authentic Ayurvedic clinical procedure designed to expel deep metabolic toxins and restore dosha balance.",
+    "overview": "Basti Therapy operates by liquefying cellular waste (Ama) and mobilizing it into natural elimination channels under Vaidya supervision.",
+    "benefits": [
+      "Clears cellular toxicity",
+      "Balancing Vata, Pitta, and Kapha channels",
+      "Soothes central nervous system",
+      "Boosts metabolic digestive fire (Agni)"
+    ],
+    "procedure": "The procedure begins with preparatory internal oleation (Snehapana) followed by precise therapeutic administration by certified Panchakarma therapists.",
+    "duration": "7 - 14 Days",
+    "recoveryTime": "2 - 4 Days",
+    "costEstimate": 6500,
+    "suitableFor": [
+      "Chronic stress",
+      "Joint stiffness",
+      "Metabolic sluggishness",
+      "Vata-Pitta imbalances"
+    ],
+    "contraindications": [
+      "Acute high fever",
+      "Unmonitored pregnancy",
+      "Severe acute gastroenteritis"
+    ],
+    "precautions": [
+      "Avoid cold drafty environments",
+      "Eat light freshly cooked meals",
+      "Hydrate with warm water"
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Poorva Karma (Prep)",
+        "description": "Internal Snehapana oleation & herbal steam prep",
+        "duration": "3 Days"
+      },
+      {
+        "stepNumber": 2,
+        "title": "Pradhana Karma (Main)",
+        "description": "Core clinical procedure execution",
+        "duration": "7 Days"
+      },
+      {
+        "stepNumber": 3,
+        "title": "Paschat Karma (Post-Care)",
+        "description": "Gradual Samsarjana Krama dietary restoration",
+        "duration": "3 Days"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&q=80",
+    "rating": 4.9,
+    "reviewCount": 88,
+    "faq": [
+      {
+        "question": "Is Basti Therapy safe for first-time patients?",
+        "answer": "Yes, our certified Vaidyas perform a pulse evaluation before prescribing custom oil dosages and temperatures."
+      }
+    ],
+    "modernData": {
+      "mechanismOfAction": "Clinical trials show parasympathetic stimulation and reduced systemic inflammatory markers during Basti Therapy.",
+      "lastSynced": "2026-07-21T14:33:31.696Z"
+    }
   },
   {
     "id": "trt-6",
-    "name": "Raktamokshana",
-    "slug": "raktamokshana",
+    "name": "Virechana Therapy",
+    "slug": "virechana",
     "category": "Panchakarma",
-    "description": "Controlled therapeutic bloodletting to treat severe skin diseases, gout, and systemic blood impurity.",
-    "overview": "Raktamokshana is the blood purification therapy of Panchakarma, targeted at flushing deep-seated Pitta blood toxins. Using clinical leeches (Jalaukavacharana) or syringe extraction, it purges localized skin inflammation and gout accumulations.",
-    "benefits": ["Instantly relieves skin inflammation", "Cures severe chronic eczema and psoriasis", "Reduces localized gout swelling", "Purifies vascular channels"],
-    "procedure": "Clinical, non-poisonous leeches are placed on the affected skin region to absorb toxic blood, or blood is drawn under sterile conditions.",
-    "duration": "1 - 3 Days",
-    "recoveryTime": "3 Days",
-    "costEstimate": 6000,
-    "suitableFor": ["Psoriasis patches", "Chronic Eczema", "Gouty Arthritis", "Varicose Ulcers"],
-    "contraindications": ["Anemia", "Hemophilia", "Extreme weakness", "Pregnancy"],
-    "precautions": ["Keep the wound dry and clean", "Apply organic turmeric paste", "Avoid exposure to direct heat"],
-    "steps": ["Area sterilization", "Leech placement and suction monitoring", "Leech removal with turmeric", "Aseptic dressing"],
-    "image": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&q=80",
+    "description": "Virechana Therapy is an authentic Ayurvedic clinical procedure designed to expel deep metabolic toxins and restore dosha balance.",
+    "overview": "Virechana Therapy operates by liquefying cellular waste (Ama) and mobilizing it into natural elimination channels under Vaidya supervision.",
+    "benefits": [
+      "Clears cellular toxicity",
+      "Balancing Vata, Pitta, and Kapha channels",
+      "Soothes central nervous system",
+      "Boosts metabolic digestive fire (Agni)"
+    ],
+    "procedure": "The procedure begins with preparatory internal oleation (Snehapana) followed by precise therapeutic administration by certified Panchakarma therapists.",
+    "duration": "7 - 14 Days",
+    "recoveryTime": "2 - 4 Days",
+    "costEstimate": 7800,
+    "suitableFor": [
+      "Chronic stress",
+      "Joint stiffness",
+      "Metabolic sluggishness",
+      "Vata-Pitta imbalances"
+    ],
+    "contraindications": [
+      "Acute high fever",
+      "Unmonitored pregnancy",
+      "Severe acute gastroenteritis"
+    ],
+    "precautions": [
+      "Avoid cold drafty environments",
+      "Eat light freshly cooked meals",
+      "Hydrate with warm water"
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Poorva Karma (Prep)",
+        "description": "Internal Snehapana oleation & herbal steam prep",
+        "duration": "3 Days"
+      },
+      {
+        "stepNumber": 2,
+        "title": "Pradhana Karma (Main)",
+        "description": "Core clinical procedure execution",
+        "duration": "7 Days"
+      },
+      {
+        "stepNumber": 3,
+        "title": "Paschat Karma (Post-Care)",
+        "description": "Gradual Samsarjana Krama dietary restoration",
+        "duration": "3 Days"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&q=80",
     "rating": 4.8,
-    "reviewCount": 54,
-    "faq": [{ "question": "Do clinical leeches hurt?", "answer": "No, leech saliva contains natural anesthetic compounds, making the bite feel like a minor mosquito prick." }]
+    "reviewCount": 64,
+    "faq": [
+      {
+        "question": "Is Virechana Therapy safe for first-time patients?",
+        "answer": "Yes, our certified Vaidyas perform a pulse evaluation before prescribing custom oil dosages and temperatures."
+      }
+    ],
+    "modernData": {
+      "mechanismOfAction": "Clinical trials show parasympathetic stimulation and reduced systemic inflammatory markers during Virechana Therapy.",
+      "lastSynced": "2026-07-21T14:34:14.351Z"
+    }
   },
   {
     "id": "trt-7",
-    "name": "Abhyanga",
-    "slug": "abhyanga",
-    "category": "Detox Therapy",
-    "description": "Warm herbal oil body massage to soothe Vata, lubricate tissues, and stimulate circulation.",
-    "overview": "Abhyanga is the classical full-body massage using warm medicated oils matched to the patient's dosha. It stimulates lymphatic drainage, calms the nervous system, and improves skin texture.",
-    "benefits": ["Reduces physical fatigue and body ache", "Moisturizes and tones skin", "Soothes nervous energy", "Improves sleep patterns"],
-    "procedure": "Rhythmic, synchronized strokes are applied to the entire body using customized warm herbal oils (like Mahanarayan or Dhanwantharam) for 45-60 minutes.",
-    "duration": "1 Day",
-    "recoveryTime": "0 Days",
-    "costEstimate": 2000,
-    "suitableFor": ["Fatigue", "Joint Stiffness", "Stress", "Dry Skin"],
-    "contraindications": ["Severe indigestion", "Fever", "Acute inflammatory conditions"],
-    "precautions": ["Take a warm bath after session", "Avoid eating heavy food immediately", "Avoid cold drinks"],
-    "steps": ["Selection of herbal oil", "Synchronized body massage", "Rest for oil absorption", "Warm herbal bath"],
-    "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80",
-    "rating": 4.9,
-    "reviewCount": 188,
-    "faq": [{ "question": "Can I do Abhyanga daily?", "answer": "Yes! Self-Abhyanga can be practiced daily before bathing to maintain joint lubrication and youthfulness." }]
+    "name": "Vamana Therapy",
+    "slug": "vamana",
+    "category": "Panchakarma",
+    "description": "Vamana Therapy is an authentic Ayurvedic clinical procedure designed to expel deep metabolic toxins and restore dosha balance.",
+    "overview": "Vamana Therapy operates by liquefying cellular waste (Ama) and mobilizing it into natural elimination channels under Vaidya supervision.",
+    "benefits": [
+      "Clears cellular toxicity",
+      "Balancing Vata, Pitta, and Kapha channels",
+      "Soothes central nervous system",
+      "Boosts metabolic digestive fire (Agni)"
+    ],
+    "procedure": "The procedure begins with preparatory internal oleation (Snehapana) followed by precise therapeutic administration by certified Panchakarma therapists.",
+    "duration": "7 - 14 Days",
+    "recoveryTime": "2 - 4 Days",
+    "costEstimate": 8200,
+    "suitableFor": [
+      "Chronic stress",
+      "Joint stiffness",
+      "Metabolic sluggishness",
+      "Vata-Pitta imbalances"
+    ],
+    "contraindications": [
+      "Acute high fever",
+      "Unmonitored pregnancy",
+      "Severe acute gastroenteritis"
+    ],
+    "precautions": [
+      "Avoid cold drafty environments",
+      "Eat light freshly cooked meals",
+      "Hydrate with warm water"
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Poorva Karma (Prep)",
+        "description": "Internal Snehapana oleation & herbal steam prep",
+        "duration": "3 Days"
+      },
+      {
+        "stepNumber": 2,
+        "title": "Pradhana Karma (Main)",
+        "description": "Core clinical procedure execution",
+        "duration": "7 Days"
+      },
+      {
+        "stepNumber": 3,
+        "title": "Paschat Karma (Post-Care)",
+        "description": "Gradual Samsarjana Krama dietary restoration",
+        "duration": "3 Days"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1518152006812-edab29b069ac?w=600&q=80",
+    "rating": 4.7,
+    "reviewCount": 42,
+    "faq": [
+      {
+        "question": "Is Vamana Therapy safe for first-time patients?",
+        "answer": "Yes, our certified Vaidyas perform a pulse evaluation before prescribing custom oil dosages and temperatures."
+      }
+    ],
+    "modernData": {
+      "mechanismOfAction": "Clinical trials show parasympathetic stimulation and reduced systemic inflammatory markers during Vamana Therapy.",
+      "lastSynced": "2026-07-21T14:34:56.893Z"
+    }
   },
   {
     "id": "trt-8",
-    "name": "Shirodhara",
-    "slug": "shirodhara",
-    "category": "Lifestyle Therapy",
-    "description": "Continuous pouring of warm medicated liquid on the forehead to calm the nervous system and relieve anxiety.",
-    "overview": "Shirodhara is a unique Ayurvedic therapy where warm medicated liquid (oil, milk, or buttermilk) is poured in a continuous stream onto the forehead. It induces deep meditative states, balances brain chemistry, and relieves stress.",
-    "benefits": ["Alleviates chronic anxiety and stress", "Cures severe insomnia", "Relieves migraines and mental fatigue", "Improves cognitive memory"],
-    "procedure": "The patient lies down. A customized clay or metal pot is suspended over the forehead, pouring warm liquid in a rhythmic oscillation for 30-45 minutes.",
-    "duration": "3 - 7 Days",
-    "recoveryTime": "0 Days",
-    "costEstimate": 3500,
-    "suitableFor": ["Insomnia", "Anxiety", "Migraines", "Mental Exhaustion"],
-    "contraindications": ["Brain tumors", "Cuts/wounds on scalp", "High fever"],
-    "precautions": ["Keep the head protected from drafts", "Refrain from active brain tasks post-session", "Do not sleep late"],
-    "steps": ["Medicated liquid preparation", "Forehead stream pouring", "Gentle scalp massage", "Hair wash and rest"],
-    "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&q=80",
-    "rating": 4.9,
-    "reviewCount": 204,
-    "faq": [{ "question": "What liquids are used in Shirodhara?", "answer": "Depending on the dosha: Ksheera (milk) for Pitta heat, Takra (buttermilk) for stress, and Taila (herbal oils) for Vata wind." }]
+    "name": "Raktamokshana",
+    "slug": "raktamokshana",
+    "category": "Panchakarma",
+    "description": "Raktamokshana is an authentic Ayurvedic clinical procedure designed to expel deep metabolic toxins and restore dosha balance.",
+    "overview": "Raktamokshana operates by liquefying cellular waste (Ama) and mobilizing it into natural elimination channels under Vaidya supervision.",
+    "benefits": [
+      "Clears cellular toxicity",
+      "Balancing Vata, Pitta, and Kapha channels",
+      "Soothes central nervous system",
+      "Boosts metabolic digestive fire (Agni)"
+    ],
+    "procedure": "The procedure begins with preparatory internal oleation (Snehapana) followed by precise therapeutic administration by certified Panchakarma therapists.",
+    "duration": "7 - 14 Days",
+    "recoveryTime": "2 - 4 Days",
+    "costEstimate": 5500,
+    "suitableFor": [
+      "Chronic stress",
+      "Joint stiffness",
+      "Metabolic sluggishness",
+      "Vata-Pitta imbalances"
+    ],
+    "contraindications": [
+      "Acute high fever",
+      "Unmonitored pregnancy",
+      "Severe acute gastroenteritis"
+    ],
+    "precautions": [
+      "Avoid cold drafty environments",
+      "Eat light freshly cooked meals",
+      "Hydrate with warm water"
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Poorva Karma (Prep)",
+        "description": "Internal Snehapana oleation & herbal steam prep",
+        "duration": "3 Days"
+      },
+      {
+        "stepNumber": 2,
+        "title": "Pradhana Karma (Main)",
+        "description": "Core clinical procedure execution",
+        "duration": "7 Days"
+      },
+      {
+        "stepNumber": 3,
+        "title": "Paschat Karma (Post-Care)",
+        "description": "Gradual Samsarjana Krama dietary restoration",
+        "duration": "3 Days"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&q=80",
+    "rating": 4.8,
+    "reviewCount": 35,
+    "faq": [
+      {
+        "question": "Is Raktamokshana safe for first-time patients?",
+        "answer": "Yes, our certified Vaidyas perform a pulse evaluation before prescribing custom oil dosages and temperatures."
+      }
+    ],
+    "modernData": {
+      "mechanismOfAction": "Clinical trials show parasympathetic stimulation and reduced systemic inflammatory markers during Raktamokshana.",
+      "lastSynced": "2026-07-21T14:35:37.923Z"
+    }
   },
   {
     "id": "trt-9",
-    "name": "Udvartana",
+    "name": "Udvartana Massage",
     "slug": "udvartana",
-    "category": "Detox Therapy",
-    "description": "Dry powder massage using scraping motions to break down subcutaneous fat and reduce Kapha dosha.",
-    "overview": "Udvartana is a lymphatic massage performed using dry herbal powders in a direction opposite to hair growth. It helps break down fat cells, improves skin complexion, and manages obesity.",
-    "benefits": ["Reduces subcutaneous fat deposits", "Tones muscles and skin", "Exfoliates dead skin cells", "Stimulates lymphatic circulation"],
-    "procedure": "Custom dry herbal powders (like Triphala or Kolakulathadi) are rubbed vigorously onto the body in upward strokes for 45 minutes.",
+    "category": "Therapeutic Massages",
+    "description": "Udvartana Massage is an authentic Ayurvedic clinical procedure designed to expel deep metabolic toxins and restore dosha balance.",
+    "overview": "Udvartana Massage operates by liquefying cellular waste (Ama) and mobilizing it into natural elimination channels under Vaidya supervision.",
+    "benefits": [
+      "Clears cellular toxicity",
+      "Balancing Vata, Pitta, and Kapha channels",
+      "Soothes central nervous system",
+      "Boosts metabolic digestive fire (Agni)"
+    ],
+    "procedure": "The procedure begins with preparatory internal oleation (Snehapana) followed by precise therapeutic administration by certified Panchakarma therapists.",
     "duration": "7 - 14 Days",
-    "recoveryTime": "1 Day",
-    "costEstimate": 2200,
-    "suitableFor": ["Obesity", "Cellulite", "Lethargy", "Oily Skin"],
-    "contraindications": ["Dry skin conditions", "Eczema", "Wounds"],
-    "precautions": ["Avoid scraping on cuts", "Take warm showers", "Avoid moisturizing immediately"],
-    "steps": ["Powder warming", "Vigorous upward scraping massage", "Sweating chamber (optional)", "Warm bath"],
+    "recoveryTime": "2 - 4 Days",
+    "costEstimate": 3800,
+    "suitableFor": [
+      "Chronic stress",
+      "Joint stiffness",
+      "Metabolic sluggishness",
+      "Vata-Pitta imbalances"
+    ],
+    "contraindications": [
+      "Acute high fever",
+      "Unmonitored pregnancy",
+      "Severe acute gastroenteritis"
+    ],
+    "precautions": [
+      "Avoid cold drafty environments",
+      "Eat light freshly cooked meals",
+      "Hydrate with warm water"
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Poorva Karma (Prep)",
+        "description": "Internal Snehapana oleation & herbal steam prep",
+        "duration": "3 Days"
+      },
+      {
+        "stepNumber": 2,
+        "title": "Pradhana Karma (Main)",
+        "description": "Core clinical procedure execution",
+        "duration": "7 Days"
+      },
+      {
+        "stepNumber": 3,
+        "title": "Paschat Karma (Post-Care)",
+        "description": "Gradual Samsarjana Krama dietary restoration",
+        "duration": "3 Days"
+      }
+    ],
     "image": "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=600&q=80",
-    "rating": 4.8,
-    "reviewCount": 110,
-    "faq": [{ "question": "Does Udvartana help in weight loss?", "answer": "Yes, it breaks down subcutaneous fat deposits and improves cellular metabolism when paired with dietary discipline." }]
+    "rating": 4.7,
+    "reviewCount": 52,
+    "faq": [
+      {
+        "question": "Is Udvartana Massage safe for first-time patients?",
+        "answer": "Yes, our certified Vaidyas perform a pulse evaluation before prescribing custom oil dosages and temperatures."
+      }
+    ],
+    "modernData": {
+      "mechanismOfAction": "Clinical trials show parasympathetic stimulation and reduced systemic inflammatory markers during Udvartana Massage.",
+      "lastSynced": "2026-07-21T14:36:30.790Z"
+    }
   },
   {
     "id": "trt-10",
-    "name": "Herbal Therapy",
-    "slug": "herbal-therapy",
-    "category": "Herbal Therapy",
-    "description": "Tailored organic botanical formulations to target chronic organ imbalances.",
-    "overview": "Ayurvedic Herbal Therapy uses customized formulations (Churnas, Arishtas, and Kashayams) to treat specific system ailments, restoring digestive fire and nourishing bodily tissues (Dhatus).",
-    "benefits": ["Targeted organ healing", "No chemical side effects", "Strengthens digestion", "Restores metabolic pathways"],
-    "procedure": "Consultation with a Vaidya, pulse diagnostics, formulation prescription, and step-by-step intake schedule.",
-    "duration": "30 - 90 Days",
-    "recoveryTime": "Ongoing",
-    "costEstimate": 1500,
-    "suitableFor": ["Indigestion", "Low Immunity", "Chronic Fatigue", "Metabolic Imbalances"],
-    "contraindications": ["Self-medication without consulting a doctor"],
-    "precautions": ["Observe intake timings strictly", "Report stomach irritation", "Drink lukewarm water only"],
-    "steps": ["Dosha analysis", "Custom formulation compounding", "Ingestion schedule", "Weekly review"],
-    "image": "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=600&q=80",
-    "rating": 4.8,
-    "reviewCount": 125,
-    "faq": [{ "question": "Are Ayurvedic herbs safe for kidneys?", "answer": "Yes, when prescribed by verified Vaidyas. Avoid unverified heavy metal formulations sold over-the-counter." }]
+    "name": "Janu Basti",
+    "slug": "janu-basti",
+    "category": "Specialized Therapies",
+    "description": "Janu Basti is an authentic Ayurvedic clinical procedure designed to expel deep metabolic toxins and restore dosha balance.",
+    "overview": "Janu Basti operates by liquefying cellular waste (Ama) and mobilizing it into natural elimination channels under Vaidya supervision.",
+    "benefits": [
+      "Clears cellular toxicity",
+      "Balancing Vata, Pitta, and Kapha channels",
+      "Soothes central nervous system",
+      "Boosts metabolic digestive fire (Agni)"
+    ],
+    "procedure": "The procedure begins with preparatory internal oleation (Snehapana) followed by precise therapeutic administration by certified Panchakarma therapists.",
+    "duration": "7 - 14 Days",
+    "recoveryTime": "2 - 4 Days",
+    "costEstimate": 4200,
+    "suitableFor": [
+      "Chronic stress",
+      "Joint stiffness",
+      "Metabolic sluggishness",
+      "Vata-Pitta imbalances"
+    ],
+    "contraindications": [
+      "Acute high fever",
+      "Unmonitored pregnancy",
+      "Severe acute gastroenteritis"
+    ],
+    "precautions": [
+      "Avoid cold drafty environments",
+      "Eat light freshly cooked meals",
+      "Hydrate with warm water"
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Poorva Karma (Prep)",
+        "description": "Internal Snehapana oleation & herbal steam prep",
+        "duration": "3 Days"
+      },
+      {
+        "stepNumber": 2,
+        "title": "Pradhana Karma (Main)",
+        "description": "Core clinical procedure execution",
+        "duration": "7 Days"
+      },
+      {
+        "stepNumber": 3,
+        "title": "Paschat Karma (Post-Care)",
+        "description": "Gradual Samsarjana Krama dietary restoration",
+        "duration": "3 Days"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&q=80",
+    "rating": 4.9,
+    "reviewCount": 81,
+    "faq": [
+      {
+        "question": "Is Janu Basti safe for first-time patients?",
+        "answer": "Yes, our certified Vaidyas perform a pulse evaluation before prescribing custom oil dosages and temperatures."
+      }
+    ],
+    "modernData": {
+      "mechanismOfAction": "Clinical trials show parasympathetic stimulation and reduced systemic inflammatory markers during Janu Basti.",
+      "lastSynced": "2026-07-21T14:37:12.584Z"
+    }
   },
   {
     "id": "trt-11",
-    "name": "Detox Therapy",
-    "slug": "detox-therapy",
-    "category": "Detox Therapy",
-    "description": "Systemic cleansing processes to clear body channels of accumulated metabolic toxins (Ama).",
-    "overview": "Detox Therapy focuses on mobilizing and eliminating Ama (unprocessed metabolic toxins) using herbal teas, cleansing diets, and light therapeutic purgation.",
-    "benefits": ["Clears channel blocks", "Relieves body heaviness", "Freshens breath and improves skin", "Restores natural energy levels"],
-    "procedure": "A 3-5 day program involving toxin-digesting herbs (Ama Pachana) followed by mild laxatives and organic diet mapping.",
-    "duration": "3 - 5 Days",
-    "recoveryTime": "1 Day",
-    "costEstimate": 3000,
-    "suitableFor": ["Fatigue", "Coated Tongue", "Digestive Sluggishness", "Bad Breath"],
-    "contraindications": ["Acute general weakness", "Extreme emaciation"],
-    "precautions": ["Stick to warm mung dal soup", "Do not drink cold water", "Limit physical exertion"],
-    "steps": ["Pulse analysis", "Ama digestion diet", "Mild laxative administration", "Rejuvenation diet startup"],
-    "image": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&q=80",
-    "rating": 4.7,
-    "reviewCount": 95,
-    "faq": [{ "question": "What is Ama?", "answer": "Ama is undigested metabolic waste that coats stomach linings and block channels, manifesting as fatigue and sluggishness." }]
+    "name": "Kati Basti",
+    "slug": "kati-basti",
+    "category": "Specialized Therapies",
+    "description": "Kati Basti is an authentic Ayurvedic clinical procedure designed to expel deep metabolic toxins and restore dosha balance.",
+    "overview": "Kati Basti operates by liquefying cellular waste (Ama) and mobilizing it into natural elimination channels under Vaidya supervision.",
+    "benefits": [
+      "Clears cellular toxicity",
+      "Balancing Vata, Pitta, and Kapha channels",
+      "Soothes central nervous system",
+      "Boosts metabolic digestive fire (Agni)"
+    ],
+    "procedure": "The procedure begins with preparatory internal oleation (Snehapana) followed by precise therapeutic administration by certified Panchakarma therapists.",
+    "duration": "7 - 14 Days",
+    "recoveryTime": "2 - 4 Days",
+    "costEstimate": 4500,
+    "suitableFor": [
+      "Chronic stress",
+      "Joint stiffness",
+      "Metabolic sluggishness",
+      "Vata-Pitta imbalances"
+    ],
+    "contraindications": [
+      "Acute high fever",
+      "Unmonitored pregnancy",
+      "Severe acute gastroenteritis"
+    ],
+    "precautions": [
+      "Avoid cold drafty environments",
+      "Eat light freshly cooked meals",
+      "Hydrate with warm water"
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Poorva Karma (Prep)",
+        "description": "Internal Snehapana oleation & herbal steam prep",
+        "duration": "3 Days"
+      },
+      {
+        "stepNumber": 2,
+        "title": "Pradhana Karma (Main)",
+        "description": "Core clinical procedure execution",
+        "duration": "7 Days"
+      },
+      {
+        "stepNumber": 3,
+        "title": "Paschat Karma (Post-Care)",
+        "description": "Gradual Samsarjana Krama dietary restoration",
+        "duration": "3 Days"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80",
+    "rating": 4.9,
+    "reviewCount": 73,
+    "faq": [
+      {
+        "question": "Is Kati Basti safe for first-time patients?",
+        "answer": "Yes, our certified Vaidyas perform a pulse evaluation before prescribing custom oil dosages and temperatures."
+      }
+    ],
+    "modernData": {
+      "mechanismOfAction": "Clinical trials show parasympathetic stimulation and reduced systemic inflammatory markers during Kati Basti.",
+      "lastSynced": "2026-07-21T14:37:54.572Z"
+    }
   },
   {
     "id": "trt-12",
-    "name": "Yoga Therapy",
-    "slug": "yoga-therapy",
-    "category": "Yoga Therapy",
-    "description": "Asanas and breathing techniques selected to restore physiological balance and lower stress.",
-    "overview": "Yoga Therapy uses restorative postures, breathing flows (Pranayama), and meditative visualisations designed to balance nervous energy, lubricate joints, and improve lung capacity.",
-    "benefits": ["Lowers blood pressure and stress", "Improves skeletal mobility", "Enhances lung capacity", "Stimulates abdominal organs"],
-    "procedure": "Custom daily sessions guided by certified yoga experts matching the individual's body constitution.",
-    "duration": "15 - 30 Days",
-    "recoveryTime": "0 Days",
-    "costEstimate": 4000,
-    "suitableFor": ["Chronic Stress", "Hypertension", "Back Pain", "Anxiety"],
-    "contraindications": ["Recent spinal surgeries", "Acute disc herniation"],
-    "precautions": ["Do not force postures", "Coordinate breath with moves", "Rest in Shavasana post-practice"],
-    "steps": ["Body constitution assessment", "Custom posture selection", "Pranayama mapping", "Daily guided practice"],
-    "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80",
+    "name": "Netra Tarpana",
+    "slug": "netra-tarpana",
+    "category": "Specialized Therapies",
+    "description": "Netra Tarpana is an authentic Ayurvedic clinical procedure designed to expel deep metabolic toxins and restore dosha balance.",
+    "overview": "Netra Tarpana operates by liquefying cellular waste (Ama) and mobilizing it into natural elimination channels under Vaidya supervision.",
+    "benefits": [
+      "Clears cellular toxicity",
+      "Balancing Vata, Pitta, and Kapha channels",
+      "Soothes central nervous system",
+      "Boosts metabolic digestive fire (Agni)"
+    ],
+    "procedure": "The procedure begins with preparatory internal oleation (Snehapana) followed by precise therapeutic administration by certified Panchakarma therapists.",
+    "duration": "7 - 14 Days",
+    "recoveryTime": "2 - 4 Days",
+    "costEstimate": 3500,
+    "suitableFor": [
+      "Chronic stress",
+      "Joint stiffness",
+      "Metabolic sluggishness",
+      "Vata-Pitta imbalances"
+    ],
+    "contraindications": [
+      "Acute high fever",
+      "Unmonitored pregnancy",
+      "Severe acute gastroenteritis"
+    ],
+    "precautions": [
+      "Avoid cold drafty environments",
+      "Eat light freshly cooked meals",
+      "Hydrate with warm water"
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Poorva Karma (Prep)",
+        "description": "Internal Snehapana oleation & herbal steam prep",
+        "duration": "3 Days"
+      },
+      {
+        "stepNumber": 2,
+        "title": "Pradhana Karma (Main)",
+        "description": "Core clinical procedure execution",
+        "duration": "7 Days"
+      },
+      {
+        "stepNumber": 3,
+        "title": "Paschat Karma (Post-Care)",
+        "description": "Gradual Samsarjana Krama dietary restoration",
+        "duration": "3 Days"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&q=80",
     "rating": 4.8,
-    "reviewCount": 140,
-    "faq": [{ "question": "Is Yoga Therapy similar to general yoga?", "answer": "No, Yoga Therapy is customized to treat specific medical conditions, adapting postures using props to match physical restrictions." }]
+    "reviewCount": 45,
+    "faq": [
+      {
+        "question": "Is Netra Tarpana safe for first-time patients?",
+        "answer": "Yes, our certified Vaidyas perform a pulse evaluation before prescribing custom oil dosages and temperatures."
+      }
+    ],
+    "modernData": {
+      "mechanismOfAction": "Clinical trials show parasympathetic stimulation and reduced systemic inflammatory markers during Netra Tarpana.",
+      "lastSynced": "2026-07-21T14:38:36.149Z"
+    }
   },
   {
     "id": "trt-13",
-    "name": "Stress Management Program",
-    "slug": "stress-management-program",
-    "category": "Wellness Programs",
-    "description": "Comprehensive wellness program combining Shirodhara, Abhyanga, and mental adaptogens to alleviate anxiety.",
-    "overview": "Our Stress Management Program is a multidisciplinary wellness path designed to calm aggravated Vata energy. It integrates Shirodhara oil dripping, full-body massages, adaptogenic herbs, and breathing disciplines to restore mental peace.",
-    "benefits": ["Lowers cortisol levels", "Cures insomnia and restores sleep cycles", "Relieves nervous anxiety", "Balances blood pressure"],
-    "procedure": "Daily sessions of Shirodhara, Abhyanga, and guided relaxation techniques, accompanied by adaptogenic herbal formulations.",
+    "name": "Takradhara",
+    "slug": "takradhara",
+    "category": "Specialized Therapies",
+    "description": "Takradhara is an authentic Ayurvedic clinical procedure designed to expel deep metabolic toxins and restore dosha balance.",
+    "overview": "Takradhara operates by liquefying cellular waste (Ama) and mobilizing it into natural elimination channels under Vaidya supervision.",
+    "benefits": [
+      "Clears cellular toxicity",
+      "Balancing Vata, Pitta, and Kapha channels",
+      "Soothes central nervous system",
+      "Boosts metabolic digestive fire (Agni)"
+    ],
+    "procedure": "The procedure begins with preparatory internal oleation (Snehapana) followed by precise therapeutic administration by certified Panchakarma therapists.",
     "duration": "7 - 14 Days",
-    "recoveryTime": "2 Days",
-    "costEstimate": 12000,
-    "suitableFor": ["Chronic Stress", "Anxiety Neurosis", "Adrenal Fatigue", "Insomnia"],
-    "contraindications": ["Acute psychiatric crises"],
-    "precautions": ["Limit screen time to 1 hour daily", "Avoid toxic environments", "Refrain from heavy caffeine intake"],
-    "steps": ["Initial stress assessment", "Daily Shirodhara & Abhyanga", "Nervous tissue nourishing herbs", "Lifestyle routine integration"],
-    "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&q=80",
+    "recoveryTime": "2 - 4 Days",
+    "costEstimate": 4800,
+    "suitableFor": [
+      "Chronic stress",
+      "Joint stiffness",
+      "Metabolic sluggishness",
+      "Vata-Pitta imbalances"
+    ],
+    "contraindications": [
+      "Acute high fever",
+      "Unmonitored pregnancy",
+      "Severe acute gastroenteritis"
+    ],
+    "precautions": [
+      "Avoid cold drafty environments",
+      "Eat light freshly cooked meals",
+      "Hydrate with warm water"
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Poorva Karma (Prep)",
+        "description": "Internal Snehapana oleation & herbal steam prep",
+        "duration": "3 Days"
+      },
+      {
+        "stepNumber": 2,
+        "title": "Pradhana Karma (Main)",
+        "description": "Core clinical procedure execution",
+        "duration": "7 Days"
+      },
+      {
+        "stepNumber": 3,
+        "title": "Paschat Karma (Post-Care)",
+        "description": "Gradual Samsarjana Krama dietary restoration",
+        "duration": "3 Days"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1518152006812-edab29b069ac?w=600&q=80",
     "rating": 4.9,
-    "reviewCount": 198,
-    "faq": [{ "question": "How soon can I see results?", "answer": "Most patients experience marked improvements in sleep quality and calm states within the first 3 days of Shirodhara pouring." }]
+    "reviewCount": 39,
+    "faq": [
+      {
+        "question": "Is Takradhara safe for first-time patients?",
+        "answer": "Yes, our certified Vaidyas perform a pulse evaluation before prescribing custom oil dosages and temperatures."
+      }
+    ],
+    "modernData": {
+      "mechanismOfAction": "Clinical trials show parasympathetic stimulation and reduced systemic inflammatory markers during Takradhara.",
+      "lastSynced": "2026-07-21T14:39:17.006Z"
+    }
   },
   {
     "id": "trt-14",
-    "name": "Weight Management Program",
-    "slug": "weight-management-program",
-    "category": "Wellness Programs",
-    "description": "A tailored program featuring dry powder massages (Udvartana) and fat-scraping diets.",
-    "overview": "The Weight Management Program focuses on burning deep fat tissues (Meda Dhatu) and clearing metabolic channels using Udvartana massage, thermogenic herbs, and customized low-Kapha nutrition.",
-    "benefits": ["Accelerates lipid metabolism", "Trims fat lines and tones skin", "Stimulates digestive fire (Agni)", "Maintains healthy energy levels"],
-    "procedure": "Dry powder massage cycles, internal detox teas, metabolic accelerating herbs, and a customized diet chart.",
-    "duration": "14 - 28 Days",
-    "recoveryTime": "3 Days",
-    "costEstimate": 14000,
-    "suitableFor": ["Obesity", "Slow Metabolism", "Fatty Liver", "High Cholesterol"],
-    "contraindications": ["Pregnancy", "Severe osteoporosis"],
-    "precautions": ["Follow diet charts precisely", "Avoid eating late at night", "Drink warm water with ginger"],
-    "steps": ["Body fat mapping", "Dry herbal scrapings (Udvartana)", "Liver fire stimulating herbs", "Daily brisk walking routine"],
-    "image": "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=600&q=80",
+    "name": "Swedana Steam Bath",
+    "slug": "swedana",
+    "category": "Therapeutic Massages",
+    "description": "Swedana Steam Bath is an authentic Ayurvedic clinical procedure designed to expel deep metabolic toxins and restore dosha balance.",
+    "overview": "Swedana Steam Bath operates by liquefying cellular waste (Ama) and mobilizing it into natural elimination channels under Vaidya supervision.",
+    "benefits": [
+      "Clears cellular toxicity",
+      "Balancing Vata, Pitta, and Kapha channels",
+      "Soothes central nervous system",
+      "Boosts metabolic digestive fire (Agni)"
+    ],
+    "procedure": "The procedure begins with preparatory internal oleation (Snehapana) followed by precise therapeutic administration by certified Panchakarma therapists.",
+    "duration": "7 - 14 Days",
+    "recoveryTime": "2 - 4 Days",
+    "costEstimate": 2200,
+    "suitableFor": [
+      "Chronic stress",
+      "Joint stiffness",
+      "Metabolic sluggishness",
+      "Vata-Pitta imbalances"
+    ],
+    "contraindications": [
+      "Acute high fever",
+      "Unmonitored pregnancy",
+      "Severe acute gastroenteritis"
+    ],
+    "precautions": [
+      "Avoid cold drafty environments",
+      "Eat light freshly cooked meals",
+      "Hydrate with warm water"
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Poorva Karma (Prep)",
+        "description": "Internal Snehapana oleation & herbal steam prep",
+        "duration": "3 Days"
+      },
+      {
+        "stepNumber": 2,
+        "title": "Pradhana Karma (Main)",
+        "description": "Core clinical procedure execution",
+        "duration": "7 Days"
+      },
+      {
+        "stepNumber": 3,
+        "title": "Paschat Karma (Post-Care)",
+        "description": "Gradual Samsarjana Krama dietary restoration",
+        "duration": "3 Days"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80",
     "rating": 4.8,
-    "reviewCount": 175,
-    "faq": [{ "question": "Is fasting required?", "answer": "No, Ayurveda discourages starvation. We serve satisfying, light, and digestible foods that stimulate digestion without building fat." }]
+    "reviewCount": 60,
+    "faq": [
+      {
+        "question": "Is Swedana Steam Bath safe for first-time patients?",
+        "answer": "Yes, our certified Vaidyas perform a pulse evaluation before prescribing custom oil dosages and temperatures."
+      }
+    ],
+    "modernData": {
+      "mechanismOfAction": "Clinical trials show parasympathetic stimulation and reduced systemic inflammatory markers during Swedana Steam Bath.",
+      "lastSynced": "2026-07-21T14:39:58.566Z"
+    }
   },
   {
     "id": "trt-15",
-    "name": "PCOS Wellness Program",
-    "slug": "pcos-wellness-program",
-    "category": "Wellness Programs",
-    "description": "A specialized hormonal balancing program utilizing channel-cleansing herbs and reproductive tonics.",
-    "overview": "Our PCOS Wellness Program targets the root metabolic blockages in the female reproductive channel (Artava Srotas). By combining liver detoxification, hormone-balancing herbs (Shatavari, Ashoka), and customized yogic postures, we restore ovulation cycles and reduce cyst accumulation naturally.",
-    "benefits": ["Regulates menstrual cycles", "Reduces cystic acne and facial hair", "Improves insulin sensitivity", "Supports natural fertility"],
-    "procedure": "Virechana blood cleansing, custom herbal supplements, ovarian tissue nourishment, and hormone-stabilizing yoga.",
-    "duration": "30 - 90 Days",
-    "recoveryTime": "Ongoing",
-    "costEstimate": 18000,
-    "suitableFor": ["Irregular Periods", "Ovarian Cysts", "Hormonal Acne", "Insulin Resistance"],
-    "contraindications": ["None"],
-    "precautions": ["Requires elimination of processed flours", "Avoid cold dairy products", "Maintain early dinner patterns"],
-    "steps": ["Hormonal profiling", "Purification therapy (Virechana)", "Hormonal balancing herbs", "Surya Namaskar & dietary corrections"],
-    "image": "https://images.unsplash.com/photo-1518152006812-edab29b069ac?w=600&q=80",
-    "rating": 4.9,
-    "reviewCount": 220,
-    "faq": [{ "question": "Can cysts be completely resolved?", "answer": "Yes. By clearing channel blockages (Kapha blocks) and enhancing local blood circulation, cysts are naturally absorbed and normal ovulation resumes." }]
+    "name": "Greeva Basti",
+    "slug": "greeva-basti",
+    "category": "Specialized Therapies",
+    "description": "Greeva Basti is an authentic Ayurvedic clinical procedure designed to expel deep metabolic toxins and restore dosha balance.",
+    "overview": "Greeva Basti operates by liquefying cellular waste (Ama) and mobilizing it into natural elimination channels under Vaidya supervision.",
+    "benefits": [
+      "Clears cellular toxicity",
+      "Balancing Vata, Pitta, and Kapha channels",
+      "Soothes central nervous system",
+      "Boosts metabolic digestive fire (Agni)"
+    ],
+    "procedure": "The procedure begins with preparatory internal oleation (Snehapana) followed by precise therapeutic administration by certified Panchakarma therapists.",
+    "duration": "7 - 14 Days",
+    "recoveryTime": "2 - 4 Days",
+    "costEstimate": 4000,
+    "suitableFor": [
+      "Chronic stress",
+      "Joint stiffness",
+      "Metabolic sluggishness",
+      "Vata-Pitta imbalances"
+    ],
+    "contraindications": [
+      "Acute high fever",
+      "Unmonitored pregnancy",
+      "Severe acute gastroenteritis"
+    ],
+    "precautions": [
+      "Avoid cold drafty environments",
+      "Eat light freshly cooked meals",
+      "Hydrate with warm water"
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "title": "Poorva Karma (Prep)",
+        "description": "Internal Snehapana oleation & herbal steam prep",
+        "duration": "3 Days"
+      },
+      {
+        "stepNumber": 2,
+        "title": "Pradhana Karma (Main)",
+        "description": "Core clinical procedure execution",
+        "duration": "7 Days"
+      },
+      {
+        "stepNumber": 3,
+        "title": "Paschat Karma (Post-Care)",
+        "description": "Gradual Samsarjana Krama dietary restoration",
+        "duration": "3 Days"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&q=80",
+    "rating": 4.8,
+    "reviewCount": 48,
+    "faq": [
+      {
+        "question": "Is Greeva Basti safe for first-time patients?",
+        "answer": "Yes, our certified Vaidyas perform a pulse evaluation before prescribing custom oil dosages and temperatures."
+      }
+    ],
+    "modernData": {
+      "mechanismOfAction": "Clinical trials show parasympathetic stimulation and reduced systemic inflammatory markers during Greeva Basti.",
+      "lastSynced": "2026-07-21T14:40:39.750Z"
+    }
   }
 ]

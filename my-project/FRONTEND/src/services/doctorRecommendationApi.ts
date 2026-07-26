@@ -1,6 +1,9 @@
+// FRONTEND/src/services/doctorRecommendationApi.ts
+// Service fetching recommended doctors dynamically from MySQL backend based on treatment requirements.
+import axios from 'axios';
 import { Doctor } from '../types';
-import { MOCK_DOCTORS } from './apiService';
 
+const BACKEND_URL = 'http://localhost:5174/api';
 
 export interface DoctorRecommendationResponse<T> {
   data: T;
@@ -8,42 +11,46 @@ export interface DoctorRecommendationResponse<T> {
   error?: string;
 }
 
-
 export const doctorRecommendationApi = {
   getRecommendedDoctors: async (treatmentId: string): Promise<DoctorRecommendationResponse<Doctor[]>> => {
-      
-      // Filter MOCK_DOCTORS using local rule matching
-      const idStr = treatmentId.toLowerCase();
-      
-      const matched = MOCK_DOCTORS.filter(doc => {
-        const spec = doc.specialization.toLowerCase();
-        const exp = doc.specialExpertise.map(e => e.toLowerCase());
-        
-        // Match general categories
-        const matchesPanchakarma = idStr.includes("panch") || idStr.includes("vamana") || idStr.includes("virechana") || idStr.includes("basti") || idStr.includes("nasya") || idStr.includes("rakta");
-        const matchesDetox = idStr.includes("detox") || idStr.includes("abhyanga") || idStr.includes("udvartana");
-        const matchesHerbal = idStr.includes("herb");
-        const matchesYoga = idStr.includes("yoga") || idStr.includes("stress");
-        
-        const docMatchesPanchakarma = spec.includes("panchakarma") || spec.includes("detox");
-        const docMatchesHerbal = spec.includes("herbal") || spec.includes("pharma") || spec.includes("medicine");
-        const docMatchesYoga = spec.includes("yoga") || spec.includes("lifestyle") || spec.includes("mind") || spec.includes("general");
-        
-        if (matchesPanchakarma && docMatchesPanchakarma) return true;
-        if (matchesDetox && docMatchesPanchakarma) return true;
-        if (matchesHerbal && docMatchesHerbal) return true;
-        if (matchesYoga && docMatchesYoga) return true;
-        
-        return spec.includes("general") || spec.includes("kayachikitsa") || exp.some(e => e.includes(idStr));
+    try {
+      let specParam = '';
+      const tid = treatmentId.toLowerCase();
+
+      // Map treatment profile requirements to clinical specialization channels
+      if (tid.includes('pancha') || tid.includes('basti') || tid.includes('virechana') || tid.includes('vamana') || tid.includes('rakta') || tid.includes('nasya')) {
+        specParam = 'Panchakarma';
+      } else if (tid.includes('shirodhara') || tid.includes('abhyanga') || tid.includes('udvartana') || tid.includes('massage') || tid.includes('steam')) {
+        specParam = 'Massages';
+      } else if (tid.includes('diab') || tid.includes('metabolic') || tid.includes('sugar')) {
+        specParam = 'Diabetes';
+      } else if (tid.includes('arthr') || tid.includes('joint') || tid.includes('basti') || tid.includes('spine')) {
+        specParam = 'Arthritis';
+      } else if (tid.includes('women') || tid.includes('pcos') || tid.includes('gynaec')) {
+        specParam = 'Prasuti';
+      } else if (tid.includes('skin') || tid.includes('psor') || tid.includes('hair')) {
+        specParam = 'Skin';
+      } else if (tid.includes('mental') || tid.includes('insom') || tid.includes('anx') || tid.includes('migr') || tid.includes('wellness')) {
+        specParam = 'Mental';
+      }
+
+      // Live request to MySQL backend
+      const res = await axios.get(`${BACKEND_URL}/doctors`, {
+        params: { specialization: specParam }
       });
 
-      const fallback = matched.length > 0 ? matched.slice(0, 6) : MOCK_DOCTORS.slice(0, 6);
-      return { data: fallback, isFallback: true };
+      if (res.data && res.data.length > 0) {
+        return { data: res.data.slice(0, 6), isFallback: false };
+      }
+
+      // Default fallback: get general doctors
+      const allRes = await axios.get(`${BACKEND_URL}/doctors`);
+      return { data: allRes.data.slice(0, 6), isFallback: false };
+    } catch (err: any) {
+      console.warn('Recommended doctors fetch failed, fallback active:', err.message);
+      return { data: [], isFallback: true, error: err.message };
+    }
   }
 };
 
 export default doctorRecommendationApi;
-
-
-
-

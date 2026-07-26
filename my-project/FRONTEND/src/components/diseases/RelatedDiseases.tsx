@@ -1,3 +1,4 @@
+// FRONTEND/src/components/diseases/RelatedDiseases.tsx
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Disease } from '../../services/diseaseApi';
@@ -9,9 +10,30 @@ interface RelatedDiseasesProps {
 }
 
 export const RelatedDiseases: React.FC<RelatedDiseasesProps> = ({ currentDisease, allDiseases, onSelect }) => {
-  // Filter similar diseases from the same category (excluding current)
+  // Filter similar diseases having same category, same symptoms, or same dosha
   const related = allDiseases
-    .filter((d) => d.category === currentDisease.category && d.id !== currentDisease.id)
+    .filter((d) => d.id !== currentDisease.id && d.slug !== currentDisease.slug)
+    .map((d) => {
+      let score = 0;
+      if (d.category === currentDisease.category) score += 5;
+      
+      // Calculate matching symptoms
+      const currentSymptoms = currentDisease.symptoms || [];
+      const dSymptoms = d.symptoms || [];
+      const matchingSymptoms = dSymptoms.filter(s => currentSymptoms.includes(s));
+      score += matchingSymptoms.length * 2;
+
+      // Calculate matching doshas
+      const currentDoshas = currentDisease.doshaAffected || [];
+      const dDoshas = d.doshaAffected || [];
+      const matchingDoshas = dDoshas.filter(ds => currentDoshas.includes(ds));
+      score += matchingDoshas.length * 3;
+
+      return { disease: d, score };
+    })
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map(item => item.disease)
     .slice(0, 3);
 
   if (related.length === 0) return null;
@@ -28,8 +50,8 @@ export const RelatedDiseases: React.FC<RelatedDiseasesProps> = ({ currentDisease
           >
             <div>
               <span className="text-[8px] uppercase tracking-wider font-bold text-accent">{d.category}</span>
-              <h5 className="font-bold text-primary text-xs mt-1">{d.name}</h5>
-              <p className="text-[10px] text-text-secondary line-clamp-2 mt-1 leading-relaxed">{d.shortDescription}</p>
+              <h5 className="font-bold text-primary text-xs mt-1">{d.diseaseName || d.name}</h5>
+              <p className="text-[10px] text-text-secondary line-clamp-2 mt-1 leading-relaxed">{d.overview || d.shortDescription}</p>
             </div>
             <div className="text-[9px] font-bold text-primary flex items-center space-x-0.5 mt-3">
               <span>Remedies</span>

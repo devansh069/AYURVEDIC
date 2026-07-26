@@ -144,69 +144,90 @@ exports.syncTreatments = async (req, res, next) => {
       return res.status(400).json({ error: "No treatments found in database to sync." });
     }
 
-    const WIKI_MAPPING = {
-      'panchakarma': 'Panchakarma',
-      'vamana': 'Vamana',
-      'virechana': 'Virechana',
-      'basti': 'Basti_(treatment)',
-      'nasya': 'Nasya',
-      'raktamokshana': 'Bloodletting',
-      'abhyanga': 'Abhyanga',
-      'shirodhara': 'Shirodhara',
-      'udvartana': 'Udvartana',
-      'herbal-therapy': 'Herbal_medicine',
-      'detox-therapy': 'Detoxification',
-      'yoga-therapy': 'Yoga_as_therapy',
-      'stress-management-program': 'Stress_management',
-      'weight-management-program': 'Weight_management',
-      'pcos-wellness-program': 'Polycystic_ovary_syndrome'
-    };
-
+    const { generateGeminiContent } = require('../config/gemini');
     const syncedTreatments = [];
 
     for (const row of rows) {
-      const wikiTerm = WIKI_MAPPING[row.slug] || row.name;
+      console.log(`🤖 Syncing "${row.name}" with Gemini AI...`);
+      const prompt = `You are a Master Vaidya and Chief Panchakarma Director. Provide authoritative, real-world clinical details for the Ayurvedic treatment protocol: "${row.name}" (Category: ${row.category}).
 
-      let wikiExtract = null;
-      let wikiImage = null;
+Return ONLY a valid JSON object matching the following structure exactly without markdown codeblock formatting:
+{
+  "description": "2-sentence executive summary of the therapy",
+  "overview": "Detailed clinical overview explaining physiological mechanism and bio-energy targeted",
+  "benefits": ["Benefit 1", "Benefit 2", "Benefit 3", "Benefit 4"],
+  "procedure": "Detailed step-by-step clinical methodology of how Vaidyas perform this procedure",
+  "duration": "e.g. 7 - 14 Days",
+  "recoveryTime": "e.g. 2 - 3 Days",
+  "suitableFor": ["Condition/Dosha 1", "Condition/Dosha 2", "Condition 3"],
+  "contraindications": ["Contraindication 1", "Contraindication 2"],
+  "precautions": ["Precaution 1", "Precaution 2"],
+  "steps": [
+    { "stepNumber": 1, "title": "Poorva Karma (Preparation)", "description": "Pre-treatment oleation and warm oil prep", "duration": "3 Days" },
+    { "stepNumber": 2, "title": "Pradhana Karma (Main Procedure)", "description": "Core therapeutic procedure execution", "duration": "7 Days" },
+    { "stepNumber": 3, "title": "Paschat Karma (Post-Care)", "description": "Post-treatment dietary restoration (Samsarjana Krama)", "duration": "3 Days" }
+  ],
+  "faq": [
+    { "question": "What should I eat during this treatment?", "answer": "Follow a strict Samsarjana Krama diet consisting of warm rice gruel, light Mung soups, and warm water." }
+  ],
+  "modernData": {
+    "mechanismOfAction": "Modern biological & neurological explanation of therapeutic action",
+    "recommendedCourse": "Standard clinical frequency"
+  }
+}`;
 
-      // Fetch from Wikipedia
+      let aiData = null;
       try {
-        const wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiTerm)}`);
-        if (wikiRes.ok) {
-          const wikiData = await wikiRes.json();
-          wikiExtract = wikiData.extract || null;
-          if (wikiData.thumbnail && wikiData.thumbnail.source) {
-            wikiImage = wikiData.thumbnail.source;
+        const responseText = await generateGeminiContent(prompt, "You output pure JSON objects without markdown block formatting.");
+        if (responseText) {
+          let clean = responseText.trim();
+          if (clean.startsWith('```')) {
+            clean = clean.replace(/^```(json)?/, '').replace(/```$/, '').trim();
           }
+          aiData = JSON.parse(clean);
         }
       } catch (err) {
-        console.error(`Wikipedia sync failed for ${row.name}:`, err.message);
+        console.error(`Gemini sync failed for ${row.name}:`, err.message);
       }
 
-      const modernData = {
-        wikiExtract,
-        wikiImage,
-        lastSynced: new Date().toISOString()
-      };
+      if (aiData) {
+        const benefits = JSON.stringify(aiData.benefits || []);
+        const suitableFor = JSON.stringify(aiData.suitableFor || []);
+        const contraindications = JSON.stringify(aiData.contraindications || []);
+        const precautions = JSON.stringify(aiData.precautions || []);
+        const steps = JSON.stringify(aiData.steps || []);
+        const faq = JSON.stringify(aiData.faq || []);
+        const modernData = JSON.stringify(aiData.modernData || {});
 
-      // Save into MySQL
-      await pool.query(
-        "UPDATE treatments SET modernData = ? WHERE id = ?",
-        [JSON.stringify(modernData), row.id]
-      );
+        await pool.query(`
+          UPDATE treatments SET
+            description = ?, overview = ?, benefits = ?, \`procedure\` = ?,
+            duration = ?, recoveryTime = ?, suitableFor = ?, contraindications = ?,
+            precautions = ?, steps = ?, faq = ?, modernData = ?
+          WHERE id = ?
+        `, [
+          aiData.description, aiData.overview, benefits, aiData.procedure,
+          aiData.duration, aiData.recoveryTime, suitableFor, contraindications,
+          precautions, steps, faq, modernData, row.id
+        ]);
 
-      syncedTreatments.push({
-        id: row.id,
-        name: row.name,
-        modernData
-      });
+        syncedTreatments.push({
+          id: row.id,
+          name: row.name,
+          status: "Synced"
+        });
+      }
     }
 
+    // Write all fresh synced treatments to treatments.json
+    const [freshRows] = await pool.query("SELECT * FROM treatments");
+    const jsonOutputPath = path.join(__dirname, '..', 'data', 'treatments.json');
+    fs.writeFileSync(jsonOutputPath, JSON.stringify(freshRows.map(parseTreatmentJsonFields), null, 2), 'utf-8');
+
     res.json({
-      message: "Successfully synced real-time Wikipedia data for all treatments.",
-      count: syncedTreatments.length,
-      treatments: syncedTreatments
+      message: "Successfully synchronized all treatments using Gemini API real-time data.",
+      count: freshRows.length,
+      treatments: freshRows.map(parseTreatmentJsonFields)
     });
   } catch (err) {
     next(err);
@@ -263,6 +284,91 @@ exports.getBookings = async (req, res, next) => {
     }
     const [rows] = await pool.query("SELECT * FROM treatment_bookings ORDER BY createdAt DESC");
     res.json(rows);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.createTreatment = async (req, res, next) => {
+  try {
+    const pool = getPool();
+    if (!pool) return res.status(500).json({ error: "Database offline" });
+
+    const {
+      name, slug, category, description, overview, benefits,
+      procedure, duration, recoveryTime, costEstimate,
+      suitableFor, contraindications, precautions, steps, image, rating
+    } = req.body;
+
+    const id = `trt-${Date.now()}`;
+    const slugVal = slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+    await pool.query(`
+      INSERT INTO treatments (
+        id, name, slug, category, description, overview, benefits,
+        \`procedure\`, duration, recoveryTime, costEstimate,
+        suitableFor, contraindications, precautions, steps, image, rating, reviewCount
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+    `, [
+      id, name, slugVal, category, description, overview, JSON.stringify(benefits || []),
+      procedure, duration, recoveryTime, parseInt(costEstimate || 3000, 10),
+      JSON.stringify(suitableFor || []), JSON.stringify(contraindications || []),
+      JSON.stringify(precautions || []), JSON.stringify(steps || []), image, parseFloat(rating || 5.0)
+    ]);
+
+    const [rows] = await pool.query("SELECT * FROM treatments WHERE id = ?", [id]);
+    res.status(201).json(parseTreatmentJsonFields(rows[0]));
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.updateTreatment = async (req, res, next) => {
+  try {
+    const pool = getPool();
+    if (!pool) return res.status(500).json({ error: "Database offline" });
+    const { id } = req.params;
+
+    const {
+      name, slug, category, description, overview, benefits,
+      procedure, duration, recoveryTime, costEstimate,
+      suitableFor, contraindications, precautions, steps, image, rating
+    } = req.body;
+
+    await pool.query(`
+      UPDATE treatments SET
+        name = ?, slug = ?, category = ?, description = ?, overview = ?,
+        benefits = ?, \`procedure\` = ?, duration = ?, recoveryTime = ?,
+        costEstimate = ?, suitableFor = ?, contraindications = ?,
+        precautions = ?, steps = ?, image = ?, rating = ?
+      WHERE id = ?
+    `, [
+      name, slug, category, description, overview, JSON.stringify(benefits || []),
+      procedure, duration, recoveryTime, parseInt(costEstimate, 10),
+      JSON.stringify(suitableFor || []), JSON.stringify(contraindications || []),
+      JSON.stringify(precautions || []), JSON.stringify(steps || []), image, parseFloat(rating),
+      id
+    ]);
+
+    const [rows] = await pool.query("SELECT * FROM treatments WHERE id = ?", [id]);
+    if (rows.length === 0) return res.status(404).json({ error: "Treatment not found" });
+    res.json(parseTreatmentJsonFields(rows[0]));
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteTreatment = async (req, res, next) => {
+  try {
+    const pool = getPool();
+    if (!pool) return res.status(500).json({ error: "Database offline" });
+    const { id } = req.params;
+
+    const [rows] = await pool.query("SELECT * FROM treatments WHERE id = ?", [id]);
+    if (rows.length === 0) return res.status(404).json({ error: "Treatment not found" });
+
+    await pool.query("DELETE FROM treatments WHERE id = ?", [id]);
+    res.json({ message: "Treatment deleted successfully", id });
   } catch (err) {
     next(err);
   }

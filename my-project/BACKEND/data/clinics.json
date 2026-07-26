@@ -1,229 +1,101 @@
 [
   {
     "id": "cl-1",
-    "name": "Kerala Ayurveda Zen Sanctuary",
-    "logo": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=150&q=80",
-    "bannerImage": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=80",
+    "name": "Anurag Nursing Home, Mansarovar Ayurvedic Clinic",
+    "logo": "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&q=80",
+    "bannerImage": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80",
     "type": "Panchakarma Center",
-    "description": "A luxurious five-star Ayurveda resort and detoxification sanctuary overlooking the tranquil backwaters of Kochi. Specializing in traditional Shodhana therapies and customized Panchakarma protocols under strict MD Vaidya supervision.",
-    "address": "12 Backwater Retreat, Fort Kochi",
-    "city": "Kochi",
-    "state": "Kerala",
+    "description": "A certified holistic healthcare center in Jaipur providing premium pulse diagnosis, organic decoctions compoundings, and customized therapies targeting systemic imbalances under the guidance of expert MD Vaidyas.",
+    "address": "No. 60/181, Rajat Path,New Sanganer Road,Mansarovar",
+    "city": "Jaipur",
+    "state": "Rajasthan",
     "country": "India",
-    "phone": "+91 484 2748390",
-    "email": "contact@keralazen.com",
-    "website": "https://www.keralazen.com",
-    "rating": "4.90",
-    "reviewCount": 284,
-    "yearsEstablished": 18,
-    "doctorsCount": 8,
+    "phone": "+91 9730544970",
+    "email": "contact@anuragnursinghomemansarovarayurvedicclinic.com",
+    "website": "https://www.anuragnursinghomemansarovarayurvedicclinic.com",
+    "rating": 4.2,
+    "reviewCount": 243,
+    "yearsEstablished": 21,
+    "doctorsCount": 5,
     "services": [
       "Panchakarma",
       "Detox Therapy",
       "Abhyanga",
       "Shirodhara",
-      "Nasya",
-      "Virechana",
-      "Basti",
-      "Stress Management"
+      "Diabetes Care",
+      "PCOS Treatment"
     ],
     "facilities": [
-      "Private Therapy Rooms",
-      "Online Consultation",
       "Pharmacy",
-      "Parking",
-      "Accommodation",
       "Diagnostic Support",
-      "Cafeteria",
-      "Wellness Programs"
+      "Private Therapy Rooms",
+      "Parking",
+      "Accommodation"
     ],
-    "openingHours": "Mon-Sun: 07:00 AM - 08:00 PM",
+    "openingHours": "Mon-Sat: 08:00 AM - 07:00 PM",
     "images": [
-      "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&q=80",
-      "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80"
+      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80",
+      "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80"
     ],
-    "latitude": "19.07600000",
-    "longitude": "72.87770000",
-    "mission": "To guide individuals towards holistic rejuvenation using customized, traditional Panchakarma purges and healing backwater therapies.",
-    "history": "Founded in 2008 in Fort Kochi, our sanctuary quickly gained international acclaim for preserving clinical Shodhana protocols and organic herbal oils compounding in Kerala.",
+    "latitude": 26.8620322,
+    "longitude": 75.7549683,
+    "mission": "To guide individuals towards balance and long-term wellness using pure Ayurvedic therapies and holistic dietary coaching.",
+    "history": "Established to extend natural clinical therapies, our center in Jaipur has served hundreds of local and corporate patients.",
     "gallery": [
       {
-        "id": "gal-1",
-        "url": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80",
+        "id": "gal-1-1",
+        "url": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
         "caption": "Luxury Therapy Suite"
       },
       {
-        "id": "gal-2",
-        "url": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&q=80",
-        "caption": "Tranquil Backwater Courtyard"
-      },
-      {
-        "id": "gal-3",
-        "url": "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=600&q=80",
-        "caption": "Organic Compound Lab"
-      },
-      {
-        "id": "gal-4",
-        "url": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80",
-        "caption": "Yoga Pavilion"
+        "id": "gal-1-2",
+        "url": "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=800&q=80",
+        "caption": "Consultation & Pulse Diagnosis"
       }
     ],
     "packages": [
       {
-        "id": "pkg-1",
-        "name": "Royal Panchakarma Detoxification",
-        "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80",
-        "price": 25000,
-        "benefits": [
-          "Complete cellular detox",
-          "Restores metabolic fire (Agni)",
-          "Soothes nervous system"
-        ],
+        "id": "pkg-1-1",
+        "name": "Royal Panchakarma Cleansing",
+        "description": "Classic fivefold body detoxification with specialized oils and custom diets.",
         "duration": "7 Days",
-        "description": "Complete fivefold cleansing (Shodhana) with customized daily massages, steam chambers, and doshic meals."
-      },
-      {
-        "id": "pkg-2",
-        "name": "Stress & Insomnia Reversal",
-        "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&q=80",
-        "price": 18000,
+        "price": 16000,
         "benefits": [
-          "Lowers cortisol levels",
-          "Deep, restorative sleep",
-          "Relieves mental fatigue"
+          "Cellular purification",
+          "Rejuvenates Vata/Pitta flow"
         ],
-        "duration": "5 Days",
-        "description": "Combining continuous warm Shirodhara drips with grounding Vata-soothing body strokes."
+        "image": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=80"
       }
     ],
     "openingHoursList": [
       {
         "day": "Monday",
-        "hours": "07:00 AM - 08:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Tuesday",
-        "hours": "07:00 AM - 08:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Wednesday",
-        "hours": "07:00 AM - 08:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Thursday",
-        "hours": "07:00 AM - 08:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Friday",
-        "hours": "07:00 AM - 08:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Saturday",
-        "hours": "07:00 AM - 08:00 PM",
-        "closed": false
-      },
-      {
-        "day": "Sunday",
-        "hours": "08:00 AM - 04:00 PM",
-        "closed": false
-      }
-    ]
-  },
-  {
-    "id": "cl-10",
-    "name": "Madhavbaug Cardiac Care Clinic",
-    "logo": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=150&q=80",
-    "bannerImage": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80",
-    "type": "Holistic Healing Center",
-    "description": "Madhavbaug is a certified leader in non-invasive cardiac care. Combining Panchakarma, diet regulation, and stress management, we help reverse heart diseases and type-2 diabetes naturally.",
-    "address": "Thane West, Gokhale Road",
-    "city": "Thane",
-    "state": "Maharashtra",
-    "country": "India",
-    "phone": "+91 22 25438800",
-    "email": "care@madhavbaug.org",
-    "website": "https://www.madhavbaug.org",
-    "rating": "4.70",
-    "reviewCount": 384,
-    "yearsEstablished": 20,
-    "doctorsCount": 8,
-    "services": [
-      "Panchakarma",
-      "Diabetes Care",
-      "Weight Management",
-      "Stress Management"
-    ],
-    "facilities": [
-      "Private Therapy Rooms",
-      "Online Consultation",
-      "Pharmacy",
-      "Parking",
-      "Diagnostic Support"
-    ],
-    "openingHours": "Mon-Sat: 09:30 AM - 06:30 PM",
-    "images": [
-      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80"
-    ],
-    "latitude": "19.21830000",
-    "longitude": "72.97810000",
-    "mission": "To reduce dependencies on cardiovascular drugs through non-invasive therapies, herbal extracts, and clinical diet corrections.",
-    "history": "A pioneer clinic established in 2006, Madhavbaug has treated over a lakh cardiac patients throughout Maharashtra.",
-    "gallery": [
-      {
-        "id": "gal-1",
-        "url": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80",
-        "caption": "Cardiac Diagnostics Area"
-      }
-    ],
-    "packages": [
-      {
-        "id": "pkg-1",
-        "name": "Heart Health & Reversal program",
-        "image": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&q=80",
-        "price": 19000,
-        "benefits": [
-          "Cardiovascular stamina increase",
-          "Cleanses arterial walls (Ama removal)",
-          "Normalizes arterial pressure"
-        ],
-        "duration": "7 Days",
-        "description": "Specialized clinic checks, arterial stress evaluations, custom low-sodium meals, and fat-cleansing enemas."
-      }
-    ],
-    "openingHoursList": [
-      {
-        "day": "Monday",
-        "hours": "09:30 AM - 06:30 PM",
-        "closed": false
-      },
-      {
-        "day": "Tuesday",
-        "hours": "09:30 AM - 06:30 PM",
-        "closed": false
-      },
-      {
-        "day": "Wednesday",
-        "hours": "09:30 AM - 06:30 PM",
-        "closed": false
-      },
-      {
-        "day": "Thursday",
-        "hours": "09:30 AM - 06:30 PM",
-        "closed": false
-      },
-      {
-        "day": "Friday",
-        "hours": "09:30 AM - 06:30 PM",
-        "closed": false
-      },
-      {
-        "day": "Saturday",
-        "hours": "09:30 AM - 06:30 PM",
+        "hours": "08:00 AM - 05:00 PM",
         "closed": false
       },
       {
@@ -235,72 +107,72 @@
   },
   {
     "id": "cl-2",
-    "name": "AyurCare Wellness Hub",
-    "logo": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=150&q=80",
-    "bannerImage": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80",
+    "name": "Getwell Poly Clinic and Hospital",
+    "logo": "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=150&q=80",
+    "bannerImage": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
     "type": "Wellness Center",
-    "description": "A premium, modern holistic health hub in the heart of Mumbai. We provide corporate stress relief programs, dietary doshic coaching, and traditional therapies customized for active urban lifestyles.",
-    "address": "45 Juhu Tara Road, Juhu",
-    "city": "Mumbai",
-    "state": "Maharashtra",
+    "description": "A certified holistic healthcare center in Jaipur providing premium pulse diagnosis, organic decoctions compoundings, and customized therapies targeting systemic imbalances under the guidance of expert MD Vaidyas.",
+    "address": "J.L.N Marg Jaipur",
+    "city": "Jaipur",
+    "state": "Rajasthan",
     "country": "India",
-    "phone": "+91 22 26154800",
-    "email": "info@ayurcaremumbai.com",
-    "website": "https://www.ayurcaremumbai.com",
-    "rating": "4.80",
-    "reviewCount": 198,
-    "yearsEstablished": 10,
-    "doctorsCount": 5,
+    "phone": "+91 9109231731",
+    "email": "contact@getwellpolyclinicandhospital.com",
+    "website": "https://www.getwellpolyclinicandhospital.com",
+    "rating": 4.5,
+    "reviewCount": 56,
+    "yearsEstablished": 22,
+    "doctorsCount": 6,
     "services": [
-      "Shirodhara",
-      "Abhyanga",
-      "PCOS Treatment",
-      "Weight Management",
       "Stress Management",
-      "Skin Care"
+      "Skin Care",
+      "Panchakarma",
+      "Diabetes Care",
+      "Nasya",
+      "Detox Therapy",
+      "Shirodhara"
     ],
     "facilities": [
       "Private Therapy Rooms",
+      "Wellness Programs",
+      "Cafeteria",
       "Online Consultation",
-      "Pharmacy",
-      "Parking",
-      "Accommodation",
-      "Wellness Programs"
+      "Diagnostic Support",
+      "Pharmacy"
     ],
     "openingHours": "Mon-Sat: 08:00 AM - 07:00 PM",
     "images": [
-      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80",
-      "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=600&q=80"
+      "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+      "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=800&q=80"
     ],
-    "latitude": "19.10260000",
-    "longitude": "72.82420000",
-    "mission": "To bridge traditional Vedic diagnostic science with fast-paced urban lifestyles, creating accessible paths to wellness.",
-    "history": "Formed in 2016, AyurCare pioneered corporate wellness and preventive consultation in Mumbai, catering to hundreds of corporate leaders.",
+    "latitude": 26.902255,
+    "longitude": 75.8167071,
+    "mission": "To guide individuals towards balance and long-term wellness using pure Ayurvedic therapies and holistic dietary coaching.",
+    "history": "Established to extend natural clinical therapies, our center in Jaipur has served hundreds of local and corporate patients.",
     "gallery": [
       {
-        "id": "gal-1",
-        "url": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80",
-        "caption": "Lobby & Waiting Lounge"
+        "id": "gal-2-1",
+        "url": "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=800&q=80",
+        "caption": "Luxury Therapy Suite"
       },
       {
-        "id": "gal-2",
-        "url": "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=600&q=80",
-        "caption": "Consultation Room"
+        "id": "gal-2-2",
+        "url": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=80",
+        "caption": "Consultation & Pulse Diagnosis"
       }
     ],
     "packages": [
       {
-        "id": "pkg-1",
-        "name": "Urban Metabolic Reset",
-        "image": "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=600&q=80",
-        "price": 12500,
+        "id": "pkg-2-1",
+        "name": "Royal Panchakarma Cleansing",
+        "description": "Classic fivefold body detoxification with specialized oils and custom diets.",
+        "duration": "7 Days",
+        "price": 26000,
         "benefits": [
-          "Boosts sluggish metabolism",
-          "Toxin scraping (Lekhana)",
-          "Dietary plan maps"
+          "Cellular purification",
+          "Rejuvenates Vata/Pitta flow"
         ],
-        "duration": "5 Days",
-        "description": "Targeted at restoring weight balance and resetting digestion through oil massages and organic diet plan coaching."
+        "image": "https://images.unsplash.com/photo-1502740479091-6398b19db310?w=800&q=80"
       }
     ],
     "openingHoursList": [
@@ -331,7 +203,7 @@
       },
       {
         "day": "Saturday",
-        "hours": "08:00 AM - 07:00 PM",
+        "hours": "08:00 AM - 05:00 PM",
         "closed": false
       },
       {
@@ -343,95 +215,101 @@
   },
   {
     "id": "cl-3",
-    "name": "Shuddhi Ayurveda Clinic",
-    "logo": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=150&q=80",
-    "bannerImage": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=80",
-    "type": "Ayurveda Clinic",
-    "description": "Dedicated to cleansing your mind and body. Located in New Delhi, Shuddhi Clinic is a leading name in pulse diagnostics (Nadi Pariksha) and customized herbal medicines for metabolic diseases.",
-    "address": "B-12 Greater Kailash I",
-    "city": "New Delhi",
-    "state": "Delhi",
+    "name": "Jain Nursing Home, Jaipur Ayurvedic Clinic",
+    "logo": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=150&q=80",
+    "bannerImage": "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=800&q=80",
+    "type": "Panchakarma Center",
+    "description": "A certified holistic healthcare center in Jaipur providing premium pulse diagnosis, organic decoctions compoundings, and customized therapies targeting systemic imbalances under the guidance of expert MD Vaidyas.",
+    "address": "4 Kh , 2 Housing Board, Shastri Nagar",
+    "city": "Jaipur",
+    "state": "Rajasthan",
     "country": "India",
-    "phone": "+91 11 41635890",
-    "email": "delhi@shuddhiayurveda.com",
-    "website": "https://www.shuddhiayurveda.com",
-    "rating": "4.70",
-    "reviewCount": 154,
-    "yearsEstablished": 8,
-    "doctorsCount": 4,
+    "phone": "+91 7654315077",
+    "email": "contact@jainnursinghomejaipurayurvedicclinic.com",
+    "website": "https://www.jainnursinghomejaipurayurvedicclinic.com",
+    "rating": 4.3,
+    "reviewCount": 57,
+    "yearsEstablished": 22,
+    "doctorsCount": 3,
     "services": [
       "Panchakarma",
       "Detox Therapy",
+      "Abhyanga",
       "Diabetes Care",
-      "Weight Management",
-      "Skin Care"
+      "Skin Care",
+      "PCOS Treatment",
+      "Shirodhara"
     ],
     "facilities": [
+      "Parking",
       "Private Therapy Rooms",
       "Online Consultation",
-      "Pharmacy",
-      "Diagnostic Support",
-      "Wellness Programs"
+      "Diagnostic Support"
     ],
-    "openingHours": "Mon-Sat: 09:00 AM - 06:00 PM",
+    "openingHours": "Mon-Sat: 08:00 AM - 07:00 PM",
     "images": [
-      "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&q=80"
+      "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=800&q=80",
+      "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=80"
     ],
-    "latitude": "28.54820000",
-    "longitude": "77.23480000",
-    "mission": "To deliver precise root-cause analysis through Nadi Pariksha and restore vitality with organic Ayurvedic extracts.",
-    "history": "Formed in 2018 in GK-1, Shuddhi has established standard protocols for metabolic disorders reversal.",
+    "latitude": 26.9474949,
+    "longitude": 75.8030704,
+    "mission": "To guide individuals towards balance and long-term wellness using pure Ayurvedic therapies and holistic dietary coaching.",
+    "history": "Established to extend natural clinical therapies, our center in Jaipur has served hundreds of local and corporate patients.",
     "gallery": [
       {
-        "id": "gal-1",
-        "url": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&q=80",
-        "caption": "Clinical Examination Room"
+        "id": "gal-3-1",
+        "url": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=80",
+        "caption": "Luxury Therapy Suite"
+      },
+      {
+        "id": "gal-3-2",
+        "url": "https://images.unsplash.com/photo-1502740479091-6398b19db310?w=800&q=80",
+        "caption": "Consultation & Pulse Diagnosis"
       }
     ],
     "packages": [
       {
-        "id": "pkg-1",
-        "name": "Nadi Rejuvenation Program",
-        "image": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&q=80",
-        "price": 8500,
+        "id": "pkg-3-1",
+        "name": "Royal Panchakarma Cleansing",
+        "description": "Classic fivefold body detoxification with specialized oils and custom diets.",
+        "duration": "7 Days",
+        "price": 16000,
         "benefits": [
-          "Nervous channel alignment",
-          "Systemic detoxification",
-          "Stress relief"
+          "Cellular purification",
+          "Rejuvenates Vata/Pitta flow"
         ],
-        "duration": "3 Days",
-        "description": "Includes precise pulse tracking, 3 personalized therapies, and 30 days of customized herbal extracts."
+        "image": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=80"
       }
     ],
     "openingHoursList": [
       {
         "day": "Monday",
-        "hours": "09:00 AM - 06:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Tuesday",
-        "hours": "09:00 AM - 06:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Wednesday",
-        "hours": "09:00 AM - 06:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Thursday",
-        "hours": "09:00 AM - 06:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Friday",
-        "hours": "09:00 AM - 06:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Saturday",
-        "hours": "09:00 AM - 06:00 PM",
+        "hours": "08:00 AM - 05:00 PM",
         "closed": false
       },
       {
@@ -443,202 +321,207 @@
   },
   {
     "id": "cl-4",
-    "name": "Himalayan Holistic Rejuvenation Hospital",
-    "logo": "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=150&q=80",
-    "bannerImage": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=80",
-    "type": "Ayurveda Hospital",
-    "description": "An expansive inpatient Ayurvedic hospital nestled in the serene foothills of Rishikesh. Combining ancient scriptural therapies with clinical diagnostic standards. Famous for metabolic restoration programs.",
-    "address": "Tapovan Hills, Badrinath Road",
-    "city": "Rishikesh",
-    "state": "Uttarakhand",
+    "name": "Jain Eye Clinic and Hospital",
+    "logo": "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&q=80",
+    "bannerImage": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=80",
+    "type": "Panchakarma Center",
+    "description": "A certified holistic healthcare center in Jaipur providing premium pulse diagnosis, organic decoctions compoundings, and customized therapies targeting systemic imbalances under the guidance of expert MD Vaidyas.",
+    "address": "K-4A, Fatehtiba, Adarsh Nagar Road",
+    "city": "Jaipur",
+    "state": "Rajasthan",
     "country": "India",
-    "phone": "+91 135 2439800",
-    "email": "heal@himalayanhospital.com",
-    "website": "https://www.himalayanhospital.com",
-    "rating": "4.90",
-    "reviewCount": 312,
-    "yearsEstablished": 25,
-    "doctorsCount": 12,
+    "phone": "+91 9920844573",
+    "email": "contact@jaineyeclinicandhospital.com",
+    "website": "mrj-jaineye.com",
+    "rating": 4.2,
+    "reviewCount": 230,
+    "yearsEstablished": 14,
+    "doctorsCount": 4,
     "services": [
-      "Panchakarma",
-      "Detox Therapy",
-      "Abhyanga",
-      "Shirodhara",
-      "Nasya",
-      "Virechana",
       "Basti",
-      "Diabetes Care",
+      "PCOS Treatment",
+      "Abhyanga",
+      "Panchakarma",
       "Weight Management"
     ],
     "facilities": [
-      "Private Therapy Rooms",
       "Online Consultation",
-      "Pharmacy",
-      "Parking",
       "Accommodation",
-      "Diagnostic Support",
       "Cafeteria",
-      "Wellness Programs"
+      "Parking"
     ],
-    "openingHours": "Mon-Sun: 24 Hours Open (Emergency available)",
+    "openingHours": "Mon-Sat: 08:00 AM - 07:00 PM",
     "images": [
-      "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&q=80"
+      "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=80",
+      "https://images.unsplash.com/photo-1502740479091-6398b19db310?w=800&q=80"
     ],
-    "latitude": "30.13140000",
-    "longitude": "78.31500000",
-    "mission": "To offer complete therapeutic inpatient immersion merging ancient wisdom with modern diagnostic standards.",
-    "history": "Celebrating 25 years in Tapovan, we have hosted patients from over 60 countries for chronic joint and metabolic rehabilitation.",
+    "latitude": 26.9090904,
+    "longitude": 75.8244556,
+    "mission": "To guide individuals towards balance and long-term wellness using pure Ayurvedic therapies and holistic dietary coaching.",
+    "history": "Established to extend natural clinical therapies, our center in Jaipur has served hundreds of local and corporate patients.",
     "gallery": [
       {
-        "id": "gal-1",
-        "url": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&q=80",
-        "caption": "Inpatient Deluxe Suite"
+        "id": "gal-4-1",
+        "url": "https://images.unsplash.com/photo-1502740479091-6398b19db310?w=800&q=80",
+        "caption": "Luxury Therapy Suite"
+      },
+      {
+        "id": "gal-4-2",
+        "url": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=80",
+        "caption": "Consultation & Pulse Diagnosis"
       }
     ],
     "packages": [
       {
-        "id": "pkg-1",
-        "name": "Himalayan Ayurvedic Immersion",
-        "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80",
-        "price": 48000,
+        "id": "pkg-4-1",
+        "name": "Royal Panchakarma Cleansing",
+        "description": "Classic fivefold body detoxification with specialized oils and custom diets.",
+        "duration": "7 Days",
+        "price": 16000,
         "benefits": [
-          "Deep joint lubrication (Janu Basti)",
-          "Complete digestive tract reset",
-          "Hormonal alignment"
+          "Cellular purification",
+          "Rejuvenates Vata/Pitta flow"
         ],
-        "duration": "14 Days",
-        "description": "Complete luxury clinical inpatient stay with 2 therapy sessions daily, custom yoga classes, and organic doshic diet plans."
+        "image": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80"
       }
     ],
     "openingHoursList": [
       {
         "day": "Monday",
-        "hours": "24 Hours Open",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Tuesday",
-        "hours": "24 Hours Open",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Wednesday",
-        "hours": "24 Hours Open",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Thursday",
-        "hours": "24 Hours Open",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Friday",
-        "hours": "24 Hours Open",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Saturday",
-        "hours": "24 Hours Open",
+        "hours": "08:00 AM - 05:00 PM",
         "closed": false
       },
       {
         "day": "Sunday",
-        "hours": "24 Hours Open",
-        "closed": false
+        "hours": "Closed",
+        "closed": true
       }
     ]
   },
   {
     "id": "cl-5",
-    "name": "Jiva Ayurveda Clinic & Rejuvenation Center",
-    "logo": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=150&q=80",
-    "bannerImage": "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=800&q=80",
-    "type": "Ayurveda Clinic",
-    "description": "Jiva provides authentic consultations and natural remedies for chronic conditions. Our team of doctors assesses your Prakriti to resolve illnesses from their root causes.",
-    "address": "Sector 21C, Landmark Road",
-    "city": "Faridabad",
-    "state": "Haryana",
+    "name": "Rajendra Clinic",
+    "logo": "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=150&q=80",
+    "bannerImage": "https://images.unsplash.com/photo-1502740479091-6398b19db310?w=800&q=80",
+    "type": "Wellness Center",
+    "description": "A certified holistic healthcare center in Mumbai providing premium pulse diagnosis, organic decoctions compoundings, and customized therapies targeting systemic imbalances under the guidance of expert MD Vaidyas.",
+    "address": "Wadala Sewri Cross Road, Wadala West, Wadala, Mumbai",
+    "city": "Mumbai",
+    "state": "Maharashtra",
     "country": "India",
-    "phone": "+91 129 4040404",
-    "email": "info@jiva.com",
-    "website": "https://www.jiva.com",
-    "rating": "4.60",
-    "reviewCount": 420,
-    "yearsEstablished": 15,
-    "doctorsCount": 6,
+    "phone": "+91 9049865381",
+    "email": "contact@rajendraclinic.com",
+    "website": "https://www.rajendraclinic.com",
+    "rating": 4.6,
+    "reviewCount": 57,
+    "yearsEstablished": 16,
+    "doctorsCount": 5,
     "services": [
+      "Panchakarma",
       "Detox Therapy",
-      "Abhyanga",
-      "PCOS Treatment",
-      "Diabetes Care",
-      "Stress Management"
+      "Virechana",
+      "Stress Management",
+      "Nasya",
+      "Shirodhara",
+      "Weight Management"
     ],
     "facilities": [
-      "Private Therapy Rooms",
-      "Online Consultation",
-      "Pharmacy",
+      "Accommodation",
       "Parking",
-      "Wellness Programs"
+      "Wellness Programs",
+      "Diagnostic Support",
+      "Pharmacy",
+      "Online Consultation"
     ],
-    "openingHours": "Mon-Sat: 09:00 AM - 07:00 PM",
+    "openingHours": "Mon-Sat: 08:00 AM - 07:00 PM",
     "images": [
-      "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=600&q=80"
+      "https://images.unsplash.com/photo-1502740479091-6398b19db310?w=800&q=80",
+      "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=80"
     ],
-    "latitude": "28.41160000",
-    "longitude": "77.31550000",
-    "mission": "To digitize and standardize Ayurvedic consultations to ensure root cause healing reaches every household.",
-    "history": "Jiva is one of the largest clinic networks in Northern India, serving chronic patients since 2011.",
+    "latitude": 19.016482,
+    "longitude": 72.8533452,
+    "mission": "To guide individuals towards balance and long-term wellness using pure Ayurvedic therapies and holistic dietary coaching.",
+    "history": "Established to extend natural clinical therapies, our center in Mumbai has served hundreds of local and corporate patients.",
     "gallery": [
       {
-        "id": "gal-1",
-        "url": "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=600&q=80",
-        "caption": "Consultation & Pulse Center"
+        "id": "gal-5-1",
+        "url": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=80",
+        "caption": "Luxury Therapy Suite"
+      },
+      {
+        "id": "gal-5-2",
+        "url": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80",
+        "caption": "Consultation & Pulse Diagnosis"
       }
     ],
     "packages": [
       {
-        "id": "pkg-1",
-        "name": "Prakriti Balance Package",
-        "image": "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=600&q=80",
-        "price": 2500,
+        "id": "pkg-5-1",
+        "name": "Royal Panchakarma Cleansing",
+        "description": "Classic fivefold body detoxification with specialized oils and custom diets.",
+        "duration": "7 Days",
+        "price": 25000,
         "benefits": [
-          "Prakriti and Dosha analysis",
-          "Metabolic blueprint guidelines",
-          "Diet tracking schedules"
+          "Cellular purification",
+          "Rejuvenates Vata/Pitta flow"
         ],
-        "duration": "1 Day",
-        "description": "Personalized constitution analysis, diet guidance, and 30-day supply of organic herbal formulas."
+        "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80"
       }
     ],
     "openingHoursList": [
       {
         "day": "Monday",
-        "hours": "09:00 AM - 07:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Tuesday",
-        "hours": "09:00 AM - 07:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Wednesday",
-        "hours": "09:00 AM - 07:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Thursday",
-        "hours": "09:00 AM - 07:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Friday",
-        "hours": "09:00 AM - 07:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Saturday",
-        "hours": "09:00 AM - 07:00 PM",
+        "hours": "08:00 AM - 05:00 PM",
         "closed": false
       },
       {
@@ -650,201 +533,206 @@
   },
   {
     "id": "cl-6",
-    "name": "Somatheeram Ayurveda Village",
-    "logo": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=150&q=80",
-    "bannerImage": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+    "name": "Dr CV Hemlata Ayurvedic Clinic",
+    "logo": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=150&q=80",
+    "bannerImage": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=80",
     "type": "Panchakarma Center",
-    "description": "Somatheeram is the world’s first Ayurvedic resort, offering beautiful seaside cottages, yoga lessons, and complete Panchakarma programs in a pristine tropical landscape.",
-    "address": "Chowara, Kovalam",
-    "city": "Trivandrum",
-    "state": "Kerala",
+    "description": "A certified holistic healthcare center in Mumbai providing premium pulse diagnosis, organic decoctions compoundings, and customized therapies targeting systemic imbalances under the guidance of expert MD Vaidyas.",
+    "address": "Main Market Road, Mumbai",
+    "city": "Mumbai",
+    "state": "Maharashtra",
     "country": "India",
-    "phone": "+91 471 2266111",
-    "email": "mail@somatheeram.in",
-    "website": "https://www.somatheeram.in",
-    "rating": "4.90",
-    "reviewCount": 512,
-    "yearsEstablished": 30,
-    "doctorsCount": 15,
+    "phone": "+91 7466432499",
+    "email": "contact@drcvhemlataayurvedicclinic.com",
+    "website": "https://www.drcvhemlataayurvedicclinic.com",
+    "rating": 4.7,
+    "reviewCount": 222,
+    "yearsEstablished": 14,
+    "doctorsCount": 2,
     "services": [
-      "Panchakarma",
-      "Detox Therapy",
       "Abhyanga",
-      "Shirodhara",
-      "Nasya",
+      "Skin Care",
+      "Detox Therapy",
       "Virechana",
-      "Basti",
-      "Skin Care"
+      "Stress Management",
+      "Diabetes Care"
     ],
     "facilities": [
       "Private Therapy Rooms",
+      "Wellness Programs",
       "Online Consultation",
-      "Pharmacy",
-      "Parking",
-      "Accommodation",
-      "Diagnostic Support",
       "Cafeteria",
-      "Wellness Programs"
+      "Pharmacy"
     ],
-    "openingHours": "Mon-Sun: 07:00 AM - 09:00 PM",
+    "openingHours": "Mon-Sat: 08:00 AM - 07:00 PM",
     "images": [
-      "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80"
+      "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=80",
+      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80"
     ],
-    "latitude": "8.38460000",
-    "longitude": "76.97400000",
-    "mission": "To heal the world through seaside luxury wellness retreats and authentic classical Panchakarma routines.",
-    "history": "Established in 1990, Somatheeram is the world’s first Ayurvedic village, recognized repeatedly by governments and ministries for exports excellence.",
+    "latitude": 19.1301491,
+    "longitude": 72.821012,
+    "mission": "To guide individuals towards balance and long-term wellness using pure Ayurvedic therapies and holistic dietary coaching.",
+    "history": "Established to extend natural clinical therapies, our center in Mumbai has served hundreds of local and corporate patients.",
     "gallery": [
       {
-        "id": "gal-1",
-        "url": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80",
-        "caption": "Seaside Therapy Room"
+        "id": "gal-6-1",
+        "url": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80",
+        "caption": "Luxury Therapy Suite"
+      },
+      {
+        "id": "gal-6-2",
+        "url": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+        "caption": "Consultation & Pulse Diagnosis"
       }
     ],
     "packages": [
       {
-        "id": "pkg-1",
-        "name": "Seaside Purification program",
-        "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80",
-        "price": 35000,
-        "benefits": [
-          "Complete bodily purification",
-          "Stress relief & grounding",
-          "Cardiovascular stamina"
-        ],
+        "id": "pkg-6-1",
+        "name": "Royal Panchakarma Cleansing",
+        "description": "Classic fivefold body detoxification with specialized oils and custom diets.",
         "duration": "7 Days",
-        "description": "7 days of custom therapy, seaside cottage stay, dynamic yoga lessons, and custom organic meals."
+        "price": 15000,
+        "benefits": [
+          "Cellular purification",
+          "Rejuvenates Vata/Pitta flow"
+        ],
+        "image": "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=800&q=80"
       }
     ],
     "openingHoursList": [
       {
         "day": "Monday",
-        "hours": "07:00 AM - 09:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Tuesday",
-        "hours": "07:00 AM - 09:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Wednesday",
-        "hours": "07:00 AM - 09:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Thursday",
-        "hours": "07:00 AM - 09:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Friday",
-        "hours": "07:00 AM - 09:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Saturday",
-        "hours": "07:00 AM - 09:00 PM",
+        "hours": "08:00 AM - 05:00 PM",
         "closed": false
       },
       {
         "day": "Sunday",
-        "hours": "07:00 AM - 09:00 PM",
-        "closed": false
+        "hours": "Closed",
+        "closed": true
       }
     ]
   },
   {
     "id": "cl-7",
-    "name": "Ayurmana Spine & Joint Wellness Center",
-    "logo": "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=150&q=80",
+    "name": "Dr M S Jayaprakash Ayurvedic Clinic",
+    "logo": "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&q=80",
     "bannerImage": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80",
-    "type": "Holistic Healing Center",
-    "description": "Ayurmana is specialized in treating chronic spine stiffness, sciatica, arthritis, and orthopedic ailments using traditional herbal paste poultices and targeted local enemas (Basti).",
-    "address": "Kalyan Nagar, Outer Ring Road",
-    "city": "Bangalore",
-    "state": "Karnataka",
+    "type": "Panchakarma Center",
+    "description": "A certified holistic healthcare center in Mumbai providing premium pulse diagnosis, organic decoctions compoundings, and customized therapies targeting systemic imbalances under the guidance of expert MD Vaidyas.",
+    "address": "Main Market Road, Mumbai",
+    "city": "Mumbai",
+    "state": "Maharashtra",
     "country": "India",
-    "phone": "+91 80 25493800",
-    "email": "info@ayurmanabroad.com",
-    "website": "https://www.ayurmanaspine.com",
-    "rating": "4.80",
-    "reviewCount": 167,
-    "yearsEstablished": 12,
-    "doctorsCount": 5,
+    "phone": "+91 7702673920",
+    "email": "contact@drmsjayaprakashayurvedicclinic.com",
+    "website": "https://www.drmsjayaprakashayurvedicclinic.com",
+    "rating": 4.8,
+    "reviewCount": 79,
+    "yearsEstablished": 17,
+    "doctorsCount": 6,
     "services": [
       "Abhyanga",
+      "Skin Care",
       "Basti",
-      "Shirodhara",
-      "Stress Management"
+      "Detox Therapy"
     ],
     "facilities": [
-      "Private Therapy Rooms",
-      "Online Consultation",
-      "Pharmacy",
-      "Parking",
       "Diagnostic Support",
+      "Private Therapy Rooms",
+      "Parking",
+      "Pharmacy",
+      "Online Consultation",
       "Wellness Programs"
     ],
-    "openingHours": "Mon-Sat: 08:30 AM - 06:30 PM",
+    "openingHours": "Mon-Sat: 08:00 AM - 07:00 PM",
     "images": [
-      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80"
+      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80",
+      "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80"
     ],
-    "latitude": "12.97160000",
-    "longitude": "77.59460000",
-    "mission": "To deliver non-invasive orthotic joint care and muscular relief utilizing specialized classical local oil treatments.",
-    "history": "Founded in Bangalore in 2014, Ayurmana is a premier center for spine alignments and skeletal joint disorders.",
+    "latitude": 19.1301643,
+    "longitude": 72.8191961,
+    "mission": "To guide individuals towards balance and long-term wellness using pure Ayurvedic therapies and holistic dietary coaching.",
+    "history": "Established to extend natural clinical therapies, our center in Mumbai has served hundreds of local and corporate patients.",
     "gallery": [
       {
-        "id": "gal-1",
-        "url": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80",
-        "caption": "Spine & Joint Treatment Hall"
+        "id": "gal-7-1",
+        "url": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+        "caption": "Luxury Therapy Suite"
+      },
+      {
+        "id": "gal-7-2",
+        "url": "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=800&q=80",
+        "caption": "Consultation & Pulse Diagnosis"
       }
     ],
     "packages": [
       {
-        "id": "pkg-1",
-        "name": "Spine & Sciatica Rejuvenation",
-        "image": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&q=80",
-        "price": 15500,
+        "id": "pkg-7-1",
+        "name": "Royal Panchakarma Cleansing",
+        "description": "Classic fivefold body detoxification with specialized oils and custom diets.",
+        "duration": "7 Days",
+        "price": 24000,
         "benefits": [
-          "Numbness reversal",
-          "Spine flexibility restoration",
-          "Joint pain management"
+          "Cellular purification",
+          "Rejuvenates Vata/Pitta flow"
         ],
-        "duration": "5 Days",
-        "description": "Targeted Janu Basti, local oil pooling, herbal poultice massage (Patra Pinda Sveda), and custom lumbar stretches."
+        "image": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=80"
       }
     ],
     "openingHoursList": [
       {
         "day": "Monday",
-        "hours": "08:30 AM - 06:30 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Tuesday",
-        "hours": "08:30 AM - 06:30 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Wednesday",
-        "hours": "08:30 AM - 06:30 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Thursday",
-        "hours": "08:30 AM - 06:30 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Friday",
-        "hours": "08:30 AM - 06:30 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Saturday",
-        "hours": "08:30 AM - 06:30 PM",
+        "hours": "08:00 AM - 05:00 PM",
         "closed": false
       },
       {
@@ -856,203 +744,106 @@
   },
   {
     "id": "cl-8",
-    "name": "Atreya Ayurvedic Hospital",
-    "logo": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=150&q=80",
-    "bannerImage": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=80",
-    "type": "Ayurveda Hospital",
-    "description": "Atreya offers state-of-the-art clinical inpatient facilities. Specialized in metabolic syndrome care, skin disorders, and complete Panchakarma detox cycles managed by award-winning Vaidyas.",
-    "address": "Kothrud, Landmark Circle",
-    "city": "Pune",
+    "name": "Dr Nischint Jayaprakash Ayurvedic Clinic",
+    "logo": "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=150&q=80",
+    "bannerImage": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+    "type": "Wellness Center",
+    "description": "A certified holistic healthcare center in Mumbai providing premium pulse diagnosis, organic decoctions compoundings, and customized therapies targeting systemic imbalances under the guidance of expert MD Vaidyas.",
+    "address": "Main Market Road, Mumbai",
+    "city": "Mumbai",
     "state": "Maharashtra",
     "country": "India",
-    "phone": "+91 20 25438900",
-    "email": "pune@atreya.com",
-    "website": "https://www.atreyaayurveda.com",
-    "rating": "4.70",
-    "reviewCount": 142,
-    "yearsEstablished": 14,
-    "doctorsCount": 7,
+    "phone": "+91 9843177669",
+    "email": "contact@drnischintjayaprakashayurvedicclinic.com",
+    "website": "https://www.drnischintjayaprakashayurvedicclinic.com",
+    "rating": 4.3,
+    "reviewCount": 117,
+    "yearsEstablished": 12,
+    "doctorsCount": 6,
     "services": [
-      "Panchakarma",
-      "Detox Therapy",
-      "Virechana",
-      "Basti",
-      "Diabetes Care",
-      "Skin Care"
-    ],
-    "facilities": [
-      "Private Therapy Rooms",
-      "Online Consultation",
-      "Pharmacy",
-      "Parking",
-      "Accommodation",
-      "Diagnostic Support",
-      "Wellness Programs"
-    ],
-    "openingHours": "Mon-Sun: 24 Hours Open",
-    "images": [
-      "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&q=80"
-    ],
-    "latitude": "18.50740000",
-    "longitude": "73.80770000",
-    "mission": "To heal chronic ailments through medical board certifications and strict hospital diagnostics coupled with traditional Shodhana.",
-    "history": "A state-of-the-art medical Ayurvedic institution established in 2012 in Pune, offering 24/7 medical supervision.",
-    "gallery": [
-      {
-        "id": "gal-1",
-        "url": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&q=80",
-        "caption": "Clinical Ward & Therapy Block"
-      }
-    ],
-    "packages": [
-      {
-        "id": "pkg-1",
-        "name": "Clinical Skin Purification",
-        "image": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&q=80",
-        "price": 22000,
-        "benefits": [
-          "Pitta heat evacuation",
-          "Blood purification (Manjistha)",
-          "Silvery scale reduction"
-        ],
-        "duration": "10 Days",
-        "description": "For chronic psoriasis, eczema, and rashes. Incorporates custom Virechana purgation, organic blood purifiers, and cooling wraps."
-      }
-    ],
-    "openingHoursList": [
-      {
-        "day": "Monday",
-        "hours": "24 Hours Open",
-        "closed": false
-      },
-      {
-        "day": "Tuesday",
-        "hours": "24 Hours Open",
-        "closed": false
-      },
-      {
-        "day": "Wednesday",
-        "hours": "24 Hours Open",
-        "closed": false
-      },
-      {
-        "day": "Thursday",
-        "hours": "24 Hours Open",
-        "closed": false
-      },
-      {
-        "day": "Friday",
-        "hours": "24 Hours Open",
-        "closed": false
-      },
-      {
-        "day": "Saturday",
-        "hours": "24 Hours Open",
-        "closed": false
-      },
-      {
-        "day": "Sunday",
-        "hours": "24 Hours Open",
-        "closed": false
-      }
-    ]
-  },
-  {
-    "id": "cl-9",
-    "name": "Sanjeevani Wellness Center & Yoga Ashram",
-    "logo": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=150&q=80",
-    "bannerImage": "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=800&q=80",
-    "type": "Wellness Center",
-    "description": "Sanjeevani focuses on mental health restoration and yoga therapy. Combining daily pranayama, herbal oil drips, and constitutional diet plans to soothen adrenal exhaustion.",
-    "address": "Kanakapura Road, Valley View",
-    "city": "Bangalore",
-    "state": "Karnataka",
-    "country": "India",
-    "phone": "+91 80 28439900",
-    "email": "ashram@sanjeevani.org",
-    "website": "https://www.sanjeevaniayuryoga.org",
-    "rating": "4.80",
-    "reviewCount": 130,
-    "yearsEstablished": 16,
-    "doctorsCount": 4,
-    "services": [
-      "Shirodhara",
-      "Abhyanga",
       "Stress Management",
-      "Yoga Therapy"
+      "Abhyanga",
+      "Virechana",
+      "Skin Care",
+      "Detox Therapy"
     ],
     "facilities": [
+      "Accommodation",
       "Private Therapy Rooms",
       "Online Consultation",
       "Parking",
-      "Accommodation",
-      "Wellness Programs"
+      "Diagnostic Support"
     ],
-    "openingHours": "Mon-Sun: 06:00 AM - 08:00 PM",
+    "openingHours": "Mon-Sat: 08:00 AM - 07:00 PM",
     "images": [
-      "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=600&q=80"
+      "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+      "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=800&q=80"
     ],
-    "latitude": "12.89430000",
-    "longitude": "77.54580000",
-    "mission": "To promote mental tranquility and autonomic balance through yoga, meditation, and sensory calming routines.",
-    "history": "Set up in 2010 on a peaceful campus on Kanakapura road, Sanjeevani provides stress management for urban professionals.",
+    "latitude": 19.1301491,
+    "longitude": 72.8191318,
+    "mission": "To guide individuals towards balance and long-term wellness using pure Ayurvedic therapies and holistic dietary coaching.",
+    "history": "Established to extend natural clinical therapies, our center in Mumbai has served hundreds of local and corporate patients.",
     "gallery": [
       {
-        "id": "gal-1",
-        "url": "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=600&q=80",
-        "caption": "Ashram Meditation Hall"
+        "id": "gal-8-1",
+        "url": "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=800&q=80",
+        "caption": "Luxury Therapy Suite"
+      },
+      {
+        "id": "gal-8-2",
+        "url": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=80",
+        "caption": "Consultation & Pulse Diagnosis"
       }
     ],
     "packages": [
       {
-        "id": "pkg-1",
-        "name": "Vedic Mental Rejuvenation",
-        "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&q=80",
-        "price": 14000,
+        "id": "pkg-8-1",
+        "name": "Royal Panchakarma Cleansing",
+        "description": "Classic fivefold body detoxification with specialized oils and custom diets.",
+        "duration": "7 Days",
+        "price": 25000,
         "benefits": [
-          "Calms hyperactive Vata dosha",
-          "Enhances deep memory levels",
-          "Deep autonomic nervous reset"
+          "Cellular purification",
+          "Rejuvenates Vata/Pitta flow"
         ],
-        "duration": "5 Days",
-        "description": "Designed to relieve stress, combat burnout, and cure insomnia. Shirodhara drips, foot Abhyanga, and custom pranayama."
+        "image": "https://images.unsplash.com/photo-1502740479091-6398b19db310?w=800&q=80"
       }
     ],
     "openingHoursList": [
       {
         "day": "Monday",
-        "hours": "06:00 AM - 08:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Tuesday",
-        "hours": "06:00 AM - 08:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Wednesday",
-        "hours": "06:00 AM - 08:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Thursday",
-        "hours": "06:00 AM - 08:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Friday",
-        "hours": "06:00 AM - 08:00 PM",
+        "hours": "08:00 AM - 07:00 PM",
         "closed": false
       },
       {
         "day": "Saturday",
-        "hours": "06:00 AM - 08:00 PM",
+        "hours": "08:00 AM - 05:00 PM",
         "closed": false
       },
       {
         "day": "Sunday",
-        "hours": "06:00 AM - 08:00 PM",
-        "closed": false
+        "hours": "Closed",
+        "closed": true
       }
     ]
   }

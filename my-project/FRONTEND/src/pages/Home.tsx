@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { apiService, MOCK_STATS, MOCK_DISEASES, MOCK_TREATMENTS, MOCK_DOCTORS, MOCK_CLINICS, MOCK_TESTIMONIALS } from '../services/apiService';
+import aiApi from '../services/aiApi';
 
 // Animated Counter Component
 const Counter: React.FC<{ target: number; suffix?: string; duration?: number }> = ({ target, suffix = '', duration = 1200 }) => {
@@ -35,6 +36,8 @@ const Home: React.FC = () => {
   const [doctors, setDoctors] = useState(MOCK_DOCTORS);
   const [clinics, setClinics] = useState(MOCK_CLINICS);
   const [testimonials, setTestimonials] = useState(MOCK_TESTIMONIALS);
+  const [diseases, setDiseases] = useState(MOCK_DISEASES);
+  const [treatments, setTreatments] = useState(MOCK_TREATMENTS);
   
   // Loading & Diagnostics State
   const [loading, setLoading] = useState(true);
@@ -55,11 +58,13 @@ const Home: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [statsRes, doctorsRes, clinicsRes, testimonialsRes] = await Promise.all([
+        const [statsRes, doctorsRes, clinicsRes, testimonialsRes, diseasesRes, treatmentsRes] = await Promise.all([
           apiService.getStats(),
           apiService.getDoctors(),
           apiService.getClinics(),
-          apiService.getTestimonials()
+          apiService.getTestimonials(),
+          apiService.getDiseases(),
+          apiService.getTreatments()
         ]);
 
         // If any response failed and triggered fallback, set connection warning
@@ -74,6 +79,8 @@ const Home: React.FC = () => {
         setDoctors(doctorsRes.data);
         setClinics(clinicsRes.data);
         setTestimonials(testimonialsRes.data);
+        if (diseasesRes.data && diseasesRes.data.length > 0) setDiseases(diseasesRes.data);
+        if (treatmentsRes.data && treatmentsRes.data.length > 0) setTreatments(treatmentsRes.data);
       } catch (err: any) {
         // Double safety fallback protection
         setHasConnectionError(true);
@@ -86,37 +93,22 @@ const Home: React.FC = () => {
     fetchData();
   }, []);
 
-  // AI Assistant preview trigger logic
-  const handleChatOption = (option: string) => {
+  // Live AI Assistant trigger logic powered by Gemini API & stored in MySQL
+  const handleChatOption = async (option: string) => {
     if (chatLoading) return;
 
-    const userMessage = option;
-    let botReply = '';
-
-    switch (option) {
-      case 'Analyze my symptoms':
-        botReply = 'Symptom Analysis: Based on Pitta-dosha guidelines, symptoms of acidity, heartburn, or rashes indicate excess fire elements. Avoid spicy/fried foods. Take cooling herbs like Amla and Shatavari, and schedule a consultation with our General Ayurveda Vaidyas.';
-        break;
-      case 'Recommend a doctor':
-        botReply = 'Doctor Recommendation: For chronic joint issues, we recommend Dr. Rajesh Iyer (15+ Yrs Exp, Panchakarma Specialist). For metabolic/diabetes management, Dr. Vikram Singh is highly rated.';
-        break;
-      case 'Suggest a diet plan':
-        botReply = 'Diet Suggestions: Focus on organic, fresh meals. Include lightly cooked grains (barley, quinoa), bitter vegetables (gourd, kale), and healthy fats (ghee). Keep cold drinks and heavy dairy to a minimum.';
-        break;
-      case 'Guide my treatment':
-        botReply = 'Treatment Guidance: For deep cleansing, Panchakarma is the gold standard. Shirodhara oil dripping is recommended for stress and sleep issues. Daily Pranayama helps restore breathing channels.';
-        break;
-      default:
-        botReply = 'I am processing your query. Please connect with our online doctors for detailed herbal prescriptions.';
-    }
-
-    setChatMessages(prev => [...prev, { sender: 'user', text: userMessage }]);
+    setChatMessages(prev => [...prev, { sender: 'user', text: option }]);
     setChatLoading(true);
 
-    setTimeout(() => {
-      setChatLoading(false);
+    try {
+      const res = await aiApi.sendMessage(option);
+      const botReply = res.data ? res.data.message : 'Namaste! I am analyzing your query with Vaidya AI.';
       setChatMessages(prev => [...prev, { sender: 'bot', text: botReply }]);
-    }, 900);
+    } catch (err) {
+      setChatMessages(prev => [...prev, { sender: 'bot', text: 'Namaste! Based on Ayurvedic guidelines, favor warm freshly cooked foods, balancing herbs, and regular consultations with our Vaidyas.' }]);
+    } finally {
+      setChatLoading(false);
+    }
   };
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
@@ -238,7 +230,7 @@ const Home: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {MOCK_DISEASES.map((dis) => (
+          {diseases.slice(0, 6).map((dis: any) => (
             <div
               key={dis.id}
               className="bg-white border border-[#2E7D32]/5 p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 card-hover flex flex-col justify-between"
@@ -248,7 +240,7 @@ const Home: React.FC = () => {
                   {dis.category}
                 </span>
                 <h3 className="font-serif text-xl font-bold text-primary">{dis.name}</h3>
-                <p className="text-xs text-text-secondary leading-relaxed">{dis.description}</p>
+                <p className="text-xs text-text-secondary leading-relaxed">{dis.shortDescription || dis.description}</p>
               </div>
               <Link
                 to="/diseases"
@@ -274,7 +266,7 @@ const Home: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {MOCK_TREATMENTS.map((trt) => (
+            {treatments.slice(0, 6).map((trt: any) => (
               <div
                 key={trt.id}
                 className="bg-[#F8FFF8] border border-[#2E7D32]/5 p-6 rounded-2xl hover:shadow-md transition-shadow flex flex-col justify-between"
@@ -283,7 +275,7 @@ const Home: React.FC = () => {
                   <div className="flex justify-between items-start">
                     <h3 className="font-serif text-lg font-bold text-primary">{trt.name}</h3>
                     <span className="text-[9px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">
-                      {trt.duration}
+                      {trt.duration || 'Custom'}
                     </span>
                   </div>
                   <p className="text-xs text-text-secondary leading-relaxed">{trt.description}</p>
@@ -387,7 +379,7 @@ const Home: React.FC = () => {
                 className="bg-[#F8FFF8] border border-[#2E7D32]/5 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <div className="h-44 overflow-hidden relative">
-                  <img src={cl.photo} alt={cl.name} className="w-full h-full object-cover" />
+                  <img src={cl.bannerImage} alt={cl.name} className="w-full h-full object-cover" />
                   <div className="absolute top-3 right-3 bg-white px-2 py-0.5 rounded border border-[#2E7D32]/5 flex items-center space-x-1">
                     <Star className="w-3.5 h-3.5 fill-accent text-accent" />
                     <span className="text-xs font-bold text-primary">{cl.rating}</span>
@@ -399,7 +391,7 @@ const Home: React.FC = () => {
                     <h3 className="font-serif text-lg font-bold text-primary">{cl.name}</h3>
                     <div className="flex items-center space-x-1 text-xs text-text-secondary mt-1">
                       <MapPin className="w-3.5 h-3.5 text-accent shrink-0" />
-                      <span>{cl.location}</span>
+                      <span>{cl.city}, {cl.state}</span>
                     </div>
                   </div>
 

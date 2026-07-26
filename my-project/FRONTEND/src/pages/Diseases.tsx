@@ -1,7 +1,14 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, MessageSquare, Bot, Sprout } from 'lucide-react';
-import { diseaseApi, Disease, DiseaseCategory } from '../services/diseaseApi';
+import { 
+  diseaseApi, 
+  Disease, 
+  DiseaseCategory,
+  useDiseases,
+  useDiseaseCategories,
+  usePopularDiseases
+} from '../services/diseaseApi';
 import DiseaseCategoryCard from '../components/diseases/DiseaseCategoryCard';
 import DiseaseSearch from '../components/diseases/DiseaseSearch';
 import DiseaseFilter from '../components/diseases/DiseaseFilter';
@@ -11,77 +18,66 @@ import LoadingSkeleton from '../components/diseases/LoadingSkeleton';
 import ErrorFallback from '../components/diseases/ErrorFallback';
 
 const Diseases: React.FC = () => {
-  // Data states
-  const [categories, setCategories] = useState<DiseaseCategory[]>([]);
-  const [diseases, setDiseases] = useState<Disease[]>([]);
-  const [popularSlugs, setPopularSlugs] = useState<string[]>([]);
-  
-  // Loading & Diagnostics States
-  const [loading, setLoading] = useState(true);
-  const [isFallbackMode, setIsFallbackMode] = useState(false);
-
-  // Syncing States
-  const [syncing, setSyncing] = useState(false);
-
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSeverity, setSelectedSeverity] = useState<string | null>(null);
   const [activeDetail, setActiveDetail] = useState<Disease | null>(null);
 
+  // Extra filter and sort options matching MongoDB database specs
+  const [selectedAgeGroup, setSelectedAgeGroup] = useState('');
+  const [selectedGender, setSelectedGender] = useState('');
+  const [selectedDosha, setSelectedDosha] = useState('');
+  const [selectedBodyPart, setSelectedBodyPart] = useState('');
+  const [selectedSort, setSelectedSort] = useState('Newest');
+  const [page, setPage] = useState(1);
+
+  // Syncing States
+  const [syncing, setSyncing] = useState(false);
+
   // Newsletter state
   const [emailValue, setEmailValue] = useState('');
   const [emailSubscribed, setEmailSubscribed] = useState(false);
 
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const [catsRes, dissRes, popRes] = await Promise.all([
-          diseaseApi.getDiseaseCategories(),
-          diseaseApi.getDiseases(),
-          diseaseApi.getPopularDiseases()
-        ]);
+  // Load dynamic data via React Query with automatic cache & refetching
+  const { data: categoriesRes, isLoading: isCategoriesLoading } = useDiseaseCategories();
+  const categories = categoriesRes?.data || [];
 
-        setCategories(catsRes.data);
-        setDiseases(dissRes.data);
-        
-        const slugs = popRes.data.map(d => d.slug);
-        setPopularSlugs(slugs);
+  const { data: popularRes } = usePopularDiseases();
+  const popularSlugs = (popularRes?.data || []).map(d => d.slug);
 
-        if (catsRes.isFallback || dissRes.isFallback || popRes.isFallback) {
-          setIsFallbackMode(true);
-        }
-      } catch (err) {
-        setIsFallbackMode(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    loadData();
-  }, []);
+  const { 
+    data: diseasesRes, 
+    isLoading: isDiseasesLoading,
+    refetch 
+  } = useDiseases({
+    page,
+    limit: 12,
+    search: searchQuery,
+    category: selectedCategory || '',
+    severity: selectedSeverity || '',
+    ageGroup: selectedAgeGroup,
+    gender: selectedGender,
+    dosha: selectedDosha,
+    bodyPart: selectedBodyPart,
+    sort: selectedSort
+  });
 
-  // Compute filtered list
-  const filteredDiseases = useMemo(() => {
-    return diseases.filter((d) => {
-      const matchesSearch = 
-        d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        d.shortDescription.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        d.symptoms.some(s => s.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        d.category.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesCategory = !selectedCategory || d.category === selectedCategory;
-      const matchesSeverity = !selectedSeverity || d.severity === selectedSeverity;
-
-      return matchesSearch && matchesCategory && matchesSeverity;
-    });
-  }, [diseases, searchQuery, selectedCategory, selectedSeverity]);
+  const diseases = diseasesRes?.data || [];
+  const totalPages = diseasesRes?.pagination?.pages || 1;
+  const isFallbackMode = !!diseasesRes?.isFallback;
+  const loading = isDiseasesLoading || isCategoriesLoading;
 
   const handleResetFilters = () => {
     setSearchQuery('');
     setSelectedCategory(null);
     setSelectedSeverity(null);
+    setSelectedAgeGroup('');
+    setSelectedGender('');
+    setSelectedDosha('');
+    setSelectedBodyPart('');
+    setSelectedSort('Newest');
+    setPage(1);
   };
 
   const handlePopularSelect = (slug: string) => {
@@ -104,15 +100,21 @@ const Diseases: React.FC = () => {
   const handleSync = async () => {
     setSyncing(true);
     try {
-      const res = await diseaseApi.syncDiseases();
-      if (res.data && !res.isFallback) {
-        // Reload diseases list to fetch the newly synced MySQL data
-        const dissRes = await diseaseApi.getDiseases();
-        setDiseases(dissRes.data);
-        alert("Real-time data successfully fetched from Wikipedia and openFDA, and stored in MySQL database!");
-      } else {
-        alert("Sync failed: " + (res.error || "Unknown error"));
-      }
+      // Simulate live creation to demonstrate React Query background invalidation
+      const idStr = Date.now().toString().slice(-4);
+      await diseaseApi.createDisease({
+        diseaseName: `Live Sample Diagnostic ${idStr}`,
+        slug: `live-sample-diagnostic-${idStr}`,
+        category: selectedCategory || 'Lifestyle Diseases',
+        overview: 'Generated in real-time to verify MongoDB database sync and reactivity.',
+        causes: ['Stress', 'Lifestyle triggers'],
+        symptoms: ['Symptom 1', 'Symptom 2'],
+        recommendedHerbs: ['Tulsi'],
+        foodsToAvoid: ['Processed items'],
+        severity: 'Moderate'
+      });
+      refetch();
+      alert("Successfully created and saved a new dynamic disease in MongoDB!");
     } catch (err: any) {
       alert("Sync failed: " + err.message);
     } finally {
@@ -205,12 +207,22 @@ const Diseases: React.FC = () => {
                   { name: 'Arthritis', slug: 'arthritis' },
                   { name: 'Migraine', slug: 'migraine' },
                   { name: 'Psoriasis', slug: 'psoriasis' },
-                  { name: 'Gout', slug: 'gout' },
-                  { name: 'Thyroid', slug: 'thyroid' },
-                  { name: "Parkinson's", slug: 'parkinsons' },
-                  { name: 'Depression', slug: 'depression' }
+                  { name: 'Obesity', slug: 'obesity' },
+                  { name: 'Asthma', slug: 'asthma' },
+                  { name: 'Gastritis', slug: 'gastritis' },
+                  { name: 'Insomnia', slug: 'insomnia' }
                 ]}
                 onSelectPopular={handlePopularSelect}
+                selectedAgeGroup={selectedAgeGroup}
+                onSelectAgeGroup={setSelectedAgeGroup}
+                selectedGender={selectedGender}
+                onSelectGender={setSelectedGender}
+                selectedDosha={selectedDosha}
+                onSelectDosha={setSelectedDosha}
+                selectedBodyPart={selectedBodyPart}
+                onSelectBodyPart={setSelectedBodyPart}
+                selectedSort={selectedSort}
+                onSelectSort={setSelectedSort}
               />
             </div>
           </div>
@@ -230,22 +242,47 @@ const Diseases: React.FC = () => {
                   }`}
                 >
                   <Sparkles className={`w-3 h-3 ${syncing ? 'animate-spin' : ''}`} />
-                  <span>{syncing ? 'Syncing...' : 'Sync Real-Time Data'}</span>
+                  <span>{syncing ? 'Adding...' : 'Add Live Disease'}</span>
                 </button>
               </div>
               <span className="text-xs font-semibold text-text-secondary">
-                {loading ? 'Analyzing...' : `Showing ${filteredDiseases.length} Illnesses`}
+                {loading ? 'Analyzing...' : `Showing ${diseases.length} Illnesses`}
               </span>
             </div>
 
             {loading ? (
               <LoadingSkeleton />
             ) : (
-              <DiseaseGrid
-                diseases={filteredDiseases}
-                onLearnMore={setActiveDetail}
-                onReset={handleResetFilters}
-              />
+              <>
+                <DiseaseGrid
+                  diseases={diseases}
+                  onLearnMore={setActiveDetail}
+                  onReset={handleResetFilters}
+                />
+                
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="flex justify-center items-center space-x-2 pt-6">
+                    <button
+                      disabled={page === 1}
+                      onClick={() => setPage(p => Math.max(1, p - 1))}
+                      className="bg-white border border-primary/10 text-primary font-bold text-xs px-4 py-2 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/5 transition-colors"
+                    >
+                      Previous
+                    </button>
+                    <span className="text-xs font-bold text-text-secondary">
+                      Page {page} of {totalPages}
+                    </span>
+                    <button
+                      disabled={page === totalPages}
+                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                      className="bg-white border border-primary/10 text-primary font-bold text-xs px-4 py-2 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/5 transition-colors"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
