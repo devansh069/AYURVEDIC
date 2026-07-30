@@ -643,3 +643,87 @@ exports.updateAppointmentStatus = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error updating appointment status' });
   }
 };
+
+exports.logProgressPoint = async (req, res) => {
+  const patientId = req.headers['x-user-id'] || 'pat-123';
+  const { chartType, name, progress, target } = req.body;
+  const pool = getPool();
+
+  if (!chartType || !name || progress === undefined || target === undefined) {
+    return res.status(400).json({ success: false, message: 'chartType, name, progress, and target are required.' });
+  }
+
+  try {
+    const [rows] = await pool.query('SELECT * FROM patient_recovery_tracker WHERE patientId = ?', [patientId]);
+    
+    let tracker;
+    if (rows.length === 0) {
+      const defaultWeekly = [
+        { name: 'Wk 1', progress: 10, target: 15 },
+        { name: 'Wk 2', progress: 25, target: 30 }
+      ];
+      const defaultMonthly = [
+        { name: 'Apr', progress: 30, target: 40 }
+      ];
+      await pool.query(
+        `INSERT INTO patient_recovery_tracker (patientId, conditionName, progress, startDate, expectedCompletion, weeklyMetrics, monthlyMetrics)
+         VALUES (?, ?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 3 MONTH), ?, ?)`,
+        [patientId, 'PCOS & Metabolism Imbalance', parseInt(progress, 10), JSON.stringify(defaultWeekly), JSON.stringify(defaultMonthly)]
+      );
+      const [newRows] = await pool.query('SELECT * FROM patient_recovery_tracker WHERE patientId = ?', [patientId]);
+      tracker = newRows[0];
+    } else {
+      tracker = rows[0];
+    }
+
+    let weekly = typeof tracker.weeklyMetrics === 'string' ? JSON.parse(tracker.weeklyMetrics) : (tracker.weeklyMetrics || []);
+    let monthly = typeof tracker.monthlyMetrics === 'string' ? JSON.parse(tracker.monthlyMetrics) : (tracker.monthlyMetrics || []);
+
+    const newPoint = {
+      name,
+      progress: parseInt(progress, 10),
+      target: parseInt(target, 10)
+    };
+
+    if (chartType === 'weekly') {
+      const idx = weekly.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
+      if (idx !== -1) {
+        weekly[idx] = newPoint;
+      } else {
+        weekly.push(newPoint);
+      }
+      if (weekly.length > 8) weekly.shift();
+    } else {
+      const idx = monthly.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
+      if (idx !== -1) {
+        monthly[idx] = newPoint;
+      } else {
+        monthly.push(newPoint);
+      }
+      if (monthly.length > 6) monthly.shift();
+    }
+
+    const updatedProgress = parseInt(progress, 10);
+
+    await pool.query(
+      `UPDATE patient_recovery_tracker 
+       SET progress = ?, weeklyMetrics = ?, monthlyMetrics = ? 
+       WHERE patientId = ?`,
+      [updatedProgress, JSON.stringify(weekly), JSON.stringify(monthly), patientId]
+    );
+
+    res.json({
+      success: true,
+      message: 'Recovery progress logged successfully.',
+      data: {
+        condition: tracker.conditionName,
+        progress: updatedProgress,
+        weeklyMetrics: weekly,
+        monthlyMetrics: monthly
+      }
+    });
+  } catch (err) {
+    console.error('Error logging recovery progress:', err);
+    res.status(500).json({ success: false, message: 'Server error saving progress log' });
+  }
+};

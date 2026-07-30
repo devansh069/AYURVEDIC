@@ -269,6 +269,8 @@ const createTables = async () => {
     await conn.query(`
       CREATE TABLE IF NOT EXISTS patients (
         id VARCHAR(255) PRIMARY KEY,
+        googleId VARCHAR(255) UNIQUE,
+        loginProvider VARCHAR(50) DEFAULT 'local',
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         phone VARCHAR(50),
@@ -278,7 +280,7 @@ const createTables = async () => {
         city VARCHAR(255),
         doshaType VARCHAR(255) DEFAULT 'Pitta-Kapha',
         healthGoals JSON,
-        password VARCHAR(255) NOT NULL DEFAULT 'password',
+        password VARCHAR(255) NULL,
         joinedDate DATE
       )
     `);
@@ -422,6 +424,15 @@ const createTables = async () => {
     } catch (e) {}
     try {
       await conn.query("UPDATE doctors SET email = 'dr.arun@ayurvedaconnect.com', password = 'password' WHERE id = 'dr-1' AND email IS NULL");
+    } catch (e) {}
+    try {
+      await conn.query("ALTER TABLE patients MODIFY COLUMN password VARCHAR(255) NULL");
+    } catch (e) {}
+    try {
+      await conn.query("ALTER TABLE patients ADD COLUMN googleId VARCHAR(255) UNIQUE");
+    } catch (e) {}
+    try {
+      await conn.query("ALTER TABLE patients ADD COLUMN loginProvider VARCHAR(50) DEFAULT 'local'");
     } catch (e) {}
 
     console.log("✅ MySQL Database Tables verified/created.");

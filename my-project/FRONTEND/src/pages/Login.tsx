@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useGoogleLogin } from '@react-oauth/google';
 import { Mail, Lock, User, ShieldAlert, Sparkles, ArrowRight } from 'lucide-react';
 
 export const Login: React.FC = () => {
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, loginWithGoogleToken } = useAuth();
   const navigate = useNavigate();
 
   // Form states
@@ -47,29 +48,55 @@ export const Login: React.FC = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    const emailStr = prompt("Enter your Google Account email:", role === 'patient' ? "priyanshi@ayurvedaconnect.com" : "dr.arun@ayurvedaconnect.com");
-    if (!emailStr) return;
-    
-    setError(null);
-    setLoading(true);
-
-    try {
-      const result = await loginWithGoogle(emailStr, role);
-      if (result.success) {
-        if (role === 'patient') {
-          navigate('/dashboard');
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setError(null);
+      setLoading(true);
+      try {
+        const result = await loginWithGoogleToken(tokenResponse.access_token, role);
+        if (result.success) {
+          if (role === 'patient') {
+            navigate('/dashboard');
+          } else {
+            navigate('/doctor-dashboard');
+          }
         } else {
-          navigate('/doctor-dashboard');
+          setError(result.error || 'Google Login failed.');
         }
-      } else {
-        setError(result.error || 'Google Login failed.');
+      } catch (err) {
+        console.error(err);
+        setError('An error occurred during Google authentication.');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error(err);
-      setError('An error occurred during Google authentication.');
-    } finally {
-      setLoading(false);
+    },
+    onError: () => {
+      setError('Google sign-in was canceled or failed.');
+    }
+  });
+
+  const handleGoogleLogin = () => {
+    if (role === 'patient') {
+      googleLogin();
+    } else {
+      const emailStr = prompt("Enter your Google Account email:", "dr.arun@ayurvedaconnect.com");
+      if (!emailStr) return;
+      
+      setError(null);
+      setLoading(true);
+      loginWithGoogle(emailStr, role)
+        .then(result => {
+          if (result.success) {
+            navigate('/doctor-dashboard');
+          } else {
+            setError(result.error || 'Google Login failed.');
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          setError('An error occurred during Google authentication.');
+        })
+        .finally(() => setLoading(false));
     }
   };
 

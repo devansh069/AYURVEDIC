@@ -161,3 +161,148 @@ exports.signup = async (req, res, next) => {
     conn.release();
   }
 };
+
+const axios = require('axios');
+
+exports.googleLogin = async (req, res, next) => {
+  try {
+    const { idToken, accessToken } = req.body;
+    const token = accessToken || idToken;
+    if (!token) {
+      return res.status(400).json({ success: false, error: 'Google authentication token is required.' });
+    }
+
+    let googleUser;
+    try {
+      if (accessToken) {
+        // Access Token verification using userinfo endpoint
+        const googleRes = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        googleUser = googleRes.data;
+      } else {
+        // ID Token verification using tokeninfo endpoint
+        const googleRes = await axios.get(`https://oauth2.googleapis.com/tokeninfo?id_token=${idToken}`);
+        googleUser = googleRes.data;
+      }
+    } catch (err) {
+      console.error('Google token verification failed:', err.message);
+      return res.status(400).json({ success: false, error: 'Invalid Google token.' });
+    }
+
+    if (!googleUser || !googleUser.email) {
+      return res.status(400).json({ success: false, error: 'Invalid token payload received from Google.' });
+    }
+
+    const email = googleUser.email.toLowerCase();
+    const name = googleUser.name || 'Ayurvedic User';
+    const profilePhoto = googleUser.picture || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&q=80';
+    const googleId = googleUser.sub;
+
+    const pool = getPool();
+    const conn = await pool.getConnection();
+
+    try {
+      await conn.beginTransaction();
+
+      const [existing] = await conn.query(
+        'SELECT id, name, email, phone, age, gender, profilePhoto, city, doshaType, healthGoals, joinedDate FROM patients WHERE LOWER(email) = ? OR googleId = ?',
+        [email, googleId]
+      );
+
+      let patient;
+
+      if (existing.length > 0) {
+        patient = existing[0];
+        await conn.query(
+          `UPDATE patients SET googleId = ?, loginProvider = 'google', profilePhoto = COALESCE(profilePhoto, ?) WHERE id = ?`,
+          [googleId, profilePhoto, patient.id]
+        );
+        const [updatedRows] = await conn.query('SELECT * FROM patients WHERE id = ?', [patient.id]);
+        patient = updatedRows[0];
+      } else {
+        const patientId = `pat-${Date.now()}`;
+        const parsedGoals = ['PCOS Management', 'Stress Reduction'];
+        
+        await conn.query(
+          `INSERT INTO patients (id, googleId, loginProvider, name, email, password, age, gender, city, doshaType, healthGoals, profilePhoto, joinedDate) 
+           VALUES (?, ?, 'google', ?, ?, NULL, 25, 'Other', 'New Delhi', 'Pitta-Kapha', ?, ?, NOW())`,
+          [patientId, googleId, name, email, JSON.stringify(parsedGoals), profilePhoto]
+        );
+
+        await conn.query(
+          `INSERT INTO patient_wellness (patientId, dietAdherence, exerciseProgress, sleepQuality, waterIntake) 
+           VALUES (?, ?, ?, ?, ?)`,
+          [patientId, 85, 90, 80, 75]
+        );
+
+        const weeklyMetrics = JSON.stringify([
+          { name: 'Wk 1', progress: 10, target: 15 },
+          { name: 'Wk 2', progress: 25, target: 30 },
+          { name: 'Wk 3', progress: 42, target: 45 },
+          { name: 'Wk 4', progress: 55, target: 60 },
+          { name: 'Wk 5', progress: 62, target: 70 },
+          { name: 'Wk 6', progress: 72, target: 80 }
+        ]);
+        const monthlyMetrics = JSON.stringify([
+          { name: 'Apr', progress: 30, target: 40 },
+          { name: 'May', progress: 60, target: 70 },
+          { name: 'Jun', progress: 72, target: 80 }
+        ]);
+        await conn.query(
+          `INSERT INTO patient_recovery_tracker (patientId, progress, conditionName, startDate, expectedCompletion, weeklyMetrics, monthlyMetrics) 
+           VALUES (?, 72, 'PCOS & Metabolic Imbalance', NOW(), DATE_ADD(NOW(), INTERVAL 3 MONTH), ?, ?)`,
+          [patientId, weeklyMetrics, monthlyMetrics]
+        );
+
+        for (let i = 0; i < parsedGoals.length; i++) {
+          await conn.query(
+            `INSERT INTO patient_health_goals (id, patientId, title, progress, target) 
+             VALUES (?, ?, ?, ?, ?)`,
+            [`goal-${patientId}-${i}`, patientId, parsedGoals[i], 30, `Improve your health parameter for ${parsedGoals[i]}`]
+          );
+        }
+
+        await conn.query(
+          `INSERT INTO notifications (id, userId, role, title, message, date, type, readStatus) 
+           VALUES (?, ?, 'patient', 'Welcome to AyurVeda Connect', 'Your constitutional health profile is successfully registered via Google.', NOW(), 'Reminder', 0)`,
+          [`notif-welcome-${patientId}`, patientId]
+        );
+
+        await conn.query(
+          `INSERT INTO ai_chat_messages (id, patientId, sender, text, time) 
+           VALUES (?, ?, 'ai', ?, ?)`,
+          [
+            `msg-welcome-${patientId}`,
+            patientId,
+            `🙏 Namaste ${name}! I am your AI Ayurveda Health Advisor. How can I help you today? Ask me about Dosha analysis, diet recommendations, treatment suggestions, or general wellness guidance.`,
+            new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          ]
+        );
+
+        const [newRows] = await conn.query('SELECT * FROM patients WHERE id = ?', [patientId]);
+        patient = newRows[0];
+      }
+
+      await conn.commit();
+
+      res.json({
+        success: true,
+        data: {
+          role: 'patient',
+          profile: {
+            ...patient,
+            healthGoals: typeof patient.healthGoals === 'string' ? JSON.parse(patient.healthGoals) : (patient.healthGoals || [])
+          }
+        }
+      });
+    } catch (dbErr) {
+      await conn.rollback();
+      throw dbErr;
+    } finally {
+      conn.release();
+    }
+  } catch (err) {
+    next(err);
+  }
+};

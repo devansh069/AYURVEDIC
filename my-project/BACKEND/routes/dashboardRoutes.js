@@ -9,6 +9,7 @@ router.get('/patient/appointments', dashboardController.getAppointments);
 router.post('/patient/appointments/:id/cancel', dashboardController.cancelAppointment);
 router.post('/patient/appointments/:id/reschedule', dashboardController.rescheduleAppointment);
 router.get('/patient/recovery', dashboardController.getRecoveryProgress);
+router.post('/patient/recovery/log', dashboardController.logProgressPoint);
 router.post('/patient/wellness', dashboardController.updateWellness);
 router.get('/patient/diet', dashboardController.getDietPlan);
 router.post('/patient/diet', dashboardController.saveDietPlan);

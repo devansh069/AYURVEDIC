@@ -67,6 +67,16 @@ export const patientRecoveryApi = {
       console.error('Failed to update wellness indicators', err);
       return { success: false };
     }
+  },
+
+  logProgressPoint: async (point: { chartType: 'weekly' | 'monthly'; name: string; progress: number; target: number }): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await client.post('/patient/recovery/log', point, { headers: getAuthHeaders() });
+      return { success: response.data && response.data.success };
+    } catch (err: any) {
+      console.error('Failed to log recovery progress', err);
+      return { success: false, error: err.message };
+    }
   }
 };
 

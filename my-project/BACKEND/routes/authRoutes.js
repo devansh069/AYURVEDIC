@@ -189,6 +189,7 @@ const googleAuthHandler = async (req, res, next) => {
 // Route definitions
 router.post('/patient/login', patientAuthController.login);
 router.post('/patient/signup', patientAuthController.signup);
+router.post('/patient/google-login', patientAuthController.googleLogin);
 router.post('/doctor/login', doctorAuthController.login);
 router.post('/doctor/signup', doctorAuthController.signup);
 router.post('/google', googleAuthHandler);

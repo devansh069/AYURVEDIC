@@ -70,6 +70,15 @@ export const Dashboard: React.FC = () => {
   const [aiRecommendations, setAiRecommendations] = useState<AIRecommendation | null>(null);
   const [healthGoals, setHealthGoals] = useState<HealthGoal[]>([]);
 
+  // Recovery Log UI States
+  const [isLogModalOpen, setIsLogModalOpen] = useState(false);
+  const [logType, setLogType] = useState<'weekly' | 'monthly'>('weekly');
+  const [logName, setLogName] = useState('');
+  const [logProgress, setLogProgress] = useState(70);
+  const [logTarget, setLogTarget] = useState(80);
+  const [logSubmitting, setLogSubmitting] = useState(false);
+  const [logError, setLogError] = useState<string | null>(null);
+
   // UX Control States
   const [loading, setLoading] = useState(true);
   const [isFallback, setIsFallback] = useState(false);
@@ -156,9 +165,39 @@ export const Dashboard: React.FC = () => {
     fetchDashboardData();
   }, []);
 
-  // Update wellness index metrics
   const handleUpdateWellness = (updated: WellnessMetric) => {
     setWellness(updated);
+  };
+
+  const handleLogSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanLabel = logName.trim() || (logType === 'weekly' ? 'Wk ' + (weeklyMetrics.length + 1) : 'Month');
+    setLogError(null);
+    setLogSubmitting(true);
+    try {
+      const res = await patientRecoveryApi.logProgressPoint({
+        chartType: logType,
+        name: cleanLabel,
+        progress: logProgress,
+        target: logTarget
+      });
+      if (res.success) {
+        setIsLogModalOpen(false);
+        const recoveryRes = await patientRecoveryApi.getRecoveryProgress();
+        if (recoveryRes.data) {
+          setRecovery(recoveryRes.data);
+          setWeeklyMetrics(recoveryRes.data.weeklyMetrics || []);
+          setMonthlyMetrics(recoveryRes.data.monthlyMetrics || []);
+        }
+        setLogName('');
+      } else {
+        setLogError(res.error || 'Failed to save progress log.');
+      }
+    } catch (err: any) {
+      setLogError(err.message || 'An error occurred while saving.');
+    } finally {
+      setLogSubmitting(false);
+    }
   };
 
   // Submit appointment cancellation
@@ -388,11 +427,25 @@ export const Dashboard: React.FC = () => {
               </div>
 
               {/* Recovery curves */}
-              <RecoveryChart
-                weeklyData={weeklyMetrics}
-                monthlyData={monthlyMetrics}
-                condition={recovery?.condition || 'PCOS & Metabolism Care'}
-              />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2 text-primary font-bold text-xs uppercase tracking-wider">
+                    <Activity className="w-4 h-4 text-accent" />
+                    <span>Active Outcome Pathways</span>
+                  </div>
+                  <button
+                    onClick={() => { setIsLogModalOpen(true); setLogName('Wk ' + (weeklyMetrics.length + 1)); }}
+                    className="bg-primary/5 hover:bg-primary/10 text-primary border border-primary/10 font-bold text-[9.5px] uppercase tracking-wider px-3.5 py-1.5 rounded-xl transition-all shadow-sm flex items-center space-x-1 cursor-pointer"
+                  >
+                    <span>Log Recovery Progress</span>
+                  </button>
+                </div>
+                <RecoveryChart
+                  weeklyData={weeklyMetrics}
+                  monthlyData={monthlyMetrics}
+                  condition={recovery?.condition || 'PCOS & Metabolism Care'}
+                />
+              </div>
 
               {/* Wellness Summary trackers */}
               <WellnessCard 
@@ -453,7 +506,16 @@ export const Dashboard: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] uppercase font-bold text-text-secondary">Outcome Curves</span>
+                <button
+                  onClick={() => { setIsLogModalOpen(true); setLogName('Wk ' + (weeklyMetrics.length + 1)); }}
+                  className="bg-primary/5 hover:bg-primary/10 text-primary border border-primary/10 font-bold text-[9.5px] uppercase tracking-wider px-3.5 py-1.5 rounded-xl transition-all shadow-sm flex items-center space-x-1 cursor-pointer"
+                >
+                  <span>Log Recovery Progress</span>
+                </button>
+              </div>
               <RecoveryChart
                 weeklyData={weeklyMetrics}
                 monthlyData={monthlyMetrics}
@@ -761,6 +823,115 @@ export const Dashboard: React.FC = () => {
               <span>Member Account Created</span>
               <span className="text-primary">{patient.joinedDate}</span>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Log Progress Modal Overlay */}
+      {isLogModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-fade-in">
+          <div className="bg-[#FAF9F6] border border-[#2E7D32]/10 rounded-3xl w-full max-w-md p-6 md:p-8 space-y-6 shadow-2xl relative">
+            <button
+              onClick={() => setIsLogModalOpen(false)}
+              className="absolute top-4 right-4 text-text-secondary hover:text-primary font-bold text-base cursor-pointer"
+            >
+              ✕
+            </button>
+            <div className="space-y-1">
+              <span className="text-accent text-[9px] font-bold uppercase tracking-widest block font-sans">Patient Recovery Logging</span>
+              <h3 className="font-serif text-xl font-bold text-primary">Log Clinical Progress</h3>
+              <p className="text-[10px] text-text-secondary font-medium leading-relaxed">
+                Add an outcome data point to update your recovery tracker logs.
+              </p>
+            </div>
+            
+            {logError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-[11px] font-semibold">
+                ⚠️ {logError}
+              </div>
+            )}
+
+            <form onSubmit={handleLogSubmit} className="space-y-4 text-xs">
+              <div className="space-y-1.5">
+                <label className="block font-bold text-primary uppercase text-[8px] tracking-wider">Log Type</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => { setLogType('weekly'); setLogName('Wk ' + (weeklyMetrics.length + 1)); }}
+                    className={`py-2 rounded-xl font-bold border transition-all cursor-pointer ${
+                      logType === 'weekly'
+                        ? 'bg-primary text-white border-primary shadow-sm'
+                        : 'bg-white text-text-secondary border-gray-200 hover:border-primary/20'
+                    }`}
+                  >
+                    Weekly Log
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setLogType('monthly'); setLogName(''); }}
+                    className={`py-2 rounded-xl font-bold border transition-all cursor-pointer ${
+                      logType === 'monthly'
+                        ? 'bg-primary text-white border-primary shadow-sm'
+                        : 'bg-white text-text-secondary border-gray-200 hover:border-primary/20'
+                    }`}
+                  >
+                    Monthly Summary
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block font-bold text-primary uppercase text-[8px] tracking-wider">
+                  {logType === 'weekly' ? 'Week Label (e.g. Wk 7)' : 'Month Label (e.g. Jul)'}
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={logName}
+                  onChange={(e) => setLogName(e.target.value)}
+                  placeholder={logType === 'weekly' ? 'Wk 7' : 'Jul'}
+                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-primary font-semibold"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex justify-between font-bold text-primary uppercase text-[8px] tracking-wider">
+                  <span>Actual Progress</span>
+                  <span className="text-accent">{logProgress}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={logProgress}
+                  onChange={(e) => setLogProgress(parseInt(e.target.value))}
+                  className="w-full accent-primary cursor-pointer"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex justify-between font-bold text-primary uppercase text-[8px] tracking-wider">
+                  <span>Target Progress</span>
+                  <span className="text-accent">{logTarget}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={logTarget}
+                  onChange={(e) => setLogTarget(parseInt(e.target.value))}
+                  className="w-full accent-primary cursor-pointer"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={logSubmitting}
+                className="w-full bg-primary hover:bg-primary-light disabled:bg-primary/50 text-white font-bold py-3 rounded-xl shadow-md transition-all cursor-pointer mt-4"
+              >
+                {logSubmitting ? 'Logging Point...' : 'Save Log Entry'}
+              </button>
+            </form>
           </div>
         </div>
       )}

@@ -10,6 +10,7 @@ interface AuthContextType {
   login: (email: string, password: string, role: 'patient' | 'doctor') => Promise<{ success: boolean; error?: string }>;
   signup: (userData: any, password: string, role: 'patient' | 'doctor') => Promise<{ success: boolean; error?: string }>;
   loginWithGoogle: (email: string, role: 'patient' | 'doctor') => Promise<{ success: boolean; error?: string }>;
+  loginWithGoogleToken: (idToken: string, role: 'patient' | 'doctor') => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
@@ -176,6 +177,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const loginWithGoogleToken = async (idToken: string, role: 'patient' | 'doctor') => {
+    setLoading(true);
+    try {
+      const url = role === 'patient' 
+        ? 'http://localhost:5174/api/auth/patient/google-login'
+        : 'http://localhost:5174/api/auth/google';
+
+      const body = role === 'patient' ? { idToken, accessToken: idToken } : { email: 'dr.arun@ayurvedaconnect.com', role };
+
+      const response = await axios.post(url, body);
+
+      if (response.data && response.data.success) {
+        const { profile } = response.data.data;
+        setUser(profile);
+        setUserRole(role);
+        setIsAuthenticated(true);
+        localStorage.setItem(
+          'activeUser',
+          JSON.stringify({ role, profile })
+        );
+        setLoading(false);
+        return { success: true };
+      }
+      throw new Error('Google login failed');
+    } catch (err: any) {
+      setLoading(false);
+      return {
+        success: false,
+        error: err.response?.data?.error || 'Google login failed.'
+      };
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setUserRole(null);
@@ -184,7 +218,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, userRole, loading, login, signup, loginWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, userRole, loading, login, signup, loginWithGoogle, loginWithGoogleToken, logout }}>
       {children}
     </AuthContext.Provider>
   );
