@@ -182,9 +182,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const url = role === 'patient' 
         ? 'http://localhost:5174/api/auth/patient/google-login'
-        : 'http://localhost:5174/api/auth/google';
+        : 'http://localhost:5174/api/auth/doctor/google-login';
 
-      const body = role === 'patient' ? { idToken, accessToken: idToken } : { email: 'dr.arun@ayurvedaconnect.com', role };
+      const body = { idToken, accessToken: idToken };
 
       const response = await axios.post(url, body);
 

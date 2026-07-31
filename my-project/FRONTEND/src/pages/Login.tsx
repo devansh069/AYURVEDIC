@@ -76,28 +76,7 @@ export const Login: React.FC = () => {
   });
 
   const handleGoogleLogin = () => {
-    if (role === 'patient') {
-      googleLogin();
-    } else {
-      const emailStr = prompt("Enter your Google Account email:", "dr.arun@ayurvedaconnect.com");
-      if (!emailStr) return;
-      
-      setError(null);
-      setLoading(true);
-      loginWithGoogle(emailStr, role)
-        .then(result => {
-          if (result.success) {
-            navigate('/doctor-dashboard');
-          } else {
-            setError(result.error || 'Google Login failed.');
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          setError('An error occurred during Google authentication.');
-        })
-        .finally(() => setLoading(false));
-    }
+    googleLogin();
   };
 
   return (

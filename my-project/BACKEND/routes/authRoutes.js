@@ -192,6 +192,7 @@ router.post('/patient/signup', patientAuthController.signup);
 router.post('/patient/google-login', patientAuthController.googleLogin);
 router.post('/doctor/login', doctorAuthController.login);
 router.post('/doctor/signup', doctorAuthController.signup);
+router.post('/doctor/google-login', doctorAuthController.googleLogin);
 router.post('/google', googleAuthHandler);
 
 module.exports = router;

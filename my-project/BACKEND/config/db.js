@@ -102,6 +102,22 @@ const createTables = async () => {
       )
     `);
 
+    try {
+      await conn.query("ALTER TABLE doctors ADD COLUMN googleId VARCHAR(255) UNIQUE");
+    } catch (e) {
+      // Column already exists, ignore
+    }
+    try {
+      await conn.query("ALTER TABLE doctors ADD COLUMN loginProvider VARCHAR(50) DEFAULT 'local'");
+    } catch (e) {
+      // Column already exists, ignore
+    }
+    try {
+      await conn.query("ALTER TABLE doctors MODIFY COLUMN password VARCHAR(255) NULL");
+    } catch (e) {
+      // Ignore
+    }
+
     // clinics table
     await conn.query(`
       CREATE TABLE IF NOT EXISTS clinics (
