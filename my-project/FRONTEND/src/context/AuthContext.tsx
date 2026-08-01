@@ -10,7 +10,7 @@ interface AuthContextType {
   login: (email: string, password: string, role: 'patient' | 'doctor') => Promise<{ success: boolean; error?: string }>;
   signup: (userData: any, password: string, role: 'patient' | 'doctor') => Promise<{ success: boolean; error?: string }>;
   loginWithGoogle: (email: string, role: 'patient' | 'doctor') => Promise<{ success: boolean; error?: string }>;
-  loginWithGoogleToken: (idToken: string, role: 'patient' | 'doctor') => Promise<{ success: boolean; error?: string }>;
+  loginWithGoogleToken: (idToken: string, role: 'patient' | 'doctor') => Promise<{ success: boolean; code?: string; error?: string }>;
   logout: () => void;
 }
 
@@ -205,6 +205,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
       return {
         success: false,
+        code: err.response?.data?.code,
         error: err.response?.data?.error || 'Google login failed.'
       };
     }

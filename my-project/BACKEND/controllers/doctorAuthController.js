@@ -52,9 +52,12 @@ exports.login = async (req, res, next) => {
 exports.signup = async (req, res, next) => {
   try {
     const pool = getPool();
-    const { name, email, password, specialization, qualification, experience, city, state, clinicName } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({ success: false, error: 'Name, email, and password are required.' });
+    const { name, email, password, specialization, qualification, experience, city, state, clinicName, googleId, loginProvider, photo } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ success: false, error: 'Name and email are required.' });
+    }
+    if (loginProvider !== 'google' && !password) {
+      return res.status(400).json({ success: false, error: 'Password is required.' });
     }
 
     // Check if email already exists
@@ -64,19 +67,21 @@ exports.signup = async (req, res, next) => {
     }
 
     const doctorId = `doc-${Date.now()}`;
-    const defaultPhoto = `https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=256&q=80`;
+    const defaultPhoto = photo || `https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=256&q=80`;
 
     await pool.query(
       `INSERT INTO doctors (
-        id, name, email, password, specialization, qualification, experience, clinicName, city, state, photo,
+        id, googleId, loginProvider, name, email, password, specialization, qualification, experience, clinicName, city, state, photo,
         rating, reviewCount, consultationFee, onlineConsultationFee, languages, education, awards, specialExpertise,
         availability, successRate, patientsTreated, verified, onlineConsultation, offlineConsultation
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 5.0, 0, 500, 400, '["Hindi", "English"]', '[]', '[]', '[]', 'Mon-Fri (10:00 AM - 4:00 PM)', 95, 0, 1, 1, 1)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 5.0, 0, 500, 400, '["Hindi", "English"]', '[]', '[]', '[]', 'Mon-Fri (10:00 AM - 4:00 PM)', 95, 0, 1, 1, 1)`,
       [
         doctorId,
+        googleId || null,
+        loginProvider || 'local',
         name,
         email,
-        password,
+        password || null,
         specialization || 'General Ayurveda',
         qualification || 'BAMS',
         parseInt(experience, 10) || 2,
@@ -180,26 +185,12 @@ exports.googleLogin = async (req, res, next) => {
         );
         doctor = updatedRows[0];
       } else {
-        const doctorId = `doc-${Date.now()}`;
-        
-        await conn.query(
-          `INSERT INTO doctors (
-            id, googleId, loginProvider, name, email, password, specialization, qualification, experience, clinicName, city, state, photo,
-            rating, reviewCount, consultationFee, onlineConsultationFee, languages, education, awards, specialExpertise,
-            availability, successRate, patientsTreated, verified, onlineConsultation, offlineConsultation
-          ) VALUES (?, ?, 'google', ?, ?, NULL, 'General Ayurveda', 'BAMS', 5, 'Ayurveda Wellness Clinic', 'Jaipur', 'Rajasthan', ?, 5.0, 0, 500, 400, '["Hindi", "English"]', '[]', '[]', '[]', 'Mon-Fri (10:00 AM - 4:00 PM)', 95, 0, 1, 1, 1)`,
-          [doctorId, googleId, name, email, photo]
-        );
-
-        const [newRows] = await conn.query(
-          `SELECT id, name, email, googleId, loginProvider, specialization, qualification, experience, rating, reviewCount,
-                  fee, consultationFee, onlineConsultationFee, languages, clinicName, city, state, about,
-                  education, awards, specialExpertise, availability, successRate, patientsTreated, verified,
-                  onlineConsultation, offlineConsultation, photo
-           FROM doctors WHERE id = ?`,
-          [doctorId]
-        );
-        doctor = newRows[0];
+        await conn.rollback();
+        return res.status(404).json({
+          success: false,
+          code: 'USER_NOT_FOUND',
+          error: 'Account not found. Please sign up and register yourself first.'
+        });
       }
 
       await conn.commit();

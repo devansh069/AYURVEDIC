@@ -47,10 +47,14 @@ exports.signup = async (req, res, next) => {
   try {
     await conn.beginTransaction();
 
-    const { name, email, password, age, gender, city, doshaType, healthGoals } = req.body;
-    if (!name || !email || !password) {
+    const { name, email, password, age, gender, city, doshaType, healthGoals, googleId, loginProvider, profilePhoto } = req.body;
+    if (!name || !email) {
       await conn.rollback();
-      return res.status(400).json({ success: false, error: 'Name, email, and password are required.' });
+      return res.status(400).json({ success: false, error: 'Name and email are required.' });
+    }
+    if (loginProvider !== 'google' && !password) {
+      await conn.rollback();
+      return res.status(400).json({ success: false, error: 'Password is required.' });
     }
 
     // Check if email already exists
@@ -62,17 +66,19 @@ exports.signup = async (req, res, next) => {
 
     const patientId = `pat-${Date.now()}`;
     const parsedGoals = healthGoals || ['General Wellness'];
-    const photo = `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&q=80`;
+    const photo = profilePhoto || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&q=80`;
 
     // 1. Insert patient
     await conn.query(
-      `INSERT INTO patients (id, name, email, password, age, gender, city, doshaType, healthGoals, profilePhoto, joinedDate) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+      `INSERT INTO patients (id, googleId, loginProvider, name, email, password, age, gender, city, doshaType, healthGoals, profilePhoto, joinedDate) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
       [
         patientId,
+        googleId || null,
+        loginProvider || 'local',
         name,
         email,
-        password,
+        password || null,
         parseInt(age, 10) || 25,
         gender || 'Other',
         city || 'New Delhi',
@@ -221,67 +227,12 @@ exports.googleLogin = async (req, res, next) => {
         const [updatedRows] = await conn.query('SELECT * FROM patients WHERE id = ?', [patient.id]);
         patient = updatedRows[0];
       } else {
-        const patientId = `pat-${Date.now()}`;
-        const parsedGoals = ['PCOS Management', 'Stress Reduction'];
-        
-        await conn.query(
-          `INSERT INTO patients (id, googleId, loginProvider, name, email, password, age, gender, city, doshaType, healthGoals, profilePhoto, joinedDate) 
-           VALUES (?, ?, 'google', ?, ?, NULL, 25, 'Other', 'New Delhi', 'Pitta-Kapha', ?, ?, NOW())`,
-          [patientId, googleId, name, email, JSON.stringify(parsedGoals), profilePhoto]
-        );
-
-        await conn.query(
-          `INSERT INTO patient_wellness (patientId, dietAdherence, exerciseProgress, sleepQuality, waterIntake) 
-           VALUES (?, ?, ?, ?, ?)`,
-          [patientId, 85, 90, 80, 75]
-        );
-
-        const weeklyMetrics = JSON.stringify([
-          { name: 'Wk 1', progress: 10, target: 15 },
-          { name: 'Wk 2', progress: 25, target: 30 },
-          { name: 'Wk 3', progress: 42, target: 45 },
-          { name: 'Wk 4', progress: 55, target: 60 },
-          { name: 'Wk 5', progress: 62, target: 70 },
-          { name: 'Wk 6', progress: 72, target: 80 }
-        ]);
-        const monthlyMetrics = JSON.stringify([
-          { name: 'Apr', progress: 30, target: 40 },
-          { name: 'May', progress: 60, target: 70 },
-          { name: 'Jun', progress: 72, target: 80 }
-        ]);
-        await conn.query(
-          `INSERT INTO patient_recovery_tracker (patientId, progress, conditionName, startDate, expectedCompletion, weeklyMetrics, monthlyMetrics) 
-           VALUES (?, 72, 'PCOS & Metabolic Imbalance', NOW(), DATE_ADD(NOW(), INTERVAL 3 MONTH), ?, ?)`,
-          [patientId, weeklyMetrics, monthlyMetrics]
-        );
-
-        for (let i = 0; i < parsedGoals.length; i++) {
-          await conn.query(
-            `INSERT INTO patient_health_goals (id, patientId, title, progress, target) 
-             VALUES (?, ?, ?, ?, ?)`,
-            [`goal-${patientId}-${i}`, patientId, parsedGoals[i], 30, `Improve your health parameter for ${parsedGoals[i]}`]
-          );
-        }
-
-        await conn.query(
-          `INSERT INTO notifications (id, userId, role, title, message, date, type, readStatus) 
-           VALUES (?, ?, 'patient', 'Welcome to AyurVeda Connect', 'Your constitutional health profile is successfully registered via Google.', NOW(), 'Reminder', 0)`,
-          [`notif-welcome-${patientId}`, patientId]
-        );
-
-        await conn.query(
-          `INSERT INTO ai_chat_messages (id, patientId, sender, text, time) 
-           VALUES (?, ?, 'ai', ?, ?)`,
-          [
-            `msg-welcome-${patientId}`,
-            patientId,
-            `🙏 Namaste ${name}! I am your AI Ayurveda Health Advisor. How can I help you today? Ask me about Dosha analysis, diet recommendations, treatment suggestions, or general wellness guidance.`,
-            new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          ]
-        );
-
-        const [newRows] = await conn.query('SELECT * FROM patients WHERE id = ?', [patientId]);
-        patient = newRows[0];
+        await conn.rollback();
+        return res.status(404).json({
+          success: false,
+          code: 'USER_NOT_FOUND',
+          error: 'Account not found. Please sign up and register yourself first.'
+        });
       }
 
       await conn.commit();

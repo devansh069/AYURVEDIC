@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useGoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 import { Mail, Lock, User, Phone, MapPin, Briefcase, Award, Sparkles, ShieldCheck, ShieldAlert, Heart, Calendar } from 'lucide-react';
 
 export const Signup: React.FC = () => {
@@ -14,6 +16,11 @@ export const Signup: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  // Google sign up states
+  const [googleId, setGoogleId] = useState<string | null>(null);
+  const [loginProvider, setLoginProvider] = useState<'local' | 'google'>('local');
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
 
   // Patient Specific States
   const [age, setAge] = useState('');
@@ -32,20 +39,57 @@ export const Signup: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const googleSignup = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setError(null);
+      setLoading(true);
+      try {
+        const userInfoRes = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+        });
+        const googleUser = userInfoRes.data;
+        if (googleUser && googleUser.email) {
+          setName(googleUser.name || '');
+          setEmail(googleUser.email);
+          setGoogleId(googleUser.sub);
+          setProfilePhoto(googleUser.picture || null);
+          setLoginProvider('google');
+          alert('Google account authenticated! Please complete the remaining profile details below and click Sign Up to create your account.');
+        } else {
+          setError('Failed to fetch user info from Google.');
+        }
+      } catch (err) {
+        console.error(err);
+        setError('An error occurred during Google authentication.');
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => {
+      setError('Google sign-up was canceled or failed.');
+    }
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
+    const isGoogle = loginProvider === 'google';
+
     // Validation
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email) {
       setError('Please fill in all common required fields.');
       return;
     }
-    if (password !== confirmPassword) {
+    if (!isGoogle && (!password || !confirmPassword)) {
+      setError('Please fill in all common required fields.');
+      return;
+    }
+    if (!isGoogle && password !== confirmPassword) {
       setError('Passwords do not match.');
       return;
     }
-    if (password.length < 6) {
+    if (!isGoogle && password.length < 6) {
       setError('Password must be at least 6 characters long.');
       return;
     }
@@ -53,7 +97,14 @@ export const Signup: React.FC = () => {
     setLoading(true);
 
     try {
-      let userData: any = { name, email, phone };
+      let userData: any = { 
+        name, 
+        email, 
+        phone, 
+        googleId, 
+        loginProvider, 
+        profilePhoto 
+      };
       if (role === 'patient') {
         userData = {
           ...userData,
@@ -74,7 +125,7 @@ export const Signup: React.FC = () => {
         };
       }
 
-      const result = await signup(userData, password, role);
+      const result = await signup(userData, isGoogle ? '' : password, role);
       if (result.success) {
         if (role === 'patient') {
           navigate('/dashboard');
@@ -154,6 +205,30 @@ export const Signup: React.FC = () => {
               </div>
             </div>
 
+            {/* Google Sign Up Button */}
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={() => googleSignup()}
+                className="w-full bg-white hover:bg-gray-50 border border-gray-200 text-gray-600 font-bold text-xs py-3.5 rounded-xl shadow-sm transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer"
+              >
+                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
+                  <path fill="#EA4335" d="M12 5.04c1.62 0 3.08.56 4.22 1.65l3.15-3.15C17.45 1.74 14.93 1 12 1 7.35 1 3.4 3.65 1.5 7.5l3.86 3C6.35 7.55 8.94 5.04 12 5.04z" />
+                  <path fill="#4285F4" d="M23.49 12.27c0-.82-.07-1.61-.21-2.38H12v4.51h6.44c-.28 1.48-1.11 2.73-2.36 3.58l3.66 2.84c2.14-1.97 3.39-4.87 3.39-8.55z" />
+                  <path fill="#FBBC05" d="M5.36 14.5c-.24-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29L1.5 7.06C.54 8.98 0 11.12 0 13.37s.54 4.39 1.5 6.31l3.86-3.18z" />
+                  <path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.91l-3.66-2.84c-1.01.68-2.31 1.09-4.3 1.09-3.06 0-5.65-2.51-6.64-5.46L1.5 16.06C3.4 19.91 7.35 22.5 12 22.5z" />
+                </svg>
+                <span>Sign up with Google</span>
+              </button>
+
+              <div className="relative flex items-center justify-center my-4">
+                <div className="border-t border-gray-150 w-full"></div>
+                <span className="absolute bg-[#FAF9F6] px-3 text-[10px] uppercase font-bold text-gray-400">
+                  Or Fill Details Manually
+                </span>
+              </div>
+            </div>
+
             {/* Form Fields Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               
@@ -227,36 +302,43 @@ export const Signup: React.FC = () => {
                 </div>
 
                 {/* Password Fields */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label htmlFor="pass" className="block text-[9.5px] uppercase font-bold text-text-secondary">
-                      Password
-                    </label>
-                    <input
-                      id="pass"
-                      type="password"
-                      required
-                      placeholder="min. 6 chars"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-[#FAF9F6] border border-gray-150 rounded-xl px-4 py-2.5 text-xs text-text-primary font-semibold outline-none focus:border-primary focus:bg-white transition-all"
-                    />
+                {loginProvider === 'google' ? (
+                  <div className="bg-[#2E7D32]/5 border border-[#2E7D32]/10 p-3.5 rounded-xl text-[10.5px] text-[#2E7D32] leading-relaxed font-semibold flex items-center space-x-2">
+                    <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
+                    <span>Authenticated via Google ({email}). Password is not required.</span>
                   </div>
-                  <div className="space-y-1">
-                    <label htmlFor="confPass" className="block text-[9.5px] uppercase font-bold text-text-secondary">
-                      Confirm Pass
-                    </label>
-                    <input
-                      id="confPass"
-                      type="password"
-                      required
-                      placeholder="••••••••"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full bg-[#FAF9F6] border border-gray-150 rounded-xl px-4 py-2.5 text-xs text-text-primary font-semibold outline-none focus:border-primary focus:bg-white transition-all"
-                    />
+                ) : (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label htmlFor="pass" className="block text-[9.5px] uppercase font-bold text-text-secondary">
+                        Password
+                      </label>
+                      <input
+                        id="pass"
+                        type="password"
+                        required
+                        placeholder="min. 6 chars"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full bg-[#FAF9F6] border border-gray-150 rounded-xl px-4 py-2.5 text-xs text-text-primary font-semibold outline-none focus:border-primary focus:bg-white transition-all"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label htmlFor="confPass" className="block text-[9.5px] uppercase font-bold text-text-secondary">
+                        Confirm Pass
+                      </label>
+                      <input
+                        id="confPass"
+                        type="password"
+                        required
+                        placeholder="••••••••"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="w-full bg-[#FAF9F6] border border-gray-150 rounded-xl px-4 py-2.5 text-xs text-text-primary font-semibold outline-none focus:border-primary focus:bg-white transition-all"
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
 
               </div>
 

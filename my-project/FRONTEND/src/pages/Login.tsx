@@ -61,7 +61,12 @@ export const Login: React.FC = () => {
             navigate('/doctor-dashboard');
           }
         } else {
-          setError(result.error || 'Google Login failed.');
+          if (result.code === 'USER_NOT_FOUND') {
+            alert('Account not found. Please sign up and register yourself first.');
+            navigate('/signup');
+          } else {
+            setError(result.error || 'Google Login failed.');
+          }
         }
       } catch (err) {
         console.error(err);
