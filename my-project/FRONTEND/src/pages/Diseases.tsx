@@ -106,7 +106,7 @@ const Diseases: React.FC = () => {
         diseaseName: `Live Sample Diagnostic ${idStr}`,
         slug: `live-sample-diagnostic-${idStr}`,
         category: selectedCategory || 'Lifestyle Diseases',
-        overview: 'Generated in real-time to verify MongoDB database sync and reactivity.',
+        overview: 'Generated in real-time to verify MySQL database sync and reactivity.',
         causes: ['Stress', 'Lifestyle triggers'],
         symptoms: ['Symptom 1', 'Symptom 2'],
         recommendedHerbs: ['Tulsi'],
@@ -114,7 +114,7 @@ const Diseases: React.FC = () => {
         severity: 'Moderate'
       });
       refetch();
-      alert("Successfully created and saved a new dynamic disease in MongoDB!");
+      alert("Successfully created and saved a new dynamic disease in MySQL!");
     } catch (err: any) {
       alert("Sync failed: " + err.message);
     } finally {
@@ -201,17 +201,10 @@ const Diseases: React.FC = () => {
                 onSelectCategory={setSelectedCategory}
                 selectedSeverity={selectedSeverity}
                 onSelectSeverity={setSelectedSeverity}
-                popularDiseases={[
-                  { name: 'Diabetes', slug: 'diabetes' },
-                  { name: 'PCOS', slug: 'pcos' },
-                  { name: 'Arthritis', slug: 'arthritis' },
-                  { name: 'Migraine', slug: 'migraine' },
-                  { name: 'Psoriasis', slug: 'psoriasis' },
-                  { name: 'Obesity', slug: 'obesity' },
-                  { name: 'Asthma', slug: 'asthma' },
-                  { name: 'Gastritis', slug: 'gastritis' },
-                  { name: 'Insomnia', slug: 'insomnia' }
-                ]}
+                popularDiseases={(popularRes?.data || []).map((d: any) => ({
+                  name: d.diseaseName || d.name || '',
+                  slug: d.slug
+                }))}
                 onSelectPopular={handlePopularSelect}
                 selectedAgeGroup={selectedAgeGroup}
                 onSelectAgeGroup={setSelectedAgeGroup}

@@ -161,7 +161,7 @@ export const Login: React.FC = () => {
                   type="email"
                   required
                   placeholder={
-                    role === 'patient' ? 'priyanshi@ayurvedaconnect.com' : 'dr.arun@ayurvedaconnect.com'
+                    role === 'patient' ? 'client@ayurvedaconnect.com' : 'doctor@ayurvedaconnect.com'
                   }
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -256,12 +256,7 @@ export const Login: React.FC = () => {
             </button>
           </form>
 
-          {/* Quick Demo Info Alert */}
-          <div className="mt-6 bg-[#2E7D32]/5 border border-[#2E7D32]/10 p-3.5 rounded-xl text-[10.5px] text-text-secondary leading-relaxed font-semibold">
-            <span className="text-primary font-bold block mb-1">💡 Demo Accounts:</span>
-            Patient: <code className="bg-[#FAF9F6] px-1 py-0.5 rounded text-primary border border-primary/10">priyanshi@ayurvedaconnect.com</code> / password: <code className="bg-[#FAF9F6] px-1 py-0.5 rounded text-primary border border-primary/10">password</code><br/>
-            Doctor: <code className="bg-[#FAF9F6] px-1 py-0.5 rounded text-primary border border-primary/10">dr.arun@ayurvedaconnect.com</code> / password: <code className="bg-[#FAF9F6] px-1 py-0.5 rounded text-primary border border-primary/10">password</code>
-          </div>
+
         </div>
 
         {/* Redirect to Signup */}

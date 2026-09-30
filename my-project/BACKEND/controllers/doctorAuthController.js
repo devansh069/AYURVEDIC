@@ -52,7 +52,24 @@ exports.login = async (req, res, next) => {
 exports.signup = async (req, res, next) => {
   try {
     const pool = getPool();
-    const { name, email, password, specialization, qualification, experience, city, state, clinicName, googleId, loginProvider, photo } = req.body;
+    const { 
+      name, 
+      email, 
+      password, 
+      specialization, 
+      qualification, 
+      experience, 
+      city, 
+      state, 
+      clinicName, 
+      googleId, 
+      loginProvider, 
+      photo,
+      about,
+      education,
+      awards,
+      specialExpertise
+    } = req.body;
     if (!name || !email) {
       return res.status(400).json({ success: false, error: 'Name and email are required.' });
     }
@@ -69,12 +86,41 @@ exports.signup = async (req, res, next) => {
     const doctorId = `doc-${Date.now()}`;
     const defaultPhoto = photo || `https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=256&q=80`;
 
+    // Smart Ayurvedic professional defaults if not explicitly provided
+    const cleanName = name.replace(/^Dr\.\s*/i, '');
+    const defaultAbout = about && about.trim().length > 0 
+      ? about.trim() 
+      : `Dr. ${cleanName} is a certified Ayurvedic practitioner specializing in ${specialization || 'Ayurvedic Medicine'} with over ${experience || 5} years of clinical practice in classical healing, Nadi Pariksha diagnosis, and personalized herbal regimens.`;
+
+    const defaultEducation = (Array.isArray(education) && education.length > 0)
+      ? education 
+      : [
+          `${qualification || 'BAMS'} - Accredited Ayurvedic Medical College`,
+          `Clinical Specialization in ${specialization || 'Internal Medicine'}`
+        ];
+
+    const defaultAwards = (Array.isArray(awards) && awards.length > 0)
+      ? awards 
+      : [
+          'AYUSH Central Council Registered Practitioner',
+          'Excellence in Holistic Patient Care'
+        ];
+
+    const defaultExpertise = (Array.isArray(specialExpertise) && specialExpertise.length > 0)
+      ? specialExpertise 
+      : [
+          'Nadi Pariksha (Pulse Diagnosis)',
+          `${specialization || 'Ayurvedic Therapy'}`,
+          'Panchakarma Detoxification',
+          'Constitutional Diet & Lifestyle (Pathya)'
+        ];
+
     await pool.query(
       `INSERT INTO doctors (
         id, googleId, loginProvider, name, email, password, specialization, qualification, experience, clinicName, city, state, photo,
-        rating, reviewCount, consultationFee, onlineConsultationFee, languages, education, awards, specialExpertise,
+        rating, reviewCount, consultationFee, onlineConsultationFee, languages, education, awards, specialExpertise, about,
         availability, successRate, patientsTreated, verified, onlineConsultation, offlineConsultation
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 5.0, 0, 500, 400, '["Hindi", "English"]', '[]', '[]', '[]', 'Mon-Fri (10:00 AM - 4:00 PM)', 95, 0, 1, 1, 1)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 5.0, 0, 500, 400, '["Hindi", "English"]', ?, ?, ?, ?, 'Mon-Fri (10:00 AM - 4:00 PM)', 95, 0, 1, 1, 1)`,
       [
         doctorId,
         googleId || null,
@@ -84,11 +130,15 @@ exports.signup = async (req, res, next) => {
         password || null,
         specialization || 'General Ayurveda',
         qualification || 'BAMS',
-        parseInt(experience, 10) || 2,
+        parseInt(experience, 10) || 5,
         clinicName || 'Ayurveda Wellness Clinic',
         city || 'Jaipur',
         state || 'Rajasthan',
-        defaultPhoto
+        defaultPhoto,
+        JSON.stringify(defaultEducation),
+        JSON.stringify(defaultAwards),
+        JSON.stringify(defaultExpertise),
+        defaultAbout
       ]
     );
 

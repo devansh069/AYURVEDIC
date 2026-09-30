@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 import { 
   Calendar, 
@@ -91,8 +91,8 @@ export const Dashboard: React.FC = () => {
     {
       id: '1',
       sender: 'ai',
-      text: 'Namaste Priyanshi. I am your Vaidya AI Assistant. I see we are balancing a Pitta-Kapha dosha today. How can I assist you with your PCOS management, diet plans, or herbal decoctions?',
-      time: '02:52 PM'
+      text: 'Namaste! I am your Vaidya AI Assistant. How can I assist you with your personalized Ayurvedic diet, wellness plan, or dosha guidance today?',
+      time: 'Just now'
     }
   ]);
   const [chatInput, setChatInput] = useState('');
@@ -301,13 +301,45 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  if (loading || !patient || !wellness || !aiRecommendations) {
+  if (loading) {
     return <LoadingSkeleton />;
+  }
+
+  if (!patient) {
+    return (
+      <div className="min-h-[75vh] flex items-center justify-center bg-[#FAF9F6] px-4 py-12">
+        <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-xl border border-primary/10 text-center space-y-6">
+          <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto text-3xl">
+            🌿
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-text-primary">Patient Portal Access</h2>
+            <p className="text-xs text-text-secondary mt-2 leading-relaxed font-medium">
+              Please sign in or create an account to view your live health metrics, Dosha analysis, personalized diet plans, and medical records in real time.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3 pt-2">
+            <Link
+              to="/login"
+              className="w-full bg-primary hover:bg-primary-light text-white py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase transition-all shadow-md shadow-primary/20"
+            >
+              Sign In to Patient Portal
+            </Link>
+            <Link
+              to="/signup"
+              className="w-full bg-[#FAF9F6] hover:bg-gray-100 text-text-primary py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase transition-all border border-gray-200"
+            >
+              Create Real Account
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Active Count Metrics
   const activeAppointmentsCount = appointments.filter(a => a.status === 'Confirmed' || a.status === 'Pending').length;
-  const completedTreatmentsCount = appointments.filter(a => a.status === 'Completed').length || 1;
+  const completedTreatmentsCount = appointments.filter(a => a.status === 'Completed').length || 0;
 
   return (
     <DashboardLayout
@@ -355,7 +387,7 @@ export const Dashboard: React.FC = () => {
                 <div className="w-px h-8 bg-white/20" />
                 <div className="text-left text-xs">
                   <span className="text-white/60 text-[9px] uppercase font-bold block">Goal Status</span>
-                  <strong className="text-white text-sm font-black">72% Progress</strong>
+                  <strong className="text-white text-sm font-black">{recovery?.progress ? `${recovery.progress}% Progress` : 'In Progress'}</strong>
                 </div>
               </div>
             </div>
@@ -373,10 +405,10 @@ export const Dashboard: React.FC = () => {
             />
             <StatCard
               title="Active Recovery Program"
-              value="1 Program"
+              value={recovery ? "1 Active Plan" : "0 Active Plans"}
               icon={Activity}
               color="from-blue-500/10 to-indigo-500/10 text-blue-700 border-blue-500/20"
-              description={recovery?.condition || "PCOS Balancing"}
+              description={recovery?.condition || "Ayurvedic Balance"}
               delayIndex={1}
             />
             <StatCard

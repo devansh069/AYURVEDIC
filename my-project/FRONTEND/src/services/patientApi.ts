@@ -93,37 +93,39 @@ const MOCK_RECORDS_LOCAL: MedicalRecord[] = [
 
 export const patientApi = {
   getPatientDashboard: async (): Promise<ApiResponse<PatientDashboardData>> => {
+    const headers = getAuthHeaders();
+    if (!headers['x-user-id']) {
+      return { data: null, isFallback: false };
+    }
     try {
-      const response = await client.get('/patient/dashboard', { headers: getAuthHeaders() });
+      const response = await client.get('/patient/dashboard', { headers });
       if (response.data && response.data.success) {
         return { data: response.data.data, isFallback: false };
       }
       throw new Error('Failed to load patient dashboard from backend');
     } catch (err: any) {
-      console.warn('Backend patient dashboard failed, using mock fallbacks:', err.message);
+      console.warn('Backend patient dashboard failed:', err.message);
       return {
-        data: {
-          profile: MOCK_PROFILE_LOCAL,
-          wellness: MOCK_WELLNESS_LOCAL,
-          aiRecommendations: MOCK_AI_RECOMMENDATIONS_LOCAL,
-          healthGoals: MOCK_HEALTH_GOALS_LOCAL,
-          records: MOCK_RECORDS_LOCAL
-        },
-        isFallback: true,
+        data: null,
+        isFallback: false,
         error: err.message
       };
     }
   },
 
   getPatientProfile: async (): Promise<ApiResponse<Patient>> => {
+    const headers = getAuthHeaders();
+    if (!headers['x-user-id']) {
+      return { data: null, isFallback: false };
+    }
     try {
-      const response = await client.get('/patient/dashboard', { headers: getAuthHeaders() });
+      const response = await client.get('/patient/dashboard', { headers });
       if (response.data && response.data.success) {
         return { data: response.data.data.profile, isFallback: false };
       }
       throw new Error('Failed to load profile');
     } catch (err: any) {
-      return { data: MOCK_PROFILE_LOCAL, isFallback: true, error: err.message };
+      return { data: null, isFallback: false, error: err.message };
     }
   },
 

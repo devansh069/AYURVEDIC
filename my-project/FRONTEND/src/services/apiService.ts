@@ -1518,7 +1518,8 @@ export const apiService = {
   getDiseases: async (): Promise<ApiResponse<typeof MOCK_DISEASES>> => {
     try {
       const response = await client.get('/diseases');
-      return { data: response.data, isFallback: false };
+      const items = response.data && response.data.success ? response.data.data : response.data;
+      return { data: items, isFallback: false };
     } catch (err: any) {
       return { data: MOCK_DISEASES, isFallback: true, error: err.message };
     }

@@ -6,7 +6,7 @@ import {
   BarChart2, MessageSquare, Bell, User, Settings, LogOut, Sparkles,
   Search, Star, TrendingUp, TrendingDown, ChevronRight, Clock,
   CheckCircle, XCircle, AlertCircle, Phone, Video, MapPin, Send,
-  Download, Eye, PlusCircle, Filter, ArrowUpRight, Heart, Award,
+  Download, Eye, PlusCircle, Filter, ArrowUpRight, Heart, Award, GraduationCap,
   Stethoscope, Leaf, Brain, Shield, RefreshCw, MoreVertical,
   Edit3, Trash2, MessageCircle, ThumbsUp, ChevronDown, ChevronUp
 } from 'lucide-react';
@@ -27,6 +27,8 @@ const DOCTOR_PROFILE_GLOBAL = {
   experience: '14 Years',
   clinic: 'AyurVeda Wellness Center, New Delhi',
   qualifications: ['BAMS', 'MD (Ayurveda)', 'Panchakarma Certified'],
+  education: ['BAMS - Delhi Ayurvedic Medical College', 'MD (Ayurveda) - National Institute of Ayurveda', 'Panchakarma Fellowship'],
+  awards: ['AYUSH Registered Practitioner', 'National Dhanwantari Ayurveda Excellence Award', 'Senior Clinical Research Fellowship'],
   languages: ['Hindi', 'English', 'Sanskrit'],
   phone: '+91 98765 12345',
   email: 'dr.vikram@ayurvedaconnect.com',
@@ -196,12 +198,18 @@ const DoctorDashboardPage: React.FC = () => {
       setLoading(true);
       try {
         const active = localStorage.getItem('activeUser');
-        let doctorId = 'dr-1';
+        let doctorId = '';
         if (active) {
-          const parsed = JSON.parse(active);
-          if (parsed.role === 'doctor') {
-            doctorId = parsed.profile.id;
-          }
+          try {
+            const parsed = JSON.parse(active);
+            if (parsed.role === 'doctor' && parsed.profile?.id) {
+              doctorId = parsed.profile.id;
+            }
+          } catch (e) {}
+        }
+        if (!doctorId) {
+          setLoading(false);
+          return;
         }
         const response = await axios.get(`http://localhost:5174/api/doctor/dashboard/${doctorId}`);
         if (response.data && response.data.success) {
@@ -228,16 +236,20 @@ const DoctorDashboardPage: React.FC = () => {
         setAppointments(prev => prev.map(a => a.id === id ? { ...a, status: newStatus } : a));
         // Refresh dashboard data as well
         const active = localStorage.getItem('activeUser');
-        let doctorId = 'dr-1';
+        let doctorId = '';
         if (active) {
-          const parsed = JSON.parse(active);
-          if (parsed.role === 'doctor') {
-            doctorId = parsed.profile.id;
-          }
+          try {
+            const parsed = JSON.parse(active);
+            if (parsed.role === 'doctor' && parsed.profile?.id) {
+              doctorId = parsed.profile.id;
+            }
+          } catch (e) {}
         }
-        const refresh = await axios.get(`http://localhost:5174/api/doctor/dashboard/${doctorId}`);
-        if (refresh.data && refresh.data.success) {
-          setStats(refresh.data.data.stats);
+        if (doctorId) {
+          const refresh = await axios.get(`http://localhost:5174/api/doctor/dashboard/${doctorId}`);
+          if (refresh.data && refresh.data.success) {
+            setStats(refresh.data.data.stats);
+          }
         }
       }
     } catch (err) {
@@ -1430,15 +1442,58 @@ const DoctorDashboardPage: React.FC = () => {
                   <textarea
                     disabled
                     rows={3}
-                    value={DOCTOR_PROFILE.bio}
-                    className="w-full bg-[#F8FFF8] border border-gray-100 rounded-xl px-4 py-2.5 text-xs text-gray-700 font-semibold outline-none resize-none"
+                    value={DOCTOR_PROFILE.bio || DOCTOR_PROFILE.about || 'Certified Ayurvedic Physician dedicated to holistic patient care and authentic natural healing.'}
+                    className="w-full bg-[#F8FFF8] border border-gray-100 rounded-xl px-4 py-2.5 text-xs text-gray-700 font-semibold outline-none resize-none leading-relaxed"
                   />
                 </div>
+
+                {/* Qualifications & Education */}
+                <div className="space-y-2">
+                  <span className="text-[9px] uppercase font-black text-gray-400 tracking-wide flex items-center gap-1.5">
+                    <GraduationCap className="w-3.5 h-3.5 text-[#2E7D32]" /> Qualifications & Education
+                  </span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {((DOCTOR_PROFILE.education && DOCTOR_PROFILE.education.length > 0)
+                      ? DOCTOR_PROFILE.education
+                      : (DOCTOR_PROFILE.qualifications && DOCTOR_PROFILE.qualifications.length > 0
+                        ? DOCTOR_PROFILE.qualifications
+                        : ['BAMS - Accredited Ayurvedic Medical College'])
+                    ).map((edu: string, i: number) => (
+                      <div key={i} className="flex items-center gap-2.5 p-2.5 bg-[#F8FFF8] border border-gray-100 rounded-xl text-xs text-gray-800 font-semibold">
+                        <span className="w-2 h-2 rounded-full bg-[#2E7D32] shrink-0" />
+                        <span>{edu}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Special Expertise */}
                 <div className="space-y-1">
-                  <span className="text-[9px] uppercase font-black text-gray-400 tracking-wide">Areas of Expertise</span>
+                  <span className="text-[9px] uppercase font-black text-gray-400 tracking-wide">Areas of Special Expertise</span>
                   <div className="flex flex-wrap gap-2">
-                    {DOCTOR_PROFILE.specialExpertise.map((s, i) => (
+                    {((DOCTOR_PROFILE.specialExpertise && DOCTOR_PROFILE.specialExpertise.length > 0)
+                      ? DOCTOR_PROFILE.specialExpertise
+                      : ['Nadi Pariksha (Pulse Diagnosis)', 'Panchakarma Detoxification', 'Dosha Balancing', 'Constitutional Dietetics']
+                    ).map((s: string, i: number) => (
                       <span key={i} className="text-[10px] font-black px-3 py-1.5 bg-[#F8FFF8] text-[#2E7D32] border border-[#2E7D32]/20 rounded-xl">{s}</span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Awards & Recognition */}
+                <div className="space-y-2">
+                  <span className="text-[9px] uppercase font-black text-gray-400 tracking-wide flex items-center gap-1.5">
+                    <Award className="w-3.5 h-3.5 text-[#D4AF37]" /> Awards & Honors
+                  </span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {((DOCTOR_PROFILE.awards && DOCTOR_PROFILE.awards.length > 0)
+                      ? DOCTOR_PROFILE.awards
+                      : ['AYUSH Registered Practitioner', 'Excellence in Holistic Care']
+                    ).map((aw: string, i: number) => (
+                      <div key={i} className="flex items-center gap-2.5 p-2.5 bg-[#FAF9F6] border border-[#2E7D32]/10 rounded-xl text-xs text-gray-800 font-semibold">
+                        <Award className="w-4 h-4 text-[#D4AF37] shrink-0" />
+                        <span>{aw}</span>
+                      </div>
                     ))}
                   </div>
                 </div>

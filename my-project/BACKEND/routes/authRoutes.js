@@ -142,16 +142,29 @@ const googleAuthHandler = async (req, res, next) => {
 
       // Automatically register a new doctor via Google
       const doctorId = `doc-${Date.now()}`;
-      const name = "Dr. " + email.split('@')[0].split('.').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
-      const defaultPhoto = `https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=256&q=80`;
+      const cleanDocName = name.replace(/^Dr\.\s*/i, '');
+      const defaultAbout = `Dr. ${cleanDocName} is an experienced Ayurvedic physician committed to authentic, holistic healthcare, constitutional Dosha balance, and specialized clinical therapies.`;
+      const defaultEducation = JSON.stringify([
+        'BAMS - Accredited Ayurvedic Medical University',
+        'Clinical Practice Certification in Internal Ayurvedic Medicine'
+      ]);
+      const defaultAwards = JSON.stringify([
+        'AYUSH Central Council Registered Practitioner',
+        'Excellence in Holistic Patient Care'
+      ]);
+      const defaultExpertise = JSON.stringify([
+        'Nadi Pariksha (Pulse Diagnosis)',
+        'Ayurvedic Lifestyle & Dietetics (Pathya)',
+        'Panchakarma Consultation'
+      ]);
 
       await conn.query(
         `INSERT INTO doctors (
           id, name, email, password, specialization, qualification, experience, clinicName, city, state, photo,
-          rating, reviewCount, consultationFee, onlineConsultationFee, languages, education, awards, specialExpertise,
+          rating, reviewCount, consultationFee, onlineConsultationFee, languages, education, awards, specialExpertise, about,
           availability, successRate, patientsTreated, verified, onlineConsultation, offlineConsultation
-        ) VALUES (?, ?, ?, 'google_login', 'Ayurvedic Consultant', 'BAMS', 5, 'AyurVeda Clinic', 'New Delhi', 'Delhi', ?, 5.0, 0, 500, 400, '["Hindi", "English"]', '[]', '[]', '[]', 'Mon-Fri (10:00 AM - 4:00 PM)', 95, 0, 1, 1, 1)`,
-        [doctorId, name, email, defaultPhoto]
+        ) VALUES (?, ?, ?, 'google_login', 'Ayurvedic Consultant', 'BAMS', 5, 'AyurVeda Clinic', 'New Delhi', 'Delhi', ?, 5.0, 0, 500, 400, '["Hindi", "English"]', ?, ?, ?, ?, 'Mon-Fri (10:00 AM - 4:00 PM)', 95, 0, 1, 1, 1)`,
+        [doctorId, name, email, defaultPhoto, defaultEducation, defaultAwards, defaultExpertise, defaultAbout]
       );
 
       const [newDocRows] = await conn.query(

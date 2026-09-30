@@ -34,6 +34,7 @@ export const Signup: React.FC = () => {
   const [qualification, setQualification] = useState('BAMS, MD (Ayurveda)');
   const [experience, setExperience] = useState('');
   const [clinicName, setClinicName] = useState('');
+  const [about, setAbout] = useState('');
 
   // UX States
   const [loading, setLoading] = useState(false);
@@ -122,6 +123,7 @@ export const Signup: React.FC = () => {
           experience: experience ? `${experience}+ Years` : '5+ Years',
           clinicName,
           city,
+          about: about.trim() || undefined,
         };
       }
 
@@ -542,6 +544,21 @@ export const Signup: React.FC = () => {
                           className="w-full bg-[#FAF9F6] border border-gray-150 rounded-xl px-4 py-2.5 text-xs text-text-primary font-semibold outline-none focus:border-primary focus:bg-white transition-all"
                         />
                       </div>
+                    </div>
+
+                    {/* About / Bio */}
+                    <div className="space-y-1">
+                      <label htmlFor="docAbout" className="block text-[9.5px] uppercase font-bold text-text-secondary">
+                        Professional Bio / About (Optional)
+                      </label>
+                      <textarea
+                        id="docAbout"
+                        rows={2}
+                        placeholder="Briefly describe your Ayurvedic clinical background, treatment philosophy..."
+                        value={about}
+                        onChange={(e) => setAbout(e.target.value)}
+                        className="w-full bg-[#FAF9F6] border border-gray-150 rounded-xl px-4 py-2.5 text-xs text-text-primary font-semibold outline-none focus:border-primary focus:bg-white transition-all resize-none"
+                      />
                     </div>
 
                   </>

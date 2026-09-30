@@ -4,6 +4,7 @@ require("dotenv").config();
 const mysql = require("mysql2/promise");
 const fs = require("fs");
 const path = require("path");
+const sequelize = require("./sequelize");
 
 let pool = null;
 
@@ -41,6 +42,12 @@ const connectDB = async () => {
 
     // 3. Create tables if not exists
     await createTables();
+
+    // 3b. Authenticate and sync Sequelize models
+    await sequelize.authenticate();
+    console.log("🚀 Sequelize Database Connection Authenticated.");
+    await sequelize.sync({ alter: true });
+    console.log("🚀 Sequelize Models Synced Successfully.");
 
     // 4. Auto seed if tables are empty
     await autoSeed();
@@ -438,9 +445,7 @@ const createTables = async () => {
     try {
       await conn.query("ALTER TABLE doctors ADD COLUMN scientificData JSON");
     } catch (e) {}
-    try {
-      await conn.query("UPDATE doctors SET email = 'dr.arun@ayurvedaconnect.com', password = 'password' WHERE id = 'dr-1' AND email IS NULL");
-    } catch (e) {}
+    // No dummy updates
     try {
       await conn.query("ALTER TABLE patients MODIFY COLUMN password VARCHAR(255) NULL");
     } catch (e) {}
@@ -554,6 +559,7 @@ const autoSeed = async () => {
     }
 
     // Seed disease_categories
+    const DiseaseCategory = require("../models/DiseaseCategory");
     const [diseaseCatRows] = await conn.query("SELECT COUNT(*) as count FROM disease_categories");
     if (diseaseCatRows[0].count === 0) {
       const diseaseCatPath = path.join(__dirname, "..", "data", "disease_categories.json");
@@ -561,40 +567,24 @@ const autoSeed = async () => {
         console.log("🌱 Seeding Disease Categories into MySQL...");
         const categories = JSON.parse(fs.readFileSync(diseaseCatPath, "utf-8"));
         for (const cat of categories) {
-          await conn.query(`
-            INSERT INTO disease_categories (id, name, description, icon)
-            VALUES (?, ?, ?, ?)
-          `, [cat.id, cat.name, cat.description, cat.icon]);
+          await DiseaseCategory.create(cat);
         }
         console.log("✅ Disease Categories seeded into MySQL.");
       }
     }
 
     // Seed diseases
+    const Disease = require("../models/Disease");
     const [diseasesRows] = await conn.query("SELECT COUNT(*) as count FROM diseases");
-    if (diseasesRows[0].count === 0) {
-      const diseasesPath = path.join(__dirname, "..", "data", "diseases.json");
-      if (fs.existsSync(diseasesPath)) {
-        console.log("🌱 Seeding Diseases into MySQL...");
-        const diseasesList = JSON.parse(fs.readFileSync(diseasesPath, "utf-8"));
-        for (const dis of diseasesList) {
-          await conn.query(`
-            INSERT INTO diseases (
-              id, name, slug, category, shortDescription, severity, image,
-              symptoms, causes, ayurvedicPerspective, treatments, recommendedHerbs,
-              dietRecommendations, foodsToAvoid, lifestyleRecommendations, recoveryTimeline, faq
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-          `, [
-            dis.id, dis.name, dis.slug, dis.category, dis.shortDescription, dis.severity, dis.image,
-            JSON.stringify(dis.symptoms), JSON.stringify(dis.causes), dis.ayurvedicPerspective,
-            JSON.stringify(dis.treatments), JSON.stringify(dis.recommendedHerbs),
-            JSON.stringify(dis.dietRecommendations), JSON.stringify(dis.foodsToAvoid),
-            JSON.stringify(dis.lifestyleRecommendations), JSON.stringify(dis.recoveryTimeline),
-            JSON.stringify(dis.faq)
-          ]);
-        }
-        console.log("✅ Diseases seeded into MySQL.");
+    if (diseasesRows[0].count < 30) {
+      console.log("🧹 Clearing old mock diseases registry in MySQL...");
+      await conn.query("DELETE FROM diseases");
+      console.log("🌱 Seeding 30 Real Diseases into MySQL...");
+      const diseasesList = require("../seed/diseases");
+      for (const dis of diseasesList) {
+        await Disease.create(dis);
       }
+      console.log("✅ 30 Diseases seeded into MySQL.");
     }
 
     // Seed treatment_categories
@@ -641,85 +631,7 @@ const autoSeed = async () => {
       }
     }
 
-    // Seed patient pat-123 if not present
-    const [patientRows] = await conn.query("SELECT COUNT(*) as count FROM patients WHERE id = 'pat-123'");
-    if (patientRows[0].count === 0) {
-      console.log("🌱 Seeding default patient 'pat-123' (Priyanshi Sharma) into MySQL...");
-      await conn.query(`
-        INSERT INTO patients (id, name, email, phone, age, gender, profilePhoto, city, doshaType, healthGoals, password, joinedDate)
-        VALUES ('pat-123', 'Priyanshi Sharma', 'priyanshi@ayurvedaconnect.com', '+91 98765 43210', 28, 'Female',
-                'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&q=80', 'New Delhi', 'Pitta-Kapha',
-                '["PCOS Management", "Stress Reduction", "Improved Digestion"]', 'password', '2026-01-15')
-      `);
-
-      await conn.query(`
-        INSERT INTO patient_wellness (patientId, dietAdherence, exerciseProgress, sleepQuality, waterIntake)
-        VALUES ('pat-123', 85, 90, 80, 75)
-      `);
-
-      await conn.query(`
-        INSERT INTO patient_health_goals (id, patientId, title, progress, target) VALUES
-        ('goal-1', 'pat-123', 'Weight Management', 68, 'Reduce Kapha weight by 5kg'),
-        ('goal-2', 'pat-123', 'PCOS Management', 75, 'Cycle regularity & hormonal balance'),
-        ('goal-3', 'pat-123', 'Stress Reduction', 80, 'Increase mindfulness and sleep hours')
-      `);
-
-      await conn.query(`
-        INSERT INTO patient_medical_records (id, patientId, title, type, date, doctorName, fileSize, fileUrl) VALUES
-        ('rec-doc-1', 'pat-123', 'Thyroid & Doshic Profile Blood Test', 'Report', '2026-05-18', 'Dr. Vikram Chauhan', '2.4 MB', '#'),
-        ('rec-doc-2', 'pat-123', 'PCOS Hormone Analysis Summary', 'Report', '2026-04-12', 'Dr. Smita Naram', '1.8 MB', '#'),
-        ('rec-doc-3', 'pat-123', 'Vata-Reducing Herbal Decoction Guide', 'Prescription', '2026-05-15', 'Dr. Vikram Chauhan', '840 KB', '#')
-      `);
-
-      await conn.query(`
-        INSERT INTO patient_recovery_tracker (patientId, conditionName, progress, startDate, expectedCompletion, weeklyMetrics, monthlyMetrics)
-        VALUES (
-          'pat-123',
-          'PCOS & Metabolic Imbalance',
-          72,
-          '2026-04-10',
-          '2026-08-10',
-          '[{"name": "Wk 1", "progress": 10, "target": 15}, {"name": "Wk 2", "progress": 25, "target": 30}, {"name": "Wk 3", "progress": 42, "target": 45}, {"name": "Wk 4", "progress": 55, "target": 60}, {"name": "Wk 5", "progress": 62, "target": 70}, {"name": "Wk 6", "progress": 72, "target": 80}]',
-          '[{"name": "Apr", "progress": 30, "target": 40}, {"name": "May", "progress": 60, "target": 70}, {"name": "Jun", "progress": 72, "target": 80}]'
-        )
-      `);
-
-      await conn.query(`
-        INSERT INTO notifications (id, userId, role, title, message, date, type, readStatus) VALUES
-        ('notif-1', 'pat-123', 'patient', 'Upcoming Consultation Alert', 'Your appointment with Dr. Vikram Chauhan is in 3 days. Prepare your updated diet logs.', '2026-06-12', 'Appointment', 0),
-        ('notif-2', 'pat-123', 'patient', 'Morning Kashayam Reminder', 'Time to consume your Dashamula decoction (empty stomach) for optimal metabolic fire.', '2026-06-12', 'Reminder', 0),
-        ('notif-3', 'pat-123', 'patient', 'Daily Health Tip', 'Avoid drinking ice-cold water during or immediately after meals as it dampens Agni (digestive fire).', '2026-06-11', 'Tip', 0)
-      `);
-
-      await conn.query(`
-        INSERT INTO ai_chat_messages (id, patientId, sender, text, time) VALUES
-        ('chat-msg-1', 'pat-123', 'ai', 'Namaste Priyanshi. I am your Vaidya AI Assistant. I see we are balancing a Pitta-Kapha dosha today. How can I assist you with your PCOS management, diet plans, or herbal decoctions?', '02:52 PM')
-      `);
-
-      console.log("✅ Default patient 'pat-123' and dashboard cards seeded.");
-    }
-
-    // Seed doctor dr-1 if not present
-    const [doctorRows] = await conn.query("SELECT COUNT(*) as count FROM doctors WHERE id = 'dr-1'");
-    if (doctorRows[0].count === 0) {
-      console.log("🌱 Seeding default doctor 'dr-1' (Dr. Arun Sharma) into MySQL...");
-      await conn.query(`
-        INSERT INTO doctors (
-          id, name, email, password, specialization, qualification, experience, rating, reviewCount,
-          fee, consultationFee, onlineConsultationFee, languages, clinicName, city, state, about,
-          education, awards, specialExpertise, availability, successRate, patientsTreated, verified,
-          onlineConsultation, offlineConsultation, photo
-        ) VALUES (
-          'dr-1', 'Dr. Arun Sharma', 'dr.arun@ayurvedaconnect.com', 'password', 'Panchakarma & Internal Medicine', 'BAMS, MD (Ayurveda)', 15, 4.9, 120,
-          1200, 1200, 1000, '["Hindi", "English"]', 'AyurVeda Wellness Center', 'Jaipur', 'Rajasthan',
-          'Senior Ayurvedic physician specializing in Panchakarma therapies and metabolic balance.',
-          '["BAMS (Jaipur University)", "MD (Ayurveda) (BHU)"]', '["Ayurveda Shiromani Award 2024"]',
-          '["Panchakarma", "PCOS Management", "Metabolic Disorders"]', 'Mon-Sat (9:00 AM - 5:00 PM)', 96, 1847, 1,
-          1, 1, 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=256&q=80'
-        )
-      `);
-      console.log("✅ Default doctor 'dr-1' seeded.");
-    }
+    // Dummy patient and doctor auto-seeding removed. Real accounts register dynamically.
 
 
   } catch (error) {

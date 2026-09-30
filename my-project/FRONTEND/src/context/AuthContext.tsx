@@ -24,34 +24,6 @@ export const useAuth = () => {
   return context;
 };
 
-const DEFAULT_PATIENT: Patient = {
-  id: 'pat-123',
-  name: 'Priyanshi Sharma',
-  email: 'priyanshi@ayurvedaconnect.com',
-  phone: '+91 98765 43210',
-  age: 28,
-  gender: 'Female',
-  profilePhoto: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&q=80',
-  city: 'New Delhi',
-  doshaType: 'Pitta-Kapha',
-  healthGoals: ['PCOS Management', 'Stress Reduction', 'Improved Digestion'],
-  joinedDate: '2026-01-15'
-};
-
-const DEFAULT_DOCTOR: DoctorProfileModel = {
-  id: 'dr-1',
-  name: 'Dr. Arun Sharma',
-  photo: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=256&q=80',
-  specialization: 'Panchakarma & Internal Medicine',
-  qualification: 'BAMS, MD (Ayurveda)',
-  experience: '15+ Years',
-  rating: 4.9,
-  clinicName: 'AyurVeda Wellness Center',
-  city: 'Jaipur',
-  email: 'dr.arun@ayurvedaconnect.com',
-  phone: '+91 98765 12345'
-};
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<Patient | DoctorProfileModel | null>(null);
   const [userRole, setUserRole] = useState<'patient' | 'doctor' | null>(null);
@@ -59,26 +31,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // 1. Seed default accounts if database is empty
-    if (!localStorage.getItem('users_patient')) {
-      localStorage.setItem('users_patient', JSON.stringify([
-        { email: 'priyanshi@ayurvedaconnect.com', password: 'password', profile: DEFAULT_PATIENT }
-      ]));
-    }
-    if (!localStorage.getItem('users_doctor')) {
-      localStorage.setItem('users_doctor', JSON.stringify([
-        { email: 'dr.arun@ayurvedaconnect.com', password: 'password', profile: DEFAULT_DOCTOR }
-      ]));
-    }
+    // 1. Clean up any stale dummy local storage from previous tests
+    localStorage.removeItem('users_patient');
+    localStorage.removeItem('users_doctor');
 
     // 2. Load active session
     const activeSession = localStorage.getItem('activeUser');
     if (activeSession) {
       try {
         const parsed = JSON.parse(activeSession);
-        setUser(parsed.profile);
-        setUserRole(parsed.role);
-        setIsAuthenticated(true);
+        // If the session belonged to a removed dummy account, invalidate it
+        if (
+          parsed.profile?.id === 'pat-123' ||
+          parsed.profile?.id === 'dr-1' ||
+          parsed.profile?.email === 'priyanshi@ayurvedaconnect.com' ||
+          parsed.profile?.email === 'dr.arun@ayurvedaconnect.com'
+        ) {
+          localStorage.removeItem('activeUser');
+          setUser(null);
+          setUserRole(null);
+          setIsAuthenticated(false);
+        } else {
+          setUser(parsed.profile);
+          setUserRole(parsed.role);
+          setIsAuthenticated(true);
+        }
       } catch (err) {
         console.error('Error parsing active auth session', err);
         localStorage.removeItem('activeUser');

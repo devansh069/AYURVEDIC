@@ -1,131 +1,16 @@
 // BACKEND/controllers/diseaseController.js
-// MongoDB Disease Controller using Mongoose with automatic mock in-memory fallback.
-const mongoose = require('mongoose');
-const Disease = require('../models/diseaseMongoModel');
-const { MOCK_DISEASE_CATEGORIES, MOCK_DISEASES } = require('../models/diseaseModel');
+// MySQL/Sequelize Disease Controller with support for search, filters, sorting, and pagination.
 
-// In-memory fallback dataset matching the MongoDB schema structure
-let fallbackDiseases = MOCK_DISEASES.map((d, index) => ({
-  _id: `fallback-dis-${index + 1}`,
-  diseaseName: d.name,
-  slug: d.slug,
-  scientificName: d.name === 'Diabetes' ? 'Diabetes mellitus' : d.name === 'PCOS' ? 'Polycystic ovary syndrome' : d.name === 'Arthritis' ? 'Osteoarthritis' : '',
-  alternativeNames: d.name === 'Diabetes' ? ['Madhumeha'] : d.name === 'PCOS' ? ['Artava Srotas Blockage'] : [],
-  category: d.category,
-  subCategory: d.category,
-  overview: d.shortDescription,
-  description: d.ayurvedicPerspective,
-  causes: d.causes || [],
-  symptoms: d.symptoms || [],
-  earlySymptoms: (d.symptoms || []).slice(0, 2),
-  advancedSymptoms: (d.symptoms || []).slice(2),
-  riskFactors: ['Sedentary lifestyle', 'Stress'],
-  complications: ['Chronic fatigue'],
-  prevention: d.lifestyleRecommendations || [],
-  homeRemedies: d.dietRecommendations || [],
-  ayurvedicTreatment: Array.isArray(d.treatments) ? d.treatments.join('. ') : d.treatments,
-  modernTreatment: 'Symptomatic control and lifestyle adaptation.',
-  recommendedHerbs: d.recommendedHerbs || [],
-  recommendedMedicines: ['Chandraprabha Vati', 'Triphala Guggulu'],
-  recommendedFoods: d.dietRecommendations || [],
-  foodsToAvoid: d.foodsToAvoid || [],
-  recommendedYoga: d.lifestyleRecommendations || [],
-  recommendedExercises: ['Brisk Walking', 'Yoga'],
-  dailyRoutine: 'Wake up early, practice meditation, and consume warm water.',
-  sleepRecommendation: '7-8 hours of sleep, avoiding day sleep.',
-  stressManagement: 'Practice deep breathing, meditation and yoga.',
-  doshaAffected: d.name === 'Diabetes' ? ['Kapha', 'Pitta'] : ['Vata'],
-  bodyPartsAffected: ['Joints', 'Systemic'],
-  ageGroup: 'All',
-  gender: 'All',
-  pregnancySafe: true,
-  contagious: false,
-  severity: d.severity || 'Moderate',
-  recoveryTime: '3-6 months',
-  consultDoctorWhen: 'If symptoms persist or worsen.',
-  emergencyWarning: 'Severe discomfort or high fever.',
-  successRate: 85,
-  FAQs: (d.faq || []).map(f => ({ question: f.question, answer: f.answer })),
-  references: ['Classical Ayurvedic texts', 'Modern clinical trials'],
-  doctorSpecialization: d.name === 'Diabetes' ? 'Metabolic Specialist' : d.name === 'PCOS' ? 'Gynaecologist' : 'General Ayurveda Practitioner',
-  relatedDiseases: [],
-  featuredImage: d.image || '',
-  galleryImages: [d.image || ''],
-  videoLinks: [],
-  rating: 4.8,
-  totalViews: 120 + index * 45,
-  totalBookmarks: 30 + index * 10,
-  createdAt: new Date(),
-  updatedAt: new Date()
-}));
-
-const isMongoConnected = () => {
-  return mongoose.connection.readyState === 1;
-};
-
-// Helper to filter in-memory fallback list
-const filterFallbackDiseases = (queryOptions) => {
-  let list = [...fallbackDiseases];
-  const { search, category, severity, ageGroup, gender, recoveryTime, dosha, bodyPart, sort } = queryOptions;
-
-  if (search) {
-    const q = search.toLowerCase();
-    list = list.filter(d => 
-      d.diseaseName.toLowerCase().includes(q) ||
-      d.category.toLowerCase().includes(q) ||
-      d.symptoms.some(s => s.toLowerCase().includes(q)) ||
-      d.doshaAffected.some(ds => ds.toLowerCase().includes(q)) ||
-      d.bodyPartsAffected.some(b => b.toLowerCase().includes(q))
-    );
-  }
-
-  if (category) {
-    list = list.filter(d => d.category === category);
-  }
-
-  if (severity) {
-    list = list.filter(d => d.severity === severity);
-  }
-
-  if (ageGroup) {
-    list = list.filter(d => d.ageGroup === ageGroup || d.ageGroup === 'All');
-  }
-
-  if (gender) {
-    list = list.filter(d => d.gender === gender || d.gender === 'All');
-  }
-
-  if (dosha) {
-    list = list.filter(d => d.doshaAffected.includes(dosha));
-  }
-
-  if (bodyPart) {
-    list = list.filter(d => d.bodyPartsAffected.includes(bodyPart));
-  }
-
-  if (sort) {
-    if (sort === 'Highest Rated') {
-      list.sort((a, b) => b.rating - a.rating);
-    } else if (sort === 'Most Viewed') {
-      list.sort((a, b) => b.totalViews - a.totalViews);
-    } else if (sort === 'Newest') {
-      list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    } else if (sort === 'Oldest') {
-      list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    } else if (sort === 'Alphabetical') {
-      list.sort((a, b) => a.diseaseName.localeCompare(b.diseaseName));
-    }
-  }
-
-  return list;
-};
+const { Op } = require('sequelize');
+const Disease = require('../models/Disease');
+const DiseaseCategory = require('../models/DiseaseCategory');
 
 // ─── API CONTROLLER FUNCTIONS ───
 
 exports.getDiseaseCategories = async (req, res, next) => {
   try {
-    // Categories can be dynamic or fallback
-    res.json(MOCK_DISEASE_CATEGORIES);
+    const categories = await DiseaseCategory.findAll();
+    res.json(categories);
   } catch (err) {
     next(err);
   }
@@ -148,68 +33,88 @@ exports.getDiseases = async (req, res, next) => {
 
     const pageNum = parseInt(page, 10);
     const limitNum = parseInt(limit, 10);
+    const offset = (pageNum - 1) * limitNum;
 
-    if (isMongoConnected()) {
-      const query = {};
+    const whereClause = {};
 
-      if (search) {
-        query.$or = [
-          { diseaseName: { $regex: search, $options: 'i' } },
-          { category: { $regex: search, $options: 'i' } },
-          { symptoms: { $regex: search, $options: 'i' } },
-          { doshaAffected: { $regex: search, $options: 'i' } },
-          { bodyPartsAffected: { $regex: search, $options: 'i' } }
-        ];
-      }
+    // 1. Search filter
+    if (search) {
+      whereClause[Op.or] = [
+        { diseaseName: { [Op.like]: `%${search}%` } },
+        { category: { [Op.like]: `%${search}%` } },
+        { description: { [Op.like]: `%${search}%` } },
+        { symptoms: { [Op.like]: `%${search}%` } },
+        { doshaAffected: { [Op.like]: `%${search}%` } }
+      ];
+    }
 
-      if (category) query.category = category;
-      if (severity) query.severity = severity;
-      if (ageGroup) query.ageGroup = ageGroup;
-      if (gender) query.gender = gender;
-      if (dosha) query.doshaAffected = dosha;
-      if (bodyPart) query.bodyPartsAffected = bodyPart;
+    // 2. Category filter
+    if (category) {
+      whereClause.category = category;
+    }
 
-      let sortQuery = { createdAt: -1 };
-      if (sort === 'Highest Rated') sortQuery = { rating: -1 };
-      else if (sort === 'Most Viewed') sortQuery = { totalViews: -1 };
-      else if (sort === 'Oldest') sortQuery = { createdAt: 1 };
-      else if (sort === 'Alphabetical') sortQuery = { diseaseName: 1 };
+    // 3. Severity filter
+    if (severity) {
+      whereClause.severity = severity;
+    }
 
-      const total = await Disease.countDocuments(query);
-      const items = await Disease.find(query)
-        .sort(sortQuery)
-        .skip((pageNum - 1) * limitNum)
-        .limit(limitNum);
-
-      res.json({
-        success: true,
-        data: items,
-        pagination: {
-          total,
-          page: pageNum,
-          limit: limitNum,
-          pages: Math.ceil(total / limitNum)
-        }
-      });
-    } else {
-      // In-memory Fallback
-      const filtered = filterFallbackDiseases(req.query);
-      const total = filtered.length;
-      const startIndex = (pageNum - 1) * limitNum;
-      const paginated = filtered.slice(startIndex, startIndex + limitNum);
-
-      res.json({
-        success: true,
-        data: paginated,
-        isFallback: true,
-        pagination: {
-          total,
-          page: pageNum,
-          limit: limitNum,
-          pages: Math.ceil(total / limitNum)
-        }
+    // 4. Age Group filter (allows matching specific age or 'All')
+    if (ageGroup) {
+      whereClause[Op.and] = whereClause[Op.and] || [];
+      whereClause[Op.and].push({
+        [Op.or]: [{ ageGroup }, { ageGroup: 'All' }]
       });
     }
+
+    // 5. Gender filter (allows matching specific gender or 'All')
+    if (gender) {
+      whereClause[Op.and] = whereClause[Op.and] || [];
+      whereClause[Op.and].push({
+        [Op.or]: [{ gender }, { gender: 'All' }]
+      });
+    }
+
+    // 6. Dosha filter
+    if (dosha) {
+      whereClause.doshaAffected = { [Op.like]: `%${dosha}%` };
+    }
+
+    // 7. Body Part filter
+    if (bodyPart) {
+      whereClause.bodyPartsAffected = { [Op.like]: `%${bodyPart}%` };
+    }
+
+    // 8. Sorting options
+    let orderClause = [['createdAt', 'DESC']];
+    if (sort === 'Highest Rated') {
+      orderClause = [['rating', 'DESC']];
+    } else if (sort === 'Most Viewed') {
+      orderClause = [['views', 'DESC']];
+    } else if (sort === 'Oldest') {
+      orderClause = [['createdAt', 'ASC']];
+    } else if (sort === 'Alphabetical' || sort === 'A-Z') {
+      orderClause = [['diseaseName', 'ASC']];
+    } else if (sort === 'Recovery Time') {
+      orderClause = [['recoveryTime', 'ASC']];
+    }
+
+    const { count, rows } = await Disease.findAndCountAll({
+      where: whereClause,
+      limit: limitNum,
+      offset,
+      order: orderClause
+    });
+
+    res.json({
+      success: true,
+      data: rows,
+      pagination: {
+        total: count,
+        page: pageNum,
+        limit: limitNum,
+        pages: Math.ceil(count / limitNum)
+      }
+    });
   } catch (err) {
     next(err);
   }
@@ -218,21 +123,27 @@ exports.getDiseases = async (req, res, next) => {
 exports.getDiseaseBySlug = async (req, res, next) => {
   try {
     const { slug } = req.params;
-    if (isMongoConnected()) {
-      const disease = await Disease.findOne({ slug });
-      if (!disease) return res.status(404).json({ success: false, message: 'Disease not found' });
-      
-      // Increment views
-      disease.totalViews += 1;
-      await disease.save();
-      
-      res.json(disease);
-    } else {
-      const disease = fallbackDiseases.find(d => d.slug === slug);
-      if (!disease) return res.status(404).json({ success: false, message: 'Disease not found' });
-      disease.totalViews += 1;
-      res.json(disease);
+    
+    // We check both slug and id for backward compatibility
+    const disease = await Disease.findOne({
+      where: {
+        [Op.or]: [
+          { slug },
+          { id: slug }
+        ]
+      }
+    });
+
+    if (!disease) {
+      return res.status(404).json({ success: false, message: 'Disease not found' });
     }
+
+    // Increment views
+    await disease.increment('views', { by: 1 });
+    // Reload so we return updated count
+    await disease.reload();
+
+    res.json(disease);
   } catch (err) {
     next(err);
   }
@@ -241,15 +152,11 @@ exports.getDiseaseBySlug = async (req, res, next) => {
 exports.getDiseaseById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    if (isMongoConnected()) {
-      const disease = await Disease.findById(id);
-      if (!disease) return res.status(404).json({ success: false, message: 'Disease not found' });
-      res.json(disease);
-    } else {
-      const disease = fallbackDiseases.find(d => d._id === id);
-      if (!disease) return res.status(404).json({ success: false, message: 'Disease not found' });
-      res.json(disease);
+    const disease = await Disease.findByPk(id);
+    if (!disease) {
+      return res.status(404).json({ success: false, message: 'Disease not found' });
     }
+    res.json(disease);
   } catch (err) {
     next(err);
   }
@@ -258,21 +165,19 @@ exports.getDiseaseById = async (req, res, next) => {
 exports.searchDiseases = async (req, res, next) => {
   try {
     const { q = '' } = req.query;
-    if (isMongoConnected()) {
-      const items = await Disease.find({
-        $or: [
-          { diseaseName: { $regex: q, $options: 'i' } },
-          { category: { $regex: q, $options: 'i' } },
-          { symptoms: { $regex: q, $options: 'i' } },
-          { doshaAffected: { $regex: q, $options: 'i' } },
-          { bodyPartsAffected: { $regex: q, $options: 'i' } }
+    const items = await Disease.findAll({
+      where: {
+        [Op.or]: [
+          { diseaseName: { [Op.like]: `%${q}%` } },
+          { category: { [Op.like]: `%${q}%` } },
+          { description: { [Op.like]: `%${q}%` } },
+          { symptoms: { [Op.like]: `%${q}%` } },
+          { doshaAffected: { [Op.like]: `%${q}%` } }
         ]
-      }).limit(10);
-      res.json(items);
-    } else {
-      const filtered = filterFallbackDiseases({ search: q }).slice(0, 10);
-      res.json(filtered);
-    }
+      },
+      limit: 10
+    });
+    res.json(items);
   } catch (err) {
     next(err);
   }
@@ -281,13 +186,10 @@ exports.searchDiseases = async (req, res, next) => {
 exports.getDiseasesByCategory = async (req, res, next) => {
   try {
     const { category } = req.params;
-    if (isMongoConnected()) {
-      const items = await Disease.find({ category });
-      res.json(items);
-    } else {
-      const filtered = fallbackDiseases.filter(d => d.category.toLowerCase() === category.toLowerCase());
-      res.json(filtered);
-    }
+    const items = await Disease.findAll({
+      where: { category }
+    });
+    res.json(items);
   } catch (err) {
     next(err);
   }
@@ -295,13 +197,11 @@ exports.getDiseasesByCategory = async (req, res, next) => {
 
 exports.getPopularDiseases = async (req, res, next) => {
   try {
-    if (isMongoConnected()) {
-      const items = await Disease.find().sort({ rating: -1, totalViews: -1 }).limit(6);
-      res.json(items);
-    } else {
-      const sorted = [...fallbackDiseases].sort((a, b) => b.rating - a.rating).slice(0, 6);
-      res.json(sorted);
-    }
+    const items = await Disease.findAll({
+      order: [['rating', 'DESC'], ['views', 'DESC']],
+      limit: 6
+    });
+    res.json(items);
   } catch (err) {
     next(err);
   }
@@ -309,13 +209,11 @@ exports.getPopularDiseases = async (req, res, next) => {
 
 exports.getLatestDiseases = async (req, res, next) => {
   try {
-    if (isMongoConnected()) {
-      const items = await Disease.find().sort({ createdAt: -1 }).limit(6);
-      res.json(items);
-    } else {
-      const sorted = [...fallbackDiseases].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 6);
-      res.json(sorted);
-    }
+    const items = await Disease.findAll({
+      order: [['createdAt', 'DESC']],
+      limit: 6
+    });
+    res.json(items);
   } catch (err) {
     next(err);
   }
@@ -323,13 +221,11 @@ exports.getLatestDiseases = async (req, res, next) => {
 
 exports.getTrendingDiseases = async (req, res, next) => {
   try {
-    if (isMongoConnected()) {
-      const items = await Disease.find().sort({ totalViews: -1, totalBookmarks: -1 }).limit(6);
-      res.json(items);
-    } else {
-      const sorted = [...fallbackDiseases].sort((a, b) => b.totalViews - a.totalViews).slice(0, 6);
-      res.json(sorted);
-    }
+    const items = await Disease.findAll({
+      order: [['views', 'DESC'], ['bookmarks', 'DESC']],
+      limit: 6
+    });
+    res.json(items);
   } catch (err) {
     next(err);
   }
@@ -341,22 +237,11 @@ exports.createDisease = async (req, res, next) => {
     if (!body.slug) {
       body.slug = body.diseaseName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     }
-
-    if (isMongoConnected()) {
-      const newDisease = new Disease(body);
-      await newDisease.save();
-      res.status(201).json({ success: true, data: newDisease });
-    } else {
-      const newId = `fallback-dis-${Date.now()}`;
-      const newObj = {
-        _id: newId,
-        ...body,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      fallbackDiseases.unshift(newObj);
-      res.status(201).json({ success: true, data: newObj, isFallback: true });
+    if (!body.id) {
+      body.id = `dis-${Date.now()}`;
     }
+    const newDisease = await Disease.create(body);
+    res.status(201).json({ success: true, data: newDisease });
   } catch (err) {
     next(err);
   }
@@ -369,22 +254,12 @@ exports.updateDisease = async (req, res, next) => {
     if (body.diseaseName && !body.slug) {
       body.slug = body.diseaseName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     }
-
-    if (isMongoConnected()) {
-      const updated = await Disease.findByIdAndUpdate(id, body, { new: true, runValidators: true });
-      if (!updated) return res.status(404).json({ success: false, message: 'Disease not found' });
-      res.json({ success: true, data: updated });
-    } else {
-      const index = fallbackDiseases.findIndex(d => d._id === id);
-      if (index === -1) return res.status(404).json({ success: false, message: 'Disease not found' });
-      
-      fallbackDiseases[index] = {
-        ...fallbackDiseases[index],
-        ...body,
-        updatedAt: new Date()
-      };
-      res.json({ success: true, data: fallbackDiseases[index], isFallback: true });
+    const disease = await Disease.findByPk(id);
+    if (!disease) {
+      return res.status(404).json({ success: false, message: 'Disease not found' });
     }
+    await disease.update(body);
+    res.json({ success: true, data: disease });
   } catch (err) {
     next(err);
   }
@@ -393,16 +268,12 @@ exports.updateDisease = async (req, res, next) => {
 exports.deleteDisease = async (req, res, next) => {
   try {
     const { id } = req.params;
-    if (isMongoConnected()) {
-      const deleted = await Disease.findByIdAndDelete(id);
-      if (!deleted) return res.status(404).json({ success: false, message: 'Disease not found' });
-      res.json({ success: true, data: deleted });
-    } else {
-      const index = fallbackDiseases.findIndex(d => d._id === id);
-      if (index === -1) return res.status(404).json({ success: false, message: 'Disease not found' });
-      const deleted = fallbackDiseases.splice(index, 1);
-      res.json({ success: true, data: deleted[0], isFallback: true });
+    const disease = await Disease.findByPk(id);
+    if (!disease) {
+      return res.status(404).json({ success: false, message: 'Disease not found' });
     }
+    await disease.destroy();
+    res.json({ success: true, data: disease });
   } catch (err) {
     next(err);
   }

@@ -71,12 +71,12 @@ export const doctorApi = {
     }
   },
 
-  async getProfile(): Promise<{ data: DoctorProfileModel; isFallback: boolean }> {
+  async getProfile(): Promise<{ data: DoctorProfileModel | null; isFallback: boolean }> {
     const active = localStorage.getItem('activeUser');
     if (active) {
       try {
         const parsed = JSON.parse(active);
-        if (parsed.role === 'doctor') {
+        if (parsed.role === 'doctor' && parsed.profile) {
           return { data: parsed.profile, isFallback: false };
         }
       } catch (e) {
@@ -84,20 +84,8 @@ export const doctorApi = {
       }
     }
     return {
-      data: {
-        id: 'dr-1',
-        name: 'Dr. Arun Sharma',
-        photo: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=256&q=80',
-        specialization: 'Panchakarma & Internal Medicine',
-        qualification: 'BAMS, MD (Ayurveda)',
-        experience: '15+ Years',
-        rating: 4.9,
-        clinicName: 'AyurVeda Wellness Center',
-        city: 'Jaipur',
-        email: 'dr.arun@ayurvedaconnect.com',
-        phone: '+91 98765 12345',
-      },
-      isFallback: true
+      data: null,
+      isFallback: false
     };
   },
 

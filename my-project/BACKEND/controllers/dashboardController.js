@@ -22,7 +22,10 @@ const getAIResponseText = (message, dosha = 'Pitta-Kapha') => {
 // ─── PATIENT PORTAL CONTROLLERS ──────────────────────────────────────────────
 
 exports.getPatientDashboard = async (req, res) => {
-  const patientId = req.headers['x-user-id'] || 'pat-123';
+  const patientId = req.headers['x-user-id'];
+  if (!patientId) {
+    return res.status(401).json({ success: false, message: 'Authentication required. Please log in.' });
+  }
   const pool = getPool();
 
   try {
@@ -104,7 +107,8 @@ exports.getPatientDashboard = async (req, res) => {
 };
 
 exports.updateProfile = async (req, res) => {
-  const patientId = req.headers['x-user-id'] || 'pat-123';
+  const patientId = req.headers['x-user-id'];
+  if (!patientId) return res.status(401).json({ success: false, message: 'Authentication required' });
   const { name, phone, age, gender, city, doshaType, healthGoals } = req.body;
   const pool = getPool();
 
@@ -122,7 +126,8 @@ exports.updateProfile = async (req, res) => {
 };
 
 exports.getAppointments = async (req, res) => {
-  const patientId = req.headers['x-user-id'] || 'pat-123';
+  const patientId = req.headers['x-user-id'];
+  if (!patientId) return res.json({ success: true, data: [] });
   const pool = getPool();
 
   try {
@@ -193,7 +198,8 @@ exports.rescheduleAppointment = async (req, res) => {
 };
 
 exports.getRecoveryProgress = async (req, res) => {
-  const patientId = req.headers['x-user-id'] || 'pat-123';
+  const patientId = req.headers['x-user-id'];
+  if (!patientId) return res.json({ success: true, data: null });
   const pool = getPool();
 
   try {
@@ -259,7 +265,8 @@ exports.getRecoveryProgress = async (req, res) => {
 };
 
 exports.updateWellness = async (req, res) => {
-  const patientId = req.headers['x-user-id'] || 'pat-123';
+  const patientId = req.headers['x-user-id'];
+  if (!patientId) return res.status(401).json({ success: false, message: 'Authentication required' });
   const { dietAdherence, exerciseProgress, sleepQuality, waterIntake } = req.body;
   const pool = getPool();
 
@@ -282,7 +289,8 @@ exports.updateWellness = async (req, res) => {
 };
 
 exports.getNotifications = async (req, res) => {
-  const userId = req.headers['x-user-id'] || 'pat-123';
+  const userId = req.headers['x-user-id'];
+  if (!userId) return res.json({ success: true, data: [] });
   const userRole = req.headers['x-user-role'] || 'patient';
   const pool = getPool();
 
@@ -322,7 +330,8 @@ exports.markNotificationRead = async (req, res) => {
 };
 
 exports.getDietPlan = async (req, res) => {
-  const patientId = req.headers['x-user-id'] || 'pat-123';
+  const patientId = req.headers['x-user-id'];
+  if (!patientId) return res.json({ success: true, data: null });
   const pool = getPool();
 
   try {
@@ -367,7 +376,8 @@ exports.getDietPlan = async (req, res) => {
 };
 
 exports.saveDietPlan = async (req, res) => {
-  const patientId = req.headers['x-user-id'] || 'pat-123';
+  const patientId = req.headers['x-user-id'];
+  if (!patientId) return res.status(401).json({ success: false, message: 'Authentication required' });
   const planData = req.body;
   const pool = getPool();
 
@@ -385,7 +395,8 @@ exports.saveDietPlan = async (req, res) => {
 };
 
 exports.getChatHistory = async (req, res) => {
-  const patientId = req.headers['x-user-id'] || 'pat-123';
+  const patientId = req.headers['x-user-id'];
+  if (!patientId) return res.json({ success: true, data: [] });
   const pool = getPool();
 
   try {
@@ -401,7 +412,8 @@ exports.getChatHistory = async (req, res) => {
 };
 
 exports.postChatMessage = async (req, res) => {
-  const patientId = req.headers['x-user-id'] || 'pat-123';
+  const patientId = req.headers['x-user-id'];
+  if (!patientId) return res.status(401).json({ success: false, message: 'Authentication required' });
   const { text } = req.body;
   const pool = getPool();
 
@@ -543,14 +555,17 @@ exports.getDoctorDashboard = async (req, res) => {
           totalPatients: doc.patientsTreated + uniquePatientsCount,
           experience: `${doc.experience} Years`,
           clinic: doc.clinicName || 'AyurVeda Connect Wellness Hub',
-          qualifications: doc.education || ['BAMS'],
+          qualifications: (doc.education && doc.education.length > 0) ? doc.education : [(doc.qualification || 'BAMS')],
+          education: (doc.education && doc.education.length > 0) ? doc.education : [(doc.qualification || 'BAMS')],
+          awards: (doc.awards && doc.awards.length > 0) ? doc.awards : ['AYUSH Registered Practitioner', 'Excellence in Ayurvedic Care'],
           languages: doc.languages || ['Hindi', 'English'],
           phone: doc.phone || '+91 98765 12345',
           email: doc.email,
           consultationFee: doc.consultationFee || 1000,
           joinedDate: '2026-01-01',
-          specialExpertise: doc.specialExpertise || [],
-          bio: doc.about || 'Senior Ayurvedic physician offering holistic treatment programs.'
+          specialExpertise: (doc.specialExpertise && doc.specialExpertise.length > 0) ? doc.specialExpertise : ['Nadi Pariksha (Pulse Diagnosis)', 'Panchakarma Detoxification', 'Dosha Balancing'],
+          bio: doc.about || 'Senior Ayurvedic physician offering holistic treatment programs.',
+          about: doc.about || 'Senior Ayurvedic physician offering holistic treatment programs.'
         },
         stats: {
           totalPatients: doc.patientsTreated + uniquePatientsCount,
@@ -605,22 +620,43 @@ exports.getDoctorDashboard = async (req, res) => {
 
 exports.updateDoctorProfile = async (req, res) => {
   const doctorId = req.params.id || 'dr-1';
-  const { specialization, qualification, experience, clinicName, city, phone, email, bio } = req.body;
+  const { specialization, qualification, experience, clinicName, city, phone, email, bio, about, education, awards, specialExpertise } = req.body;
   const pool = getPool();
 
   try {
+    const finalAbout = about || bio || null;
+    const finalEdu = education ? (typeof education === 'string' ? education : JSON.stringify(education)) : null;
+    const finalAwards = awards ? (typeof awards === 'string' ? awards : JSON.stringify(awards)) : null;
+    const finalExpertise = specialExpertise ? (typeof specialExpertise === 'string' ? specialExpertise : JSON.stringify(specialExpertise)) : null;
+
     await pool.query(
       `UPDATE doctors SET 
-         specialization = ?, 
-         qualification = ?, 
-         experience = ?, 
-         clinicName = ?, 
-         city = ?, 
-         phone = ?, 
-         email = ?, 
-         about = ? 
+         specialization = COALESCE(?, specialization), 
+         qualification = COALESCE(?, qualification), 
+         experience = COALESCE(?, experience), 
+         clinicName = COALESCE(?, clinicName), 
+         city = COALESCE(?, city), 
+         phone = COALESCE(?, phone), 
+         email = COALESCE(?, email), 
+         about = COALESCE(?, about),
+         education = COALESCE(?, education),
+         awards = COALESCE(?, awards),
+         specialExpertise = COALESCE(?, specialExpertise)
        WHERE id = ?`,
-      [specialization, qualification, parseInt(experience, 10) || 5, clinicName, city, phone, email, bio, doctorId]
+      [
+        specialization || null,
+        qualification || null,
+        experience ? parseInt(experience, 10) : null,
+        clinicName || null,
+        city || null,
+        phone || null,
+        email || null,
+        finalAbout,
+        finalEdu,
+        finalAwards,
+        finalExpertise,
+        doctorId
+      ]
     );
 
     res.json({ success: true, message: 'Doctor profile updated successfully' });
@@ -645,7 +681,8 @@ exports.updateAppointmentStatus = async (req, res) => {
 };
 
 exports.logProgressPoint = async (req, res) => {
-  const patientId = req.headers['x-user-id'] || 'pat-123';
+  const patientId = req.headers['x-user-id'];
+  if (!patientId) return res.status(401).json({ success: false, message: 'Authentication required' });
   const { chartType, name, progress, target } = req.body;
   const pool = getPool();
 
