@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, Quote, ShieldCheck } from 'lucide-react';
+import axios from 'axios';
 
 interface ClinicTestimonial {
   id: string;
   patientName: string;
-  condition: string;
+  conditionName?: string;
+  condition?: string;
   clinicName: string;
   recoveryResult: string;
   quote: string;
@@ -12,35 +14,21 @@ interface ClinicTestimonial {
 }
 
 export const SuccessStoryCard: React.FC = () => {
-  const clinicStories: ClinicTestimonial[] = [
-    {
-      id: 'c-story-1',
-      patientName: 'Devendra Kulkarni',
-      condition: 'Chronic Spine Arthritis',
-      clinicName: 'Kerala Ayurveda Zen Sanctuary',
-      recoveryResult: 'Pain-Free Mobility Restored in 21 Days',
-      quote: 'The inpatient stay at the Zen Sanctuary was healing. The warm Abhyanga and Kativasti poolings cleared my chronic spine swelling completely.',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&q=80'
-    },
-    {
-      id: 'c-story-2',
-      patientName: 'Malini Hegde',
-      condition: 'Severe Metabolic Syndrome & Weight',
-      clinicName: 'Atreya Ayurvedic Hospital',
-      recoveryResult: 'Reversed Fatty Liver & Shed 12kg',
-      quote: 'Virechana purging followed by strict Samsarjana dietary rehabilitation at Atreya Pune hospital corrected my sluggish liver fire.',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&q=80'
-    },
-    {
-      id: 'c-story-3',
-      patientName: 'Rajesh Malhotra',
-      condition: 'Cardiac Blockage & High BP',
-      clinicName: 'Madhavbaug Cardiac Care Clinic',
-      recoveryResult: 'Blood Pressure Regulated; Stent Avoided',
-      quote: 'Madhavbaug reversed my high blood pressure through non-invasive cardiac detox. The diet plans combined with breathing yoga work wonders.',
-      avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&q=80'
-    }
-  ];
+  const [clinicStories, setClinicStories] = useState<ClinicTestimonial[]>([]);
+
+  useEffect(() => {
+    const fetchStories = async () => {
+      try {
+        const res = await axios.get('http://localhost:5174/api/clinics/stories');
+        if (res.data && Array.isArray(res.data) && res.data.length > 0) {
+          setClinicStories(res.data);
+        }
+      } catch (err) {
+        console.error('Failed fetching clinic stories from SQL API:', err);
+      }
+    };
+    fetchStories();
+  }, []);
 
   return (
     <section className="bg-white border border-[#2E7D32]/5 p-6 md:p-8 rounded-3xl shadow-sm space-y-6">
@@ -70,7 +58,7 @@ export const SuccessStoryCard: React.FC = () => {
                   ))}
                 </div>
                 <span className="text-[8.5px] bg-primary/5 text-primary border border-primary/10 py-0.5 px-2 rounded-full uppercase font-bold tracking-wider">
-                  {s.condition}
+                  {s.condition || s.conditionName}
                 </span>
               </div>
 

@@ -1,0 +1,29 @@
+[
+  {
+    "id": "c-story-1",
+    "patientName": "Devendra Kulkarni",
+    "conditionName": "Chronic Spine Arthritis",
+    "clinicName": "Kerala Ayurveda Zen Sanctuary",
+    "recoveryResult": "Pain-Free Mobility Restored in 21 Days",
+    "quote": "The inpatient stay at the Zen Sanctuary was healing. The warm Abhyanga and Kativasti poolings cleared my chronic spine swelling completely.",
+    "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&q=80"
+  },
+  {
+    "id": "c-story-2",
+    "patientName": "Malini Hegde",
+    "conditionName": "Severe Metabolic Syndrome & Weight",
+    "clinicName": "Atreya Ayurvedic Hospital",
+    "recoveryResult": "Reversed Fatty Liver & Shed 12kg",
+    "quote": "Virechana purging followed by strict Samsarjana dietary rehabilitation at Atreya Pune hospital corrected my sluggish liver fire.",
+    "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&q=80"
+  },
+  {
+    "id": "c-story-3",
+    "patientName": "Rajesh Malhotra",
+    "conditionName": "Cardiac Blockage & High BP",
+    "clinicName": "Madhavbaug Cardiac Care Clinic",
+    "recoveryResult": "Blood Pressure Regulated; Stent Avoided",
+    "quote": "Madhavbaug reversed my high blood pressure through non-invasive cardiac detox. The diet plans combined with breathing yoga work wonders.",
+    "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&q=80"
+  }
+]

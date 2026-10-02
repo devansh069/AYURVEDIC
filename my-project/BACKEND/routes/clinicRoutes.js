@@ -8,13 +8,15 @@ router.get('/panchakarma-centers', clinicController.getPanchakarmaCenters);
 router.get('/featured-clinics', clinicController.getFeaturedClinics);
 router.get('/cities', clinicController.getCities);
 router.get('/services', clinicController.getServices);
+router.get('/clinics/stories', clinicController.getClinicStories);
+router.get('/clinic-stories', clinicController.getClinicStories);
+router.get('/testimonials', clinicController.getTestimonials);
 router.get('/clinics/:id', clinicController.getClinicById);
 router.get('/clinics/:id/doctors', clinicController.getClinicDoctors);
 router.get('/clinics/:id/services', clinicController.getClinicServices);
 router.get('/clinics/:id/reviews', clinicController.getClinicReviews);
 router.get('/clinics/:id/gallery', clinicController.getClinicGallery);
 router.get('/clinics/:id/packages', clinicController.getClinicPackages);
-router.get('/testimonials', clinicController.getTestimonials);
 router.put('/clinics/:id/location', clinicController.updateLocation);
 
 module.exports = router;

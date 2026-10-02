@@ -13,6 +13,7 @@ router.get('/diseases/filter', diseaseController.getDiseases);
 router.get('/diseases/category/:category', diseaseController.getDiseasesByCategory);
 router.get('/diseases/:slug', diseaseController.getDiseaseBySlug);
 router.get('/diseases', diseaseController.getDiseases);
+router.get('/symptoms/data', diseaseController.getSymptomCheckerData);
 
 router.post('/diseases', diseaseController.createDisease);
 router.put('/diseases/:id', diseaseController.updateDisease);

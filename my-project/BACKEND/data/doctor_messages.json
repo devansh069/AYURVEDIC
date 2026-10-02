@@ -1,0 +1,52 @@
+[
+  {
+    "id": "msg-001",
+    "doctorId": "doc-dir-1",
+    "patientName": "Priyanshi Sharma",
+    "patientPhoto": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=60&q=80",
+    "sender": "patient",
+    "message": "Doctor, my cycle has been more regular this month. Should I continue the Shatavari dose?",
+    "time": "10:15 AM",
+    "unread": false
+  },
+  {
+    "id": "msg-002",
+    "doctorId": "doc-dir-1",
+    "patientName": "Priyanshi Sharma",
+    "patientPhoto": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=60&q=80",
+    "sender": "doctor",
+    "message": "Wonderful progress! Yes, continue the Shatavari 500mg twice daily with warm milk. Add Ashoka churna 1 tsp at bedtime. See you on the scheduled session.",
+    "time": "10:28 AM",
+    "unread": false
+  },
+  {
+    "id": "msg-003",
+    "doctorId": "doc-dir-1",
+    "patientName": "Rahul Verma",
+    "patientPhoto": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&q=80",
+    "sender": "patient",
+    "message": "The back pain has reduced significantly after the second Basti session. Thank you!",
+    "time": "09:30 AM",
+    "unread": true
+  },
+  {
+    "id": "msg-004",
+    "doctorId": "doc-dir-1",
+    "patientName": "Amit Joshi",
+    "patientPhoto": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&q=80",
+    "sender": "patient",
+    "message": "Is it okay to do yoga in the morning before the Shirodhara session?",
+    "time": "07:00 AM",
+    "unread": false
+  },
+  {
+    "id": "msg-005",
+    "doctorId": "doc-dir-1",
+    "patientName": "Amit Joshi",
+    "patientPhoto": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&q=80",
+    "sender": "doctor",
+    "message": "Gentle yoga is fine, but avoid intense inversions. Prefer Shavasana and Nadi Shodhana pranayama on therapy days.",
+    "time": "08:15 AM",
+    "unread": false
+  }
+]

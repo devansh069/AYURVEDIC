@@ -222,6 +222,16 @@ const DoctorDashboardPage: React.FC = () => {
           if (dbReviews && dbReviews.length > 0) setReviews(dbReviews);
           if (dbNotifications && dbNotifications.length > 0) setNotifications(dbNotifications);
         }
+
+        // Fetch messages from SQL
+        try {
+          const msgRes = await axios.get(`http://localhost:5174/api/doctor/messages/${doctorId}`);
+          if (msgRes.data && msgRes.data.success && msgRes.data.data.length > 0) {
+            setConversations(msgRes.data.data);
+          }
+        } catch (msgErr) {
+          console.error('Error fetching doctor messages from SQL:', msgErr);
+        }
       } catch (err) {
         console.error('Error fetching doctor dashboard data from SQL:', err);
       } finally {
@@ -299,18 +309,31 @@ const DoctorDashboardPage: React.FC = () => {
     );
   }
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatInput.trim() || !activeConversation) return;
-    const newMsg = { sender: 'doctor', text: chatInput, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
+    const textToSend = chatInput;
+    const newMsg = { sender: 'doctor', text: textToSend, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
     setConversations(prev => prev.map(c =>
       c.id === activeConversation.id
         ? { ...c, messages: [...c.messages, newMsg], unread: false }
         : c
     ));
-    const updated = conversations.find(c => c.id === activeConversation.id);
-    if (updated) setActiveConversation({ ...updated, messages: [...updated.messages, newMsg] });
+    setActiveConversation((prev: any) => prev ? { ...prev, messages: [...prev.messages, newMsg] } : null);
     setChatInput('');
+
+    // Persist to MySQL database
+    try {
+      const doctorId = profile?.id || 'doc-dir-1';
+      await axios.post('http://localhost:5174/api/doctor/messages', {
+        doctorId,
+        patientName: activeConversation.patientName,
+        sender: 'doctor',
+        message: textToSend
+      });
+    } catch (err) {
+      console.error('Failed to persist doctor message to SQL:', err);
+    }
   };
 
   const dismissNotification = (id: string) => {

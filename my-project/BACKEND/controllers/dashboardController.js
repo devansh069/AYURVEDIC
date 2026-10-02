@@ -826,3 +826,55 @@ exports.logProgressPoint = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error saving progress log' });
   }
 };
+
+exports.getDoctorMessages = async (req, res) => {
+  const doctorId = req.params.doctorId || 'doc-dir-1';
+  const pool = getPool();
+  try {
+    const [rows] = await pool.query('SELECT * FROM doctor_messages WHERE doctorId = ? ORDER BY createdAt ASC', [doctorId]);
+    const patientMap = {};
+    rows.forEach(m => {
+      if (!patientMap[m.patientName]) {
+        patientMap[m.patientName] = {
+          id: `conv-${m.patientName.replace(/\s+/g, '-').toLowerCase()}`,
+          patientName: m.patientName,
+          photo: m.patientPhoto || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=60&q=80',
+          message: m.message,
+          time: m.time,
+          unread: !!m.unread,
+          messages: []
+        };
+      }
+      patientMap[m.patientName].message = m.message;
+      patientMap[m.patientName].time = m.time;
+      patientMap[m.patientName].messages.push({
+        sender: m.sender,
+        text: m.message,
+        time: m.time
+      });
+    });
+    res.json({ success: true, data: Object.values(patientMap) });
+  } catch (err) {
+    console.error('Error fetching doctor messages:', err);
+    res.status(500).json({ success: false, message: 'Server error loading messages' });
+  }
+};
+
+exports.postDoctorMessage = async (req, res) => {
+  const { doctorId, patientName, patientPhoto, sender, message } = req.body;
+  const pool = getPool();
+  try {
+    const id = `msg-${Date.now()}`;
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    await pool.query(
+      `INSERT INTO doctor_messages (id, doctorId, patientName, patientPhoto, sender, message, time, unread)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [id, doctorId || 'doc-dir-1', patientName || 'Priyanshi Sharma', patientPhoto || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=60&q=80', sender || 'doctor', message, time, 0]
+    );
+    res.status(201).json({ success: true, data: { id, doctorId, patientName, sender, message, time } });
+  } catch (err) {
+    console.error('Error saving doctor message:', err);
+    res.status(500).json({ success: false, message: 'Server error saving message' });
+  }
+};
+

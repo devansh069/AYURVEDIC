@@ -4,6 +4,7 @@ const router = express.Router();
 const recordController = require('../controllers/recordController');
 
 router.get('/records', recordController.getRecords);
+router.get('/patient/records', recordController.getRecords);
 router.get('/records/:id', recordController.getRecordById);
 router.get('/prescriptions', recordController.getPrescriptions);
 router.get('/reports', recordController.getReports);

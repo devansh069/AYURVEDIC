@@ -423,6 +423,45 @@ const createTables = async () => {
       )
     `);
 
+    // doctor_messages table
+    await conn.query(`
+      CREATE TABLE IF NOT EXISTS doctor_messages (
+        id VARCHAR(255) PRIMARY KEY,
+        doctorId VARCHAR(255) NOT NULL,
+        patientName VARCHAR(255) NOT NULL,
+        patientPhoto VARCHAR(500),
+        sender VARCHAR(50) NOT NULL,
+        message TEXT NOT NULL,
+        time VARCHAR(50) NOT NULL,
+        unread BOOLEAN DEFAULT TRUE,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_doc_msg (doctorId)
+      )
+    `);
+
+    // clinic_stories table
+    await conn.query(`
+      CREATE TABLE IF NOT EXISTS clinic_stories (
+        id VARCHAR(255) PRIMARY KEY,
+        patientName VARCHAR(255) NOT NULL,
+        conditionName VARCHAR(255) NOT NULL,
+        clinicName VARCHAR(255) NOT NULL,
+        recoveryResult VARCHAR(255) NOT NULL,
+        quote TEXT NOT NULL,
+        avatar VARCHAR(500)
+      )
+    `);
+
+    // symptom_checker_data table
+    await conn.query(`
+      CREATE TABLE IF NOT EXISTS symptom_checker_data (
+        id VARCHAR(100) PRIMARY KEY,
+        category VARCHAR(100) NOT NULL,
+        data JSON NOT NULL,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // Alter table schemas dynamically to add any missing columns in dev environment
     try {
       await conn.query("ALTER TABLE doctors ADD COLUMN email VARCHAR(255) UNIQUE");
@@ -718,6 +757,57 @@ const autoSeed = async () => {
         ('apt-106', 'doc-dir-1', 'Deepak Singh', 'deepak.singh@gmail.com', '+91 43210 98765', '2026-10-10', '11:00 AM', 'Online Video', 'Completed', 800)
       `);
       console.log("✅ Consultations & Appointments seeded into MySQL.");
+    }
+
+    // Seed doctor_messages
+    const [msgRows] = await conn.query("SELECT COUNT(*) as count FROM doctor_messages");
+    if (msgRows[0].count === 0) {
+      const msgPath = path.join(__dirname, "..", "data", "doctor_messages.json");
+      if (fs.existsSync(msgPath)) {
+        console.log("🌱 Seeding Doctor Messages into MySQL...");
+        const msgs = JSON.parse(fs.readFileSync(msgPath, "utf-8"));
+        for (const m of msgs) {
+          await conn.query(`
+            INSERT INTO doctor_messages (id, doctorId, patientName, patientPhoto, sender, message, time, unread)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          `, [m.id, m.doctorId, m.patientName, m.patientPhoto, m.sender, m.message, m.time, m.unread ? 1 : 0]);
+        }
+        console.log("✅ Doctor Messages seeded into MySQL.");
+      }
+    }
+
+    // Seed clinic_stories
+    const [storyRows] = await conn.query("SELECT COUNT(*) as count FROM clinic_stories");
+    if (storyRows[0].count === 0) {
+      const storyPath = path.join(__dirname, "..", "data", "clinic_stories.json");
+      if (fs.existsSync(storyPath)) {
+        console.log("🌱 Seeding Clinic Stories into MySQL...");
+        const stories = JSON.parse(fs.readFileSync(storyPath, "utf-8"));
+        for (const s of stories) {
+          await conn.query(`
+            INSERT INTO clinic_stories (id, patientName, conditionName, clinicName, recoveryResult, quote, avatar)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+          `, [s.id, s.patientName, s.conditionName, s.clinicName, s.recoveryResult, s.quote, s.avatar]);
+        }
+        console.log("✅ Clinic Stories seeded into MySQL.");
+      }
+    }
+
+    // Seed symptom_checker_data
+    const [sympRows] = await conn.query("SELECT COUNT(*) as count FROM symptom_checker_data");
+    if (sympRows[0].count === 0) {
+      const sympPath = path.join(__dirname, "..", "data", "symptom_checker.json");
+      if (fs.existsSync(sympPath)) {
+        console.log("🌱 Seeding Symptom Checker Data into MySQL...");
+        const sympData = JSON.parse(fs.readFileSync(sympPath, "utf-8"));
+        for (const key of Object.keys(sympData)) {
+          await conn.query(`
+            INSERT INTO symptom_checker_data (id, category, data)
+            VALUES (?, ?, ?)
+          `, [`symp-${key.toLowerCase()}`, key, JSON.stringify(sympData[key])]);
+        }
+        console.log("✅ Symptom Checker Data seeded into MySQL.");
+      }
     }
   } catch (error) {
     console.error("❌ MySQL Seeding Error:", error);

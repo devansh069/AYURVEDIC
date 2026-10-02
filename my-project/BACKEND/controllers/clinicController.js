@@ -379,3 +379,17 @@ exports.updateLocation = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getClinicStories = async (req, res, next) => {
+  try {
+    const pool = getPool();
+    if (!pool) {
+      return res.json(require('../data/clinic_stories.json'));
+    }
+    const [rows] = await pool.query("SELECT * FROM clinic_stories");
+    res.json(rows.length > 0 ? rows : require('../data/clinic_stories.json'));
+  } catch (err) {
+    next(err);
+  }
+};
+

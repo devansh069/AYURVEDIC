@@ -1,4 +1,5 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import {
@@ -486,6 +487,28 @@ const SymptomChecker: React.FC = () => {
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(null);
   const [scaleValue, setScaleValue] = useState(5);
+  const [symptomsData, setSymptomsData] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchSymptomData = async () => {
+      try {
+        const res = await axios.get('http://localhost:5174/api/symptoms/data');
+        if (res.data) {
+          setSymptomsData(res.data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch symptom checker data from SQL API:', e);
+      }
+    };
+    fetchSymptomData();
+  }, []);
+
+  const allSymptoms: Symptom[] = symptomsData?.MOCK_SYMPTOMS || MOCK_SYMPTOMS;
+  const allQuestions = symptomsData?.ASSESSMENT_QUESTIONS || ASSESSMENT_QUESTIONS;
+  const allResults: AnalysisResult[] = symptomsData?.MOCK_ANALYSIS_RESULTS || MOCK_ANALYSIS_RESULTS;
+  const allRemedies = symptomsData?.AYURVEDIC_REMEDIES || AYURVEDIC_REMEDIES;
+  const allTestimonials = symptomsData?.SYMPTOM_CHECKER_TESTIMONIALS || SYMPTOM_CHECKER_TESTIMONIALS;
+  const allFaqs = symptomsData?.SYMPTOM_CHECKER_FAQS || SYMPTOM_CHECKER_FAQS;
 
   const { register, watch } = useForm();
   const textAnswer = watch('textAnswer');
@@ -494,7 +517,7 @@ const SymptomChecker: React.FC = () => {
   const categories = ['All', 'Digestive', 'Respiratory', 'Skin', 'Mental/Emotional', 'Musculoskeletal', 'Sleep', 'Energy'];
 
   // Filtered symptoms
-  const filteredSymptoms = MOCK_SYMPTOMS.filter(s => {
+  const filteredSymptoms = allSymptoms.filter(s => {
     const matchCat = activeCategory === 'All' || s.category === activeCategory;
     const matchSearch = s.name.toLowerCase().includes(symptomSearch.toLowerCase());
     return matchCat && matchSearch;
@@ -521,7 +544,7 @@ const SymptomChecker: React.FC = () => {
   };
 
   const handleNextStep = () => {
-    if (currentStep < ASSESSMENT_QUESTIONS.length) {
+    if (currentStep < allQuestions.length) {
       setCurrentStep(s => s + 1);
     } else {
       runAnalysis();
@@ -537,9 +560,9 @@ const SymptomChecker: React.FC = () => {
     setTimeout(() => {
       // Determine result based on answers
       const dosha = answers['q4'];
-      let result = MOCK_ANALYSIS_RESULTS[0];
-      if (dosha === 'pitta') result = MOCK_ANALYSIS_RESULTS[1];
-      else if (dosha === 'kapha') result = MOCK_ANALYSIS_RESULTS[2];
+      let result = allResults[0];
+      if (dosha === 'pitta') result = allResults[1] || allResults[0];
+      else if (dosha === 'kapha') result = allResults[2] || allResults[0];
       setSelectedResult(result);
       setAnalysisLoading(false);
       setPhase('results');
@@ -565,15 +588,16 @@ const SymptomChecker: React.FC = () => {
     setScaleValue(5);
   };
 
-  const currentQuestion = ASSESSMENT_QUESTIONS[currentStep - 1];
+  const allDoshaProfiles = symptomsData?.DOSHA_PROFILES || DOSHA_PROFILES;
+  const currentQuestion = allQuestions[currentStep - 1] || allQuestions[0];
 
   // ─── RADAR CHART DATA ───────────────────────────────────────────────────────
-  const radarData = DOSHA_PROFILES.map(d => ({
+  const radarData = allDoshaProfiles.map((d: any) => ({
     dosha: d.dosha, value: d.percentage,
   }));
 
   // ─── DOSHA PIE DATA ─────────────────────────────────────────────────────────
-  const pieData = DOSHA_PROFILES.map(d => ({
+  const pieData = allDoshaProfiles.map((d: any) => ({
     name: d.dosha, value: d.percentage, color: d.color
   }));
 
@@ -919,7 +943,7 @@ const SymptomChecker: React.FC = () => {
                 </div>
 
                 <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 md:p-8">
-                  <AssessmentProgress step={currentStep} total={ASSESSMENT_QUESTIONS.length} />
+                  <AssessmentProgress step={currentStep} total={allQuestions.length} />
 
                   <AnimatePresence mode="wait">
                     <motion.div
@@ -1021,7 +1045,7 @@ const SymptomChecker: React.FC = () => {
                     >
                       ← Previous
                     </button>
-                    <span className="text-xs text-gray-400">{currentStep}/{ASSESSMENT_QUESTIONS.length}</span>
+                    <span className="text-xs text-gray-400">{currentStep}/{allQuestions.length}</span>
                     <motion.button
                       whileHover={{ scale: 1.04 }}
                       whileTap={{ scale: 0.97 }}
@@ -1383,7 +1407,7 @@ const SymptomChecker: React.FC = () => {
             variants={stagger}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
           >
-            {AYURVEDIC_REMEDIES.map((remedy, i) => (
+            {allRemedies.map((remedy, i) => (
               <RemedyCard key={remedy.id} remedy={remedy} index={i} />
             ))}
           </motion.div>
@@ -1414,7 +1438,7 @@ const SymptomChecker: React.FC = () => {
             variants={stagger}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
           >
-            {SYMPTOM_CHECKER_TESTIMONIALS.map((t, i) => (
+            {allTestimonials.map((t, i) => (
               <motion.div
                 key={t.id}
                 variants={fadeInUp}
@@ -1466,7 +1490,7 @@ const SymptomChecker: React.FC = () => {
             variants={stagger}
             className="space-y-3"
           >
-            {SYMPTOM_CHECKER_FAQS.map((faq, i) => (
+            {allFaqs.map((faq, i) => (
               <FAQItem key={faq.id} faq={faq} index={i} />
             ))}
           </motion.div>

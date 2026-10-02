@@ -278,3 +278,29 @@ exports.deleteDisease = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getSymptomCheckerData = async (req, res, next) => {
+  try {
+    const { getPool } = require('../config/db');
+    const pool = getPool();
+    if (!pool) {
+      return res.json(require('../data/symptom_checker.json'));
+    }
+    const [rows] = await pool.query("SELECT * FROM symptom_checker_data");
+    if (rows && rows.length > 0) {
+      const result = {};
+      rows.forEach(r => {
+        try {
+          result[r.category] = typeof r.data === 'string' ? JSON.parse(r.data) : r.data;
+        } catch (e) {
+          result[r.category] = r.data;
+        }
+      });
+      return res.json(result);
+    }
+    res.json(require('../data/symptom_checker.json'));
+  } catch (err) {
+    next(err);
+  }
+};
+

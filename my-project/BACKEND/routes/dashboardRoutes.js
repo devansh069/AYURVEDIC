@@ -23,5 +23,7 @@ router.post('/patient/medical-records', dashboardController.uploadMedicalRecord)
 router.get('/doctor/dashboard/:id', dashboardController.getDoctorDashboard);
 router.put('/doctor/profile/:id', dashboardController.updateDoctorProfile);
 router.post('/doctor/appointments/:id/status', dashboardController.updateAppointmentStatus);
+router.get('/doctor/messages/:doctorId', dashboardController.getDoctorMessages);
+router.post('/doctor/messages', dashboardController.postDoctorMessage);
 
 module.exports = router;
