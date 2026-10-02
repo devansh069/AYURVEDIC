@@ -631,9 +631,94 @@ const autoSeed = async () => {
       }
     }
 
-    // Dummy patient and doctor auto-seeding removed. Real accounts register dynamically.
+    // Seed patients
+    const [patientRows] = await conn.query("SELECT COUNT(*) as count FROM patients");
+    if (patientRows[0].count === 0) {
+      console.log("🌱 Seeding Baseline Patient into MySQL...");
+      await conn.query(`
+        INSERT INTO patients (
+          id, name, email, phone, age, gender, profilePhoto, city, doshaType, healthGoals, password, joinedDate
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `, [
+        'pat-1', 'Priyanshi Sharma', 'priyanshi@ayurvedaconnect.com', '+91 98765 43210', 28, 'Female',
+        'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&q=80', 'New Delhi', 'Pitta-Kapha',
+        JSON.stringify(['PCOS Management', 'Stress Reduction', 'Improved Digestion']),
+        'Gandhi@2005', '2026-01-15'
+      ]);
 
+      await conn.query(`
+        INSERT INTO patient_wellness (patientId, dietAdherence, exerciseProgress, sleepQuality, waterIntake)
+        VALUES (?, ?, ?, ?, ?)
+      `, ['pat-1', 85, 90, 80, 75]);
 
+      await conn.query(`
+        INSERT INTO patient_health_goals (id, patientId, title, progress, target) VALUES
+        ('goal-1', 'pat-1', 'Daily Herbal Decoction (Kadha)', 80, 'Every morning before breakfast'),
+        ('goal-2', 'pat-1', 'Pranayama & Meditation', 65, '20 mins daily (Sheetali & Anulom Vilom)'),
+        ('goal-3', 'pat-1', 'Diet Adherence (Pathya)', 90, 'No cold dairy, refined sugar or fried foods')
+      `);
+
+      await conn.query(`
+        INSERT INTO patient_medical_records (id, patientId, title, type, date, doctorName, fileSize, fileUrl) VALUES
+        ('rec-1', 'pat-1', 'Panchakarma Detox Protocol Summary', 'Clinical Report', '2026-05-10', 'Dr. Aditya Vardhan Sharma', '2.4 MB', '#'),
+        ('rec-2', 'pat-1', 'Nadi Pariksha & Dosha Balance Assessment', 'Diagnostic', '2026-04-18', 'Dr. Sandeep Kulkarni', '1.8 MB', '#'),
+        ('rec-3', 'pat-1', 'Complete Hormone & Thyroid Panel', 'Lab Test', '2026-03-25', 'Dr. Lakshmi S. Nair', '3.1 MB', '#')
+      `);
+
+      await conn.query(`
+        INSERT INTO patient_recovery_tracker (patientId, conditionName, progress, startDate, expectedCompletion, weeklyMetrics, monthlyMetrics)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `, [
+        'pat-1', 'PCOS & Metabolic Restoration', 74, '2026-03-01', '2026-07-01',
+        JSON.stringify([
+          { name: 'Wk 1', progress: 15, target: 20 },
+          { name: 'Wk 2', progress: 30, target: 35 },
+          { name: 'Wk 3', progress: 48, target: 50 },
+          { name: 'Wk 4', progress: 60, target: 65 },
+          { name: 'Wk 5', progress: 68, target: 75 },
+          { name: 'Wk 6', progress: 74, target: 80 }
+        ]),
+        JSON.stringify([
+          { name: 'Mar', progress: 30, target: 40 },
+          { name: 'Apr', progress: 55, target: 60 },
+          { name: 'May', progress: 74, target: 80 }
+        ])
+      ]);
+
+      console.log("✅ Baseline Patient and records seeded into MySQL.");
+    }
+
+    // Seed doctor_consultations and appointments
+    const [consultationRows] = await conn.query("SELECT COUNT(*) as count FROM doctor_consultations");
+    if (consultationRows[0].count === 0) {
+      console.log("🌱 Seeding Consultations into MySQL...");
+      await conn.query(`
+        INSERT INTO doctor_consultations (
+          id, doctorId, doctorName, patientName, patientEmail, patientPhone,
+          appointmentDate, appointmentTime, consultationType, consultationFee,
+          paymentMethod, paymentStatus, paymentTxnId, doctorRevenue, platformRevenue
+        ) VALUES 
+        ('ap-101', 'doc-dir-1', 'Dr. Aditya Vardhan Sharma', 'Priyanshi Sharma', 'priyanshi@ayurvedaconnect.com', '+91 98765 43210', '2026-10-05', '09:00 AM', 'Online Video', 800, 'Paytm', 'Paid', 'TXN-PAYTM-101', 680.00, 120.00),
+        ('ap-102', 'doc-dir-1', 'Dr. Aditya Vardhan Sharma', 'Rahul Verma', 'rahul.verma@gmail.com', '+91 87654 32109', '2026-10-06', '10:30 AM', 'In-Clinic', 800, 'Paytm', 'Paid', 'TXN-PAYTM-102', 680.00, 120.00),
+        ('ap-103', 'doc-dir-1', 'Dr. Aditya Vardhan Sharma', 'Sunita Reddy', 'sunita.reddy@gmail.com', '+91 76543 21098', '2026-10-07', '12:00 PM', 'In-Clinic', 800, 'Paytm', 'Pending', 'TXN-PAYTM-103', 680.00, 120.00),
+        ('ap-104', 'doc-dir-1', 'Dr. Aditya Vardhan Sharma', 'Amit Joshi', 'amit.joshi@gmail.com', '+91 65432 10987', '2026-10-08', '02:00 PM', 'Online Video', 800, 'Paytm', 'Paid', 'TXN-PAYTM-104', 680.00, 120.00),
+        ('ap-105', 'doc-dir-1', 'Dr. Aditya Vardhan Sharma', 'Meera Pillai', 'meera.pillai@gmail.com', '+91 54321 09876', '2026-10-09', '09:30 AM', 'In-Clinic', 800, 'Paytm', 'Pending', 'TXN-PAYTM-105', 680.00, 120.00),
+        ('ap-106', 'doc-dir-1', 'Dr. Aditya Vardhan Sharma', 'Deepak Singh', 'deepak.singh@gmail.com', '+91 43210 98765', '2026-10-10', '11:00 AM', 'Online Video', 800, 'Paytm', 'Completed', 'TXN-PAYTM-106', 680.00, 120.00)
+      `);
+
+      await conn.query(`
+        INSERT INTO doctor_appointments (
+          id, doctorId, patientName, patientEmail, patientPhone, appointmentDate, appointmentTime, consultationType, status, consultationFee
+        ) VALUES
+        ('apt-101', 'doc-dir-1', 'Priyanshi Sharma', 'priyanshi@ayurvedaconnect.com', '+91 98765 43210', '2026-10-05', '09:00 AM', 'Online Video', 'Confirmed', 800),
+        ('apt-102', 'doc-dir-1', 'Rahul Verma', 'rahul.verma@gmail.com', '+91 87654 32109', '2026-10-06', '10:30 AM', 'In-Clinic', 'Confirmed', 800),
+        ('apt-103', 'doc-dir-1', 'Sunita Reddy', 'sunita.reddy@gmail.com', '+91 76543 21098', '2026-10-07', '12:00 PM', 'In-Clinic', 'Pending', 800),
+        ('apt-104', 'doc-dir-1', 'Amit Joshi', 'amit.joshi@gmail.com', '+91 65432 10987', '2026-10-08', '02:00 PM', 'Online Video', 'Confirmed', 800),
+        ('apt-105', 'doc-dir-1', 'Meera Pillai', 'meera.pillai@gmail.com', '+91 54321 09876', '2026-10-09', '09:30 AM', 'In-Clinic', 'Pending', 800),
+        ('apt-106', 'doc-dir-1', 'Deepak Singh', 'deepak.singh@gmail.com', '+91 43210 98765', '2026-10-10', '11:00 AM', 'Online Video', 'Completed', 800)
+      `);
+      console.log("✅ Consultations & Appointments seeded into MySQL.");
+    }
   } catch (error) {
     console.error("❌ MySQL Seeding Error:", error);
   } finally {

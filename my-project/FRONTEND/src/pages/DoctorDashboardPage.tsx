@@ -191,6 +191,7 @@ const DoctorDashboardPage: React.FC = () => {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [patients, setPatients] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>(MOCK_REVIEWS);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -208,20 +209,21 @@ const DoctorDashboardPage: React.FC = () => {
           } catch (e) {}
         }
         if (!doctorId) {
-          setLoading(false);
-          return;
+          doctorId = 'doc-dir-1'; // Default doctor from MySQL
         }
         const response = await axios.get(`http://localhost:5174/api/doctor/dashboard/${doctorId}`);
         if (response.data && response.data.success) {
-          const { profile: dbProfile, stats: dbStats, appointments: dbApts, patients: dbPats, analytics: dbAnalytics } = response.data.data;
+          const { profile: dbProfile, stats: dbStats, appointments: dbApts, patients: dbPats, analytics: dbAnalytics, reviews: dbReviews, notifications: dbNotifications } = response.data.data;
           setProfile(dbProfile);
           setStats(dbStats);
-          setAppointments(dbApts);
-          setPatients(dbPats);
-          setAnalytics(dbAnalytics);
+          if (dbApts && dbApts.length > 0) setAppointments(dbApts);
+          if (dbPats && dbPats.length > 0) setPatients(dbPats);
+          if (dbAnalytics && dbAnalytics.length > 0) setAnalytics(dbAnalytics);
+          if (dbReviews && dbReviews.length > 0) setReviews(dbReviews);
+          if (dbNotifications && dbNotifications.length > 0) setNotifications(dbNotifications);
         }
       } catch (err) {
-        console.error('Error fetching doctor dashboard data:', err);
+        console.error('Error fetching doctor dashboard data from SQL:', err);
       } finally {
         setLoading(false);
       }
@@ -1204,7 +1206,7 @@ const DoctorDashboardPage: React.FC = () => {
                 </div>
               </div>
               <div className="space-y-4">
-                {MOCK_REVIEWS.map(r => (
+                {reviews.map(r => (
                   <div key={r.id} className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
                     <div className="flex items-start gap-4">
                       <img src={r.photo} alt="" className="w-11 h-11 rounded-xl object-cover shrink-0 border border-gray-100" />

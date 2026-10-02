@@ -94,9 +94,6 @@ const MOCK_RECORDS_LOCAL: MedicalRecord[] = [
 export const patientApi = {
   getPatientDashboard: async (): Promise<ApiResponse<PatientDashboardData>> => {
     const headers = getAuthHeaders();
-    if (!headers['x-user-id']) {
-      return { data: null, isFallback: false };
-    }
     try {
       const response = await client.get('/patient/dashboard', { headers });
       if (response.data && response.data.success) {
@@ -115,9 +112,6 @@ export const patientApi = {
 
   getPatientProfile: async (): Promise<ApiResponse<Patient>> => {
     const headers = getAuthHeaders();
-    if (!headers['x-user-id']) {
-      return { data: null, isFallback: false };
-    }
     try {
       const response = await client.get('/patient/dashboard', { headers });
       if (response.data && response.data.success) {

@@ -1,26 +1,31 @@
 // BACKEND/controllers/recordController.js
-const { 
-  MOCK_DOCUMENTS, 
-  MOCK_PRESCRIPTIONS, 
-  MOCK_LAB_REPORTS, 
-  MOCK_TREATMENT_HISTORY, 
-  MOCK_ACTIVITIES, 
-  MOCK_INSIGHTS 
-} = require('../models/recordModel');
+// Direct MySQL implementation for Patient Medical Records
+const { getPool } = require('../config/db');
 
-exports.getRecords = (req, res, next) => {
+exports.getRecords = async (req, res, next) => {
   try {
-    res.json(MOCK_DOCUMENTS);
+    const pool = getPool();
+    if (!pool) return res.status(500).json({ error: "Database offline" });
+
+    const patientId = req.headers['x-user-id'] || 'pat-1';
+    const [rows] = await pool.query(
+      "SELECT * FROM patient_medical_records WHERE patientId = ? ORDER BY date DESC",
+      [patientId]
+    );
+    res.json(rows);
   } catch (err) {
     next(err);
   }
 };
 
-exports.getRecordById = (req, res, next) => {
+exports.getRecordById = async (req, res, next) => {
   try {
-    const doc = MOCK_DOCUMENTS.find(d => d.id === req.params.id);
-    if (doc) {
-      res.json(doc);
+    const pool = getPool();
+    if (!pool) return res.status(500).json({ error: "Database offline" });
+
+    const [rows] = await pool.query("SELECT * FROM patient_medical_records WHERE id = ?", [req.params.id]);
+    if (rows.length > 0) {
+      res.json(rows[0]);
     } else {
       res.status(404).json({ error: "Record not found" });
     }
@@ -29,110 +34,122 @@ exports.getRecordById = (req, res, next) => {
   }
 };
 
-exports.getPrescriptions = (req, res, next) => {
+exports.getPrescriptions = async (req, res, next) => {
   try {
-    res.json(MOCK_PRESCRIPTIONS);
+    const pool = getPool();
+    if (!pool) return res.status(500).json({ error: "Database offline" });
+
+    const patientId = req.headers['x-user-id'] || 'pat-1';
+    const [rows] = await pool.query(
+      "SELECT * FROM patient_medical_records WHERE patientId = ? AND type LIKE '%Prescription%' ORDER BY date DESC",
+      [patientId]
+    );
+    res.json(rows);
   } catch (err) {
     next(err);
   }
 };
 
-exports.getReports = (req, res, next) => {
+exports.getReports = async (req, res, next) => {
   try {
-    res.json(MOCK_LAB_REPORTS);
+    const pool = getPool();
+    if (!pool) return res.status(500).json({ error: "Database offline" });
+
+    const patientId = req.headers['x-user-id'] || 'pat-1';
+    const [rows] = await pool.query(
+      "SELECT * FROM patient_medical_records WHERE patientId = ? AND (type LIKE '%Report%' OR type LIKE '%Lab%') ORDER BY date DESC",
+      [patientId]
+    );
+    res.json(rows);
   } catch (err) {
     next(err);
   }
 };
 
-exports.getLabTests = (req, res, next) => {
+exports.getLabTests = async (req, res, next) => {
   try {
-    res.json(MOCK_LAB_REPORTS);
+    const pool = getPool();
+    if (!pool) return res.status(500).json({ error: "Database offline" });
+
+    const patientId = req.headers['x-user-id'] || 'pat-1';
+    const [rows] = await pool.query(
+      "SELECT * FROM patient_medical_records WHERE patientId = ? AND type LIKE '%Lab%' ORDER BY date DESC",
+      [patientId]
+    );
+    res.json(rows);
   } catch (err) {
     next(err);
   }
 };
 
-exports.getTreatmentHistory = (req, res, next) => {
+exports.getTreatmentHistory = async (req, res, next) => {
   try {
-    res.json(MOCK_TREATMENT_HISTORY);
+    const pool = getPool();
+    if (!pool) return res.status(500).json({ error: "Database offline" });
+
+    const patientId = req.headers['x-user-id'] || 'pat-1';
+    const [rows] = await pool.query(
+      "SELECT * FROM doctor_consultations WHERE patientId = ? OR patientEmail = (SELECT email FROM patients WHERE id = ?) ORDER BY appointmentDate DESC",
+      [patientId, patientId]
+    );
+    res.json(rows);
   } catch (err) {
     next(err);
   }
 };
 
-exports.getActivities = (req, res, next) => {
+exports.getActivities = async (req, res, next) => {
   try {
-    res.json(MOCK_ACTIVITIES);
+    const pool = getPool();
+    if (!pool) return res.status(500).json({ error: "Database offline" });
+
+    const [rows] = await pool.query(
+      "SELECT id, title, type, date as timestamp, 'Completed' as details FROM patient_medical_records ORDER BY date DESC LIMIT 5"
+    );
+    res.json(rows);
   } catch (err) {
     next(err);
   }
 };
 
-exports.getInsights = (req, res, next) => {
+exports.getInsights = (req, res) => {
+  res.json({
+    summary: "Your Ayurvedic medical records indicate positive systemic responses to Panchakarma therapy.",
+    vitalMetrics: { adherenceScore: 88, overallImprovement: "74%" }
+  });
+};
+
+exports.uploadRecord = async (req, res, next) => {
   try {
-    res.json(MOCK_INSIGHTS);
+    const pool = getPool();
+    if (!pool) return res.status(500).json({ error: "Database offline" });
+
+    const patientId = req.headers['x-user-id'] || 'pat-1';
+    const { title, category, doctorName, date, fileSize } = req.body;
+    const newRecordId = `rec-${Date.now()}`;
+    const recordDate = date || new Date().toISOString().split('T')[0];
+
+    await pool.query(
+      `INSERT INTO patient_medical_records (id, patientId, title, type, date, doctorName, fileSize, fileUrl)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [newRecordId, patientId, title || "Uploaded Record", category || "Clinical Report", recordDate, doctorName || "Consulting Vaidya", fileSize || "1.5 MB", "#"]
+    );
+
+    const [rows] = await pool.query("SELECT * FROM patient_medical_records WHERE id = ?", [newRecordId]);
+    res.status(201).json({ success: true, data: rows[0] });
   } catch (err) {
     next(err);
   }
 };
 
-exports.uploadRecord = (req, res, next) => {
+exports.deleteRecord = async (req, res, next) => {
   try {
-    const { title, category, doctorName, clinicName, date, description, fileType, fileSize } = req.body;
-    const newRecord = {
-      id: `rec-${Date.now()}`,
-      title: title || "New Ayurvedic Document",
-      category: category || "Report",
-      type: category === "Prescription" ? "Prescription" : category === "Report" ? "Report" : "Document",
-      date: date || new Date().toISOString().split('T')[0],
-      doctorName: doctorName || "Consulting Vaidya",
-      clinicName: clinicName || "AyurVeda Clinic Center",
-      fileType: fileType || "PDF",
-      fileSize: fileSize || "1.5 MB",
-      description: description || "No description provided.",
-      status: "Completed",
-      fileUrl: "#"
-    };
-    MOCK_DOCUMENTS.unshift(newRecord);
-    
-    // Log activity
-    const newActivity = {
-      id: `act-${Date.now()}`,
-      title: "Document Uploaded",
-      type: "Upload",
-      timestamp: "Just Now",
-      details: `Uploaded ${newRecord.title} (${newRecord.fileType}).`
-    };
-    MOCK_ACTIVITIES.unshift(newActivity);
+    const pool = getPool();
+    if (!pool) return res.status(500).json({ error: "Database offline" });
 
-    res.status(201).json({ success: true, data: newRecord });
-  } catch (err) {
-    next(err);
-  }
-};
-
-exports.deleteRecord = (req, res, next) => {
-  try {
     const { id } = req.params;
-    const idx = MOCK_DOCUMENTS.findIndex(d => d.id === id);
-    if (idx !== -1) {
-      const deleted = MOCK_DOCUMENTS.splice(idx, 1)[0];
-      
-      // Log activity
-      const newActivity = {
-        id: `act-${Date.now()}`,
-        title: "Document Deleted",
-        type: "Download",
-        timestamp: "Just Now",
-        details: `Deleted document: ${deleted.title}.`
-      };
-      MOCK_ACTIVITIES.unshift(newActivity);
-
-      res.json({ success: true, data: deleted });
-    } else {
-      res.status(404).json({ error: "Record not found" });
-    }
+    await pool.query("DELETE FROM patient_medical_records WHERE id = ?", [id]);
+    res.json({ success: true, message: "Record deleted successfully from database" });
   } catch (err) {
     next(err);
   }

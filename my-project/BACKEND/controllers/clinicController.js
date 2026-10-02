@@ -1,7 +1,6 @@
 // BACKEND/controllers/clinicController.js
 const { getPool } = require('../config/db');
 const { MOCK_CLINICS, MOCK_TESTIMONIALS } = require('../models/clinicModel');
-const { MOCK_DOCTORS } = require('../models/doctorModel');
 
 const parseClinicJsonFields = (clinic) => {
   if (!clinic) return clinic;
